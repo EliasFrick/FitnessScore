@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Switch } from 'react-native';
 import { Card, List, Divider, Button, Dialog, Portal, RadioButton } from 'react-native-paper';
 import { useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -12,6 +13,7 @@ export default function SettingsScreen() {
   const { themeMode, setThemeMode } = useTheme();
   const [themeDialogVisible, setThemeDialogVisible] = useState(false);
   const backgroundColor = useThemeColor({}, 'background');
+  const insets = useSafeAreaInsets();
 
   const getThemeDescription = () => {
     switch (themeMode) {
@@ -24,7 +26,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor }]}>
-      <ThemedView style={styles.content}>
+      <ThemedView style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 20 }]}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Settings</ThemedText>
         </ThemedView>
@@ -40,15 +42,6 @@ export default function SettingsScreen() {
               right={() => <Switch value={true} onValueChange={() => {}} />}
             />
             
-            <Divider style={styles.divider} />
-            
-            <List.Item
-              title="Data Sources"
-              description="Manage connected devices and apps"
-              left={() => <IconSymbol name="link" size={24} color="#4ECDC4" />}
-              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
-              onPress={() => {}}
-            />
           </Card.Content>
         </Card>
 
@@ -63,14 +56,6 @@ export default function SettingsScreen() {
               right={() => <Switch value={false} onValueChange={() => {}} />}
             />
             
-            <Divider style={styles.divider} />
-            
-            <List.Item
-              title="Goal Achievements"
-              description="Celebrate when you reach fitness milestones"
-              left={() => <IconSymbol name="trophy.fill" size={24} color="#FF9500" />}
-              right={() => <Switch value={true} onValueChange={() => {}} />}
-            />
           </Card.Content>
         </Card>
 
@@ -86,38 +71,9 @@ export default function SettingsScreen() {
               onPress={() => setThemeDialogVisible(true)}
             />
             
-            <Divider style={styles.divider} />
-            
-            <List.Item
-              title="Units"
-              description="Metric (kg, cm, km)"
-              left={() => <IconSymbol name="ruler" size={24} color="#3498DB" />}
-              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
-              onPress={() => {}}
-            />
           </Card.Content>
         </Card>
 
-        <Card style={styles.settingsCard}>
-          <Card.Content>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>About</ThemedText>
-            
-            <List.Item
-              title="Privacy Policy"
-              left={() => <IconSymbol name="lock.fill" size={24} color="#95A5A6" />}
-              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
-              onPress={() => {}}
-            />
-            
-            <Divider style={styles.divider} />
-            
-            <List.Item
-              title="Version"
-              description="1.0.0"
-              left={() => <IconSymbol name="info.circle.fill" size={24} color="#95A5A6" />}
-            />
-          </Card.Content>
-        </Card>
       </ThemedView>
 
       <Portal>

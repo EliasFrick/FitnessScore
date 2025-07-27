@@ -4,7 +4,7 @@
     "slug": "VitalityScore",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "vitalityscore",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -12,20 +12,23 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSHealthShareUsageDescription": "This app needs access to your health data to calculate your vitality score and provide personalized fitness insights.",
-        "NSHealthUpdateUsageDescription": "This app may update your health data to sync fitness information."
-      }
+        "NSHealthUpdateUsageDescription": "This app may update your health data to sync fitness information.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.elias187.VitalityScore"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/app-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.elias187.VitalityScore"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/app-icon.png"
     },
     "plugins": [
       "react-native-health",
@@ -42,6 +45,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "819f71b5-6e72-4521-ad9e-920e970d7b3c"
+      }
     }
   }
 }

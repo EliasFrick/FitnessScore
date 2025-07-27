@@ -1,138 +1,185 @@
-import { ScrollView, StyleSheet, SafeAreaView, View } from 'react-native';
-import { Text, Card, Chip, ProgressBar } from 'react-native-paper';
+import {
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { Card, Chip, ProgressBar, Text, useTheme } from "react-native-paper";
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { FitnessRings } from '@/components/FitnessRings';
-import { calculateFitnessScore, getMockHealthMetrics } from '@/utils/fitnessCalculator';
+import { FitnessRings } from "@/components/FitnessRings";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { useHealthData } from "@/hooks/useHealthData";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { calculateFitnessScore } from "@/utils/fitnessCalculator";
 
 export default function OverviewScreen() {
-  const healthMetrics = getMockHealthMetrics();
+  const { healthMetrics, isLoading, error, isHealthKitAvailable, refreshData } =
+    useHealthData();
   const fitnessResult = calculateFitnessScore(healthMetrics);
+  const backgroundColor = useThemeColor({}, "background");
+  const theme = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+      <ScrollView
+        style={[styles.container, { backgroundColor }]}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refreshData} />
+        }
+      >
         <ThemedView style={styles.content}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">VitalityScore Overview</ThemedText>
-        </ThemedView>
-      
-      <ThemedView style={styles.fitnessContainer}>
-        <Card style={styles.fitnessCard}>
-          <Card.Content style={styles.cardContent}>
-            <FitnessRings
-              fitnessScore={fitnessResult.totalScore}
-              regenerationScore={fitnessResult.recoveryPoints}
-              overallLevel={fitnessResult.totalScore}
-              size={140}
-            />
-            <ThemedView style={styles.fitnessInfo}>
-              <Text variant="headlineSmall" style={styles.fitnessLevel}>
-                {fitnessResult.fitnessLevel}
+          <ThemedView style={styles.titleContainer}>
+            <ThemedText type="title">VitalityScore Overview</ThemedText>
+            {!isHealthKitAvailable && (
+              <Text variant="bodySmall" style={styles.statusText}>
+                📱 Apple Health not available on this platform
               </Text>
-              <Text variant="bodyMedium" style={styles.scoreText}>
-                Gesamt-Score: {fitnessResult.totalScore}/100
+            )}
+            {isHealthKitAvailable && !error && (
+              <Text variant="bodySmall" style={styles.statusText}>
+                📊 Connected to Apple Health
               </Text>
-              <Text variant="bodySmall" style={styles.detailText}>
-                Herz-Kreislauf: {fitnessResult.cardiovascularPoints}/30
+            )}
+            {error && (
+              <Text
+                variant="bodySmall"
+                style={[styles.statusText, styles.errorText]}
+              >
+                ⚠️ {error}
               </Text>
-              <Text variant="bodySmall" style={styles.detailText}>
-                Regeneration: {fitnessResult.recoveryPoints}/35
-              </Text>
-              <Text variant="bodySmall" style={styles.detailText}>
-                Aktivität: {fitnessResult.activityPoints}/30
-              </Text>
-            </ThemedView>
-          </Card.Content>
-        </Card>
-      </ThemedView>
+            )}
+          </ThemedView>
 
-        {/* Metrics Overview Cards */}
-        <ThemedView style={styles.metricsContainer}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>Gesundheits-Übersicht</ThemedText>
-          
-          <View style={styles.metricsGrid}>
-            <Card style={styles.metricCard}>
-              <Card.Content style={styles.metricContent}>
-                <Text variant="labelMedium" style={styles.metricLabel}>Herz-Kreislauf</Text>
-                <Text variant="headlineSmall" style={styles.metricValue}>
-                  {fitnessResult.cardiovascularPoints}/30
-                </Text>
-                <ProgressBar 
-                  progress={fitnessResult.cardiovascularPoints / 30} 
-                  style={styles.progressBar}
+          <ThemedView style={styles.fitnessContainer}>
+            <Card style={styles.fitnessCard}>
+              <Card.Content style={styles.cardContent}>
+                <FitnessRings
+                  fitnessScore={fitnessResult.totalScore}
+                  regenerationScore={fitnessResult.recoveryPoints}
+                  overallLevel={fitnessResult.totalScore}
+                  size={140}
                 />
+                <View style={styles.fitnessInfo}>
+                  <Text variant="headlineSmall" style={styles.fitnessLevel}>
+                    {fitnessResult.fitnessLevel}
+                  </Text>
+                  <Text variant="bodyMedium" style={styles.scoreText}>
+                    Gesamt-Score: {fitnessResult.totalScore}/100
+                  </Text>
+                  <Text variant="bodySmall" style={styles.detailText}>
+                    Herz-Kreislauf: {fitnessResult.cardiovascularPoints}/30
+                  </Text>
+                  <Text variant="bodySmall" style={styles.detailText}>
+                    Regeneration: {fitnessResult.recoveryPoints}/35
+                  </Text>
+                  <Text variant="bodySmall" style={styles.detailText}>
+                    Aktivität: {fitnessResult.activityPoints}/30
+                  </Text>
+                </View>
               </Card.Content>
             </Card>
-            
-            <Card style={styles.metricCard}>
-              <Card.Content style={styles.metricContent}>
-                <Text variant="labelMedium" style={styles.metricLabel}>Regeneration</Text>
-                <Text variant="headlineSmall" style={styles.metricValue}>
-                  {fitnessResult.recoveryPoints}/35
-                </Text>
-                <ProgressBar 
-                  progress={fitnessResult.recoveryPoints / 35} 
-                  style={styles.progressBar}
-                />
-              </Card.Content>
-            </Card>
-          </View>
+          </ThemedView>
 
-          <View style={styles.metricsGrid}>
-            <Card style={styles.metricCard}>
-              <Card.Content style={styles.metricContent}>
-                <Text variant="labelMedium" style={styles.metricLabel}>Aktivität</Text>
-                <Text variant="headlineSmall" style={styles.metricValue}>
-                  {fitnessResult.activityPoints}/30
-                </Text>
-                <ProgressBar 
-                  progress={fitnessResult.activityPoints / 30} 
-                  style={styles.progressBar}
-                />
-              </Card.Content>
-            </Card>
-            
-            <Card style={styles.metricCard}>
-              <Card.Content style={styles.metricContent}>
-                <Text variant="labelMedium" style={styles.metricLabel}>Bonus</Text>
-                <Text variant="headlineSmall" style={styles.metricValue}>
-                  {fitnessResult.bonusPoints}/5
-                </Text>
-                <ProgressBar 
-                  progress={fitnessResult.bonusPoints / 5} 
-                  style={styles.progressBar}
-                />
-              </Card.Content>
-            </Card>
-          </View>
-        </ThemedView>
+          {/* Metrics Overview Cards */}
+          <ThemedView style={styles.metricsContainer}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              Gesundheits-Übersicht
+            </ThemedText>
 
-        {/* Insights Section */}
-        <ThemedView style={styles.insightsContainer}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>Deine Fitness-Insights</ThemedText>
-          
-          <Card style={styles.insightCard}>
-            <Card.Content>
-              <View style={styles.chipContainer}>
-                <Chip icon="heart" mode="outlined" style={styles.chip}>
-                  {fitnessResult.fitnessLevel}
-                </Chip>
-                <Chip icon="trending-up" mode="outlined" style={styles.chip}>
-                  {fitnessResult.totalScore} Punkte
-                </Chip>
-              </View>
-              
-              <ThemedText style={styles.insightText}>
-                Die äußere Ring zeigt deine Regeneration, der innere Ring deine Gesamtfitness. 
-                Arbeite kontinuierlich an allen Bereichen für optimale Ergebnisse.
-              </ThemedText>
-            </Card.Content>
-          </Card>
+            <View style={styles.metricsGrid}>
+              <Card style={styles.metricCard}>
+                <Card.Content style={styles.metricContent}>
+                  <Text variant="labelMedium" style={styles.metricLabel}>
+                    Herz-Kreislauf
+                  </Text>
+                  <Text variant="headlineSmall" style={styles.metricValue}>
+                    {fitnessResult.cardiovascularPoints}/30
+                  </Text>
+                  <ProgressBar
+                    progress={fitnessResult.cardiovascularPoints / 30}
+                    style={styles.progressBar}
+                  />
+                </Card.Content>
+              </Card>
+
+              <Card style={styles.metricCard}>
+                <Card.Content style={styles.metricContent}>
+                  <Text variant="labelMedium" style={styles.metricLabel}>
+                    Regeneration
+                  </Text>
+                  <Text variant="headlineSmall" style={styles.metricValue}>
+                    {fitnessResult.recoveryPoints}/35
+                  </Text>
+                  <ProgressBar
+                    progress={fitnessResult.recoveryPoints / 35}
+                    style={styles.progressBar}
+                  />
+                </Card.Content>
+              </Card>
+            </View>
+
+            <View style={styles.metricsGrid}>
+              <Card style={styles.metricCard}>
+                <Card.Content style={styles.metricContent}>
+                  <Text variant="labelMedium" style={styles.metricLabel}>
+                    Aktivität
+                  </Text>
+                  <Text variant="headlineSmall" style={styles.metricValue}>
+                    {fitnessResult.activityPoints}/30
+                  </Text>
+                  <ProgressBar
+                    progress={fitnessResult.activityPoints / 30}
+                    style={styles.progressBar}
+                  />
+                </Card.Content>
+              </Card>
+
+              <Card style={styles.metricCard}>
+                <Card.Content style={styles.metricContent}>
+                  <Text variant="labelMedium" style={styles.metricLabel}>
+                    Bonus
+                  </Text>
+                  <Text variant="headlineSmall" style={styles.metricValue}>
+                    {fitnessResult.bonusPoints}/5
+                  </Text>
+                  <ProgressBar
+                    progress={fitnessResult.bonusPoints / 5}
+                    style={styles.progressBar}
+                  />
+                </Card.Content>
+              </Card>
+            </View>
+          </ThemedView>
+
+          {/* Insights Section */}
+          <ThemedView style={styles.insightsContainer}>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>
+              Deine Fitness-Insights
+            </ThemedText>
+
+            <Card style={styles.insightCard}>
+              <Card.Content>
+                <View style={styles.chipContainer}>
+                  <Chip icon="heart" mode="outlined" style={styles.chip}>
+                    {fitnessResult.fitnessLevel}
+                  </Chip>
+                  <Chip icon="trending-up" mode="outlined" style={styles.chip}>
+                    {fitnessResult.totalScore} Punkte
+                  </Chip>
+                </View>
+
+                <ThemedText style={styles.insightText}>
+                  Die äußere Ring zeigt deine Regeneration, der innere Ring
+                  deine Gesamtfitness. Arbeite kontinuierlich an allen Bereichen
+                  für optimale Ergebnisse.
+                </ThemedText>
+              </Card.Content>
+            </Card>
+          </ThemedView>
         </ThemedView>
-        
-      </ThemedView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -144,7 +191,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
   },
   content: {
     padding: 20,
@@ -152,15 +198,23 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Extra space for tab bar
   },
   titleContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
+  },
+  statusText: {
+    marginTop: 8,
+    textAlign: "center",
+    opacity: 0.7,
+  },
+  errorText: {
+    color: "#FF6B6B",
   },
   fitnessContainer: {
     marginBottom: 24,
   },
   fitnessCard: {
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -169,8 +223,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 20,
     paddingVertical: 20,
   },
@@ -179,11 +233,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   fitnessLevel: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   scoreText: {
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   detailText: {
@@ -192,19 +246,19 @@ const styles = StyleSheet.create({
   // New styles for enhanced layout
   sectionTitle: {
     marginBottom: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   metricsContainer: {
     gap: 16,
   },
   metricsGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   metricCard: {
     flex: 1,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -215,20 +269,20 @@ const styles = StyleSheet.create({
   metricContent: {
     paddingVertical: 16,
     paddingHorizontal: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   metricLabel: {
     opacity: 0.7,
     marginBottom: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   metricValue: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   progressBar: {
-    width: '100%',
+    width: "100%",
     height: 6,
     borderRadius: 3,
   },
@@ -237,7 +291,7 @@ const styles = StyleSheet.create({
   },
   insightCard: {
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -246,13 +300,13 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   chipContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginBottom: 12,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   chip: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   insightText: {
     lineHeight: 20,

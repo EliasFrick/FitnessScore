@@ -5,14 +5,14 @@ export interface HealthMetrics {
   vo2Max: number;
   
   // Recovery & Regeneration
-  deepSleepPercentage: number; // 0-1 (0% to 100%)
-  remSleepPercentage: number; // 0-1 (0% to 100%)
-  sleepConsistencyStdDev: number; // Standard deviation in minutes
+  deepSleepPercentage: number; // 0-100 (percentage)
+  remSleepPercentage: number; // 0-100 (percentage)
+  sleepConsistency: number; // 0-100 (consistency score)
   
   // Activity & Training
-  weeklyTrainingMinutes: number;
-  workoutsOver30MinPerWeek: number;
-  averageDailySteps: number;
+  weeklyTrainingTime: number; // in minutes
+  trainingIntensity: number; // 0-100 (intensity score)
+  dailySteps: number; // today's steps
 }
 
 export interface FitnessScoreResult {
@@ -71,31 +71,31 @@ export function calculateFitnessScore(metrics: HealthMetrics): FitnessScoreResul
   let recoveryPoints = 0;
   
   // 4. Deep Sleep Percentage
-  if (metrics.deepSleepPercentage > 0.20) {
+  if (metrics.deepSleepPercentage > 20) {
     recoveryPoints += 15; // > 20%
-  } else if (metrics.deepSleepPercentage >= 0.15 && metrics.deepSleepPercentage <= 0.20) {
+  } else if (metrics.deepSleepPercentage >= 15 && metrics.deepSleepPercentage <= 20) {
     recoveryPoints += 12; // 15-20%
-  } else if (metrics.deepSleepPercentage >= 0.10 && metrics.deepSleepPercentage <= 0.14) {
+  } else if (metrics.deepSleepPercentage >= 10 && metrics.deepSleepPercentage <= 14) {
     recoveryPoints += 9; // 10-14%
   } else {
     recoveryPoints += 6; // < 10%
   }
   
   // 5. REM Sleep Percentage
-  if (metrics.remSleepPercentage > 0.20) {
+  if (metrics.remSleepPercentage > 20) {
     recoveryPoints += 10; // > 20%
-  } else if (metrics.remSleepPercentage >= 0.15 && metrics.remSleepPercentage <= 0.20) {
+  } else if (metrics.remSleepPercentage >= 15 && metrics.remSleepPercentage <= 20) {
     recoveryPoints += 8; // 15-20%
-  } else if (metrics.remSleepPercentage >= 0.10 && metrics.remSleepPercentage <= 0.14) {
+  } else if (metrics.remSleepPercentage >= 10 && metrics.remSleepPercentage <= 14) {
     recoveryPoints += 6; // 10-14%
   } else {
     recoveryPoints += 4; // < 10%
   }
   
-  // 6. Sleep Consistency (Standard deviation of sleep start time in minutes)
-  if (metrics.sleepConsistencyStdDev < 30) {
+  // 6. Sleep Consistency (0-100 score)
+  if (metrics.sleepConsistency > 80) {
     recoveryPoints += 10;
-  } else if (metrics.sleepConsistencyStdDev >= 30 && metrics.sleepConsistencyStdDev <= 60) {
+  } else if (metrics.sleepConsistency >= 60 && metrics.sleepConsistency <= 80) {
     recoveryPoints += 8;
   } else {
     recoveryPoints += 5;
@@ -107,35 +107,35 @@ export function calculateFitnessScore(metrics: HealthMetrics): FitnessScoreResul
   let activityPoints = 0;
   
   // 7. Weekly Training Time (in minutes)
-  if (metrics.weeklyTrainingMinutes > 240) {
+  if (metrics.weeklyTrainingTime > 240) {
     activityPoints += 10;
-  } else if (metrics.weeklyTrainingMinutes >= 180 && metrics.weeklyTrainingMinutes <= 240) {
+  } else if (metrics.weeklyTrainingTime >= 180 && metrics.weeklyTrainingTime <= 240) {
     activityPoints += 8;
-  } else if (metrics.weeklyTrainingMinutes >= 120 && metrics.weeklyTrainingMinutes <= 179) {
+  } else if (metrics.weeklyTrainingTime >= 120 && metrics.weeklyTrainingTime <= 179) {
     activityPoints += 6;
-  } else if (metrics.weeklyTrainingMinutes >= 60 && metrics.weeklyTrainingMinutes <= 119) {
+  } else if (metrics.weeklyTrainingTime >= 60 && metrics.weeklyTrainingTime <= 119) {
     activityPoints += 4;
   } else {
     activityPoints += 2;
   }
   
-  // 8. Training Intensity/Consistency (Number of workouts > 30 min/week)
-  if (metrics.workoutsOver30MinPerWeek >= 5) {
+  // 8. Training Intensity (0-100 score)
+  if (metrics.trainingIntensity >= 80) {
     activityPoints += 10;
-  } else if (metrics.workoutsOver30MinPerWeek >= 3 && metrics.workoutsOver30MinPerWeek <= 4) {
+  } else if (metrics.trainingIntensity >= 60 && metrics.trainingIntensity <= 79) {
     activityPoints += 8;
-  } else if (metrics.workoutsOver30MinPerWeek >= 1 && metrics.workoutsOver30MinPerWeek <= 2) {
+  } else if (metrics.trainingIntensity >= 40 && metrics.trainingIntensity <= 59) {
     activityPoints += 6;
   } else {
     activityPoints += 4;
   }
   
-  // 9. Daily Activity (Average steps per day)
-  if (metrics.averageDailySteps > 10000) {
+  // 9. Daily Activity (Today's steps)
+  if (metrics.dailySteps > 10000) {
     activityPoints += 10;
-  } else if (metrics.averageDailySteps >= 7500 && metrics.averageDailySteps <= 10000) {
+  } else if (metrics.dailySteps >= 7500 && metrics.dailySteps <= 10000) {
     activityPoints += 8;
-  } else if (metrics.averageDailySteps >= 5000 && metrics.averageDailySteps <= 7499) {
+  } else if (metrics.dailySteps >= 5000 && metrics.dailySteps <= 7499) {
     activityPoints += 6;
   } else {
     activityPoints += 4;
@@ -193,11 +193,26 @@ export function getMockHealthMetrics(): HealthMetrics {
     restingHeartRate: 55,
     heartRateVariability: 45,
     vo2Max: 40,
-    deepSleepPercentage: 0.18,
-    remSleepPercentage: 0.22,
-    sleepConsistencyStdDev: 25,
-    weeklyTrainingMinutes: 200,
-    workoutsOver30MinPerWeek: 4,
-    averageDailySteps: 8500,
+    deepSleepPercentage: 18,
+    remSleepPercentage: 22,
+    sleepConsistency: 75,
+    weeklyTrainingTime: 200,
+    trainingIntensity: 60,
+    dailySteps: 8500,
+  };
+}
+
+// Zero health metrics for no-data state
+export function getZeroHealthMetrics(): HealthMetrics {
+  return {
+    restingHeartRate: 0,
+    heartRateVariability: 0,
+    vo2Max: 0,
+    deepSleepPercentage: 0,
+    remSleepPercentage: 0,
+    sleepConsistency: 0,
+    weeklyTrainingTime: 0,
+    trainingIntensity: 0,
+    dailySteps: 0,
   };
 }

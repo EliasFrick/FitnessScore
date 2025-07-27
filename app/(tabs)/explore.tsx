@@ -1,16 +1,29 @@
 import { ScrollView, StyleSheet, Switch } from 'react-native';
-import { Card, List, Divider } from 'react-native-paper';
+import { Card, List, Divider, Button, Dialog, Portal, RadioButton } from 'react-native-paper';
+import { useState } from 'react';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function SettingsScreen() {
-  const colorScheme = useColorScheme();
+  const { themeMode, setThemeMode } = useTheme();
+  const [themeDialogVisible, setThemeDialogVisible] = useState(false);
+  const backgroundColor = useThemeColor({}, 'background');
+
+  const getThemeDescription = () => {
+    switch (themeMode) {
+      case 'light': return 'Light mode';
+      case 'dark': return 'Dark mode';
+      case 'system': return 'Follow system setting';
+      default: return 'Follow system setting';
+    }
+  };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor }]}>
       <ThemedView style={styles.content}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Settings</ThemedText>
@@ -33,7 +46,7 @@ export default function SettingsScreen() {
               title="Data Sources"
               description="Manage connected devices and apps"
               left={() => <IconSymbol name="link" size={24} color="#4ECDC4" />}
-              right={() => <IconSymbol name="chevron.right" size={16} />}
+              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
               onPress={() => {}}
             />
           </Card.Content>
@@ -67,10 +80,10 @@ export default function SettingsScreen() {
             
             <List.Item
               title="Theme"
-              description={`Currently using ${colorScheme === 'dark' ? 'Dark' : 'Light'} mode`}
+              description={getThemeDescription()}
               left={() => <IconSymbol name="paintbrush.fill" size={24} color="#8E44AD" />}
-              right={() => <IconSymbol name="chevron.right" size={16} />}
-              onPress={() => {}}
+              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
+              onPress={() => setThemeDialogVisible(true)}
             />
             
             <Divider style={styles.divider} />
@@ -79,7 +92,7 @@ export default function SettingsScreen() {
               title="Units"
               description="Metric (kg, cm, km)"
               left={() => <IconSymbol name="ruler" size={24} color="#3498DB" />}
-              right={() => <IconSymbol name="chevron.right" size={16} />}
+              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
               onPress={() => {}}
             />
           </Card.Content>
@@ -92,7 +105,7 @@ export default function SettingsScreen() {
             <List.Item
               title="Privacy Policy"
               left={() => <IconSymbol name="lock.fill" size={24} color="#95A5A6" />}
-              right={() => <IconSymbol name="chevron.right" size={16} />}
+              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
               onPress={() => {}}
             />
             
@@ -106,6 +119,22 @@ export default function SettingsScreen() {
           </Card.Content>
         </Card>
       </ThemedView>
+
+      <Portal>
+        <Dialog visible={themeDialogVisible} onDismiss={() => setThemeDialogVisible(false)}>
+          <Dialog.Title>Choose Theme</Dialog.Title>
+          <Dialog.Content>
+            <RadioButton.Group onValueChange={(value) => setThemeMode(value as any)} value={themeMode}>
+              <RadioButton.Item label="Follow system setting" value="system" />
+              <RadioButton.Item label="Light mode" value="light" />
+              <RadioButton.Item label="Dark mode" value="dark" />
+            </RadioButton.Group>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setThemeDialogVisible(false)}>Done</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </ScrollView>
   );
 }
@@ -113,7 +142,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
   },
   content: {
     padding: 20,

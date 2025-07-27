@@ -6,6 +6,7 @@ import { PaperProvider, MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
 import 'react-native-reanimated';
 
 import { ThemeProvider as CustomThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { HistoryProvider } from '@/contexts/HistoryContext';
 import { Colors } from '@/constants/Colors';
 
 function AppContent() {
@@ -53,6 +54,7 @@ function AppContent() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="history" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
@@ -64,7 +66,9 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <CustomThemeProvider>
-      <AppContent />
+      <HistoryProvider>
+        <AppContent />
+      </HistoryProvider>
     </CustomThemeProvider>
   );
 }

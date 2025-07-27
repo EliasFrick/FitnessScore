@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Switch } from 'react-native';
 import { Card, List, Divider, Button, Dialog, Portal, RadioButton } from 'react-native-paper';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -69,6 +70,14 @@ export default function SettingsScreen() {
               left={() => <IconSymbol name="paintbrush.fill" size={24} color="#8E44AD" />}
               right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
               onPress={() => setThemeDialogVisible(true)}
+            />
+            
+            <List.Item
+              title="History"
+              description="View your scoring history"
+              left={() => <IconSymbol name="clock.fill" size={24} color="#34C759" />}
+              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
+              onPress={() => router.push('/history')}
             />
             
           </Card.Content>

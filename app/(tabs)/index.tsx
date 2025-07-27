@@ -6,19 +6,34 @@ import {
   View,
 } from "react-native";
 import { Card, Chip, ProgressBar, Text } from "react-native-paper";
+import { useEffect, useRef } from "react";
 
 import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useHistory } from "@/contexts/HistoryContext";
 import { calculateFitnessScore } from "@/utils/fitnessCalculator";
 
 export default function OverviewScreen() {
   const { healthMetrics, isLoading, error, isHealthKitAvailable, refreshData } =
     useHealthData();
+  const { addHistoryItem } = useHistory();
   const fitnessResult = calculateFitnessScore(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+
+  const lastScoreRef = useRef<number>(-1);
+
+  useEffect(() => {
+    // Only add history items when the score actually changes
+    if (fitnessResult.totalScore !== lastScoreRef.current && fitnessResult.historyItems.length > 0) {
+      lastScoreRef.current = fitnessResult.totalScore;
+      fitnessResult.historyItems.forEach(item => {
+        addHistoryItem(item);
+      });
+    }
+  }, [fitnessResult.totalScore, addHistoryItem]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>

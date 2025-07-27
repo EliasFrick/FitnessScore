@@ -1,11 +1,14 @@
-import { ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, View } from 'react-native';
-import { useState } from 'react';
+import { ScrollView, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, View, Alert } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { useHealthData } from '@/hooks/useHealthData';
+import AIService from '@/services/aiService';
+import HealthAggregationService from '@/services/healthAggregationService';
 
 interface Message {
   id: string;
@@ -18,13 +21,17 @@ export default function AIChatScreen() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! I\'m your AI health assistant. I can help you analyze your vitality data, answer questions about your fitness metrics, and provide personalized insights. What would you like to know?',
+      text: 'Hello! I\'m Jasmine, your AI health assistant. I can help you analyze your vitality data, answer questions about your fitness metrics, and provide personalized insights. What would you like to know?',
       sender: 'ai',
       timestamp: new Date(),
     },
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isAIConfigured, setIsAIConfigured] = useState(false);
+  
+  const scrollViewRef = useRef<ScrollView>(null);
+  const { healthMetrics, isLoading: isHealthLoading, refreshData } = useHealthData();
   
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -35,6 +42,31 @@ export default function AIChatScreen() {
   const borderColor = useThemeColor({ light: '#E5E5EA', dark: '#38383A' }, 'icon');
   const subtleTextColor = useThemeColor({ light: '#8E8E93', dark: '#98989D' }, 'tabIconDefault');
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    checkAIConfiguration();
+  }, []);
+
+  useEffect(() => {
+    // Auto-scroll to bottom when new messages arrive
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  }, [messages]);
+
+  const checkAIConfiguration = () => {
+    const config = AIService.getConfigurationStatus();
+    setIsAIConfigured(config.isConfigured);
+    
+    if (!config.isConfigured) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: 'To enable AI features, please configure your OpenAI API key in the AI Settings tab. Until then, I can provide basic responses about your health data.',
+        sender: 'ai',
+        timestamp: new Date(),
+      }]);
+    }
+  };
 
   const sendMessage = async () => {
     if (!inputText.trim()) return;
@@ -50,39 +82,43 @@ export default function AIChatScreen() {
     setInputText('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
+    try {
+      // Create health context for AI
+      const healthContext = await HealthAggregationService.createHealthContext(healthMetrics);
+      
+      // Get AI response
+      const aiResponse = await AIService.generateResponse(
+        userMessage.text,
+        healthContext,
+        true // Use cache
+      );
+
+      const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: getAIResponse(userMessage.text),
+        text: aiResponse.message,
         sender: 'ai',
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 1500);
-  };
 
-  const getAIResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    
-    if (input.includes('sleep') || input.includes('rem') || input.includes('deep')) {
-      return 'Based on your sleep data, I can see patterns in your REM and deep sleep percentages. Good sleep consistency is crucial for your vitality score. Would you like specific recommendations for improving your sleep quality?';
+      setMessages(prev => [...prev, aiMessage]);
+
+      // Store health data for future analysis
+      await HealthAggregationService.storeAndAggregate(healthMetrics);
+
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'I apologize, but I encountered an error processing your request. Please check your AI settings and try again. In the meantime, I can still help with basic questions about your health data.',
+        sender: 'ai',
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
     }
-    
-    if (input.includes('heart') || input.includes('hrv') || input.includes('cardiovascular')) {
-      return 'Your cardiovascular health metrics including resting heart rate and HRV are important indicators. I can help analyze trends and suggest ways to improve these metrics. What specific aspect would you like to focus on?';
-    }
-    
-    if (input.includes('score') || input.includes('vitality') || input.includes('fitness')) {
-      return 'Your vitality score is calculated from cardiovascular health (30%), recovery & sleep (35%), activity & training (30%), and consistency bonus (5%). I can break down each category and show you where to focus for improvement.';
-    }
-    
-    if (input.includes('training') || input.includes('exercise') || input.includes('activity')) {
-      return 'Your training and activity data shows your weekly patterns. Consistency is key for both your fitness and vitality score. Would you like personalized training recommendations based on your current metrics?';
-    }
-    
-    return 'I can help you understand your health data better. Try asking me about your sleep patterns, cardiovascular metrics, training data, or overall vitality score. What specific aspect of your health would you like to explore?';
   };
 
   const formatTime = (date: Date) => {
@@ -101,12 +137,27 @@ export default function AIChatScreen() {
           </View>
           <View style={styles.headerText}>
             <ThemedText type="title" style={[styles.headerTitle, { color: textColor }]}>Jasmine</ThemedText>
-            <ThemedText style={[styles.headerSubtitle, { color: subtleTextColor }]}>AI Health Assistant</ThemedText>
+            <ThemedText style={[styles.headerSubtitle, { color: subtleTextColor }]}>
+              AI Health Assistant {!isAIConfigured && '(Basic Mode)'}
+            </ThemedText>
           </View>
+          
+          <TouchableOpacity
+            style={[styles.refreshButton, { backgroundColor: inputBackground }]}
+            onPress={refreshData}
+            disabled={isHealthLoading}
+          >
+            <IconSymbol 
+              name={isHealthLoading ? "arrow.clockwise" : "arrow.clockwise"} 
+              size={16} 
+              color={tintColor} 
+            />
+          </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView 
+        ref={scrollViewRef}
         style={[styles.messagesContainer, { backgroundColor }]}
         contentContainerStyle={styles.messagesContent}
         showsVerticalScrollIndicator={false}
@@ -214,6 +265,13 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
+  },
+  refreshButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,

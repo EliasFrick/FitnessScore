@@ -10,7 +10,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useHistory } from '@/contexts/HistoryContext';
 
 export default function HistoryScreen() {
-  const { historyItems } = useHistory();
+  const { historyItems, isLoading } = useHistory();
   const backgroundColor = useThemeColor({}, 'background');
   const insets = useSafeAreaInsets();
 
@@ -52,11 +52,21 @@ export default function HistoryScreen() {
               color="#666" 
             />
           </TouchableOpacity>
-          <ThemedText type="title">Scoring History</ThemedText>
+          <ThemedText type="title">Scoring History (30 Days)</ThemedText>
           <View style={styles.placeholder} />
         </ThemedView>
 
-        {historyItems.length === 0 ? (
+        {isLoading ? (
+          <Card style={styles.emptyCard}>
+            <Card.Content style={styles.emptyContent}>
+              <IconSymbol name="arrow.clockwise" size={48} color="#CCC" />
+              <ThemedText type="subtitle" style={styles.emptyTitle}>Loading History...</ThemedText>
+              <ThemedText style={styles.emptyDescription}>
+                Retrieving your scoring history from the last 30 days.
+              </ThemedText>
+            </Card.Content>
+          </Card>
+        ) : historyItems.length === 0 ? (
           <Card style={styles.emptyCard}>
             <Card.Content style={styles.emptyContent}>
               <IconSymbol name="clock" size={48} color="#CCC" />

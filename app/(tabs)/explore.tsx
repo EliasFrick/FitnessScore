@@ -1,110 +1,143 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Switch } from 'react-native';
+import { Card, List, Divider } from 'react-native-paper';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
-export default function TabTwoScreen() {
+export default function SettingsScreen() {
+  const colorScheme = useColorScheme();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
+    <ScrollView style={styles.container}>
+      <ThemedView style={styles.content}>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title">Settings</ThemedText>
+        </ThemedView>
+        
+        <Card style={styles.settingsCard}>
+          <Card.Content>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>Health Data</ThemedText>
+            
+            <List.Item
+              title="Sync Health Data"
+              description="Automatically sync with HealthKit/Google Fit"
+              left={() => <IconSymbol name="heart.fill" size={24} color="#FF6B6B" />}
+              right={() => <Switch value={true} onValueChange={() => {}} />}
+            />
+            
+            <Divider style={styles.divider} />
+            
+            <List.Item
+              title="Data Sources"
+              description="Manage connected devices and apps"
+              left={() => <IconSymbol name="link" size={24} color="#4ECDC4" />}
+              right={() => <IconSymbol name="chevron.right" size={16} />}
+              onPress={() => {}}
+            />
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.settingsCard}>
+          <Card.Content>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>Notifications</ThemedText>
+            
+            <List.Item
+              title="Daily Reminders"
+              description="Get reminded to check your vitality score"
+              left={() => <IconSymbol name="bell.fill" size={24} color="#FFD93D" />}
+              right={() => <Switch value={false} onValueChange={() => {}} />}
+            />
+            
+            <Divider style={styles.divider} />
+            
+            <List.Item
+              title="Goal Achievements"
+              description="Celebrate when you reach fitness milestones"
+              left={() => <IconSymbol name="trophy.fill" size={24} color="#FF9500" />}
+              right={() => <Switch value={true} onValueChange={() => {}} />}
+            />
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.settingsCard}>
+          <Card.Content>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>App Preferences</ThemedText>
+            
+            <List.Item
+              title="Theme"
+              description={`Currently using ${colorScheme === 'dark' ? 'Dark' : 'Light'} mode`}
+              left={() => <IconSymbol name="paintbrush.fill" size={24} color="#8E44AD" />}
+              right={() => <IconSymbol name="chevron.right" size={16} />}
+              onPress={() => {}}
+            />
+            
+            <Divider style={styles.divider} />
+            
+            <List.Item
+              title="Units"
+              description="Metric (kg, cm, km)"
+              left={() => <IconSymbol name="ruler" size={24} color="#3498DB" />}
+              right={() => <IconSymbol name="chevron.right" size={16} />}
+              onPress={() => {}}
+            />
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.settingsCard}>
+          <Card.Content>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>About</ThemedText>
+            
+            <List.Item
+              title="Privacy Policy"
+              left={() => <IconSymbol name="lock.fill" size={24} color="#95A5A6" />}
+              right={() => <IconSymbol name="chevron.right" size={16} />}
+              onPress={() => {}}
+            />
+            
+            <Divider style={styles.divider} />
+            
+            <List.Item
+              title="Version"
+              description="1.0.0"
+              left={() => <IconSymbol name="info.circle.fill" size={24} color="#95A5A6" />}
+            />
+          </Card.Content>
+        </Card>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  content: {
+    padding: 20,
+    gap: 16,
   },
   titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  settingsCard: {
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+  },
+  sectionTitle: {
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  divider: {
+    marginVertical: 8,
   },
 });

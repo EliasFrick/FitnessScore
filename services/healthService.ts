@@ -1,9 +1,27 @@
+import { NativeModules, Platform } from 'react-native';
 import AppleHealthKit, {
   HealthKitPermissions,
   HealthInputOptions,
   HealthValue,
 } from 'react-native-health';
-import { Platform } from 'react-native';
+
+// Workaround for react-native-health missing functions
+// This fixes the interface issues with the abandoned package
+if (Platform.OS === 'ios' && NativeModules.AppleHealthKit) {
+  for (let key of [
+    "initHealthKit",
+    "getRestingHeartRateSamples", 
+    "getHeartRateVariabilitySamples",
+    "getVo2MaxSamples",
+    "getSleepSamples",
+    "getStepCount",
+    "getSamples"
+  ]) {
+    if (!AppleHealthKit[key] && NativeModules.AppleHealthKit[key]) {
+      AppleHealthKit[key] = NativeModules.AppleHealthKit[key];
+    }
+  }
+}
 
 export interface HealthMetrics {
   restingHeartRate: number;

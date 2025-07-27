@@ -5,7 +5,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { Card, Chip, ProgressBar, Text, useTheme } from "react-native-paper";
+import { Card, Chip, ProgressBar, Text } from "react-native-paper";
 
 import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
@@ -19,7 +19,6 @@ export default function OverviewScreen() {
     useHealthData();
   const fitnessResult = calculateFitnessScore(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
-  const theme = useTheme();
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>

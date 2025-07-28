@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     textAlign: "center",
+    backgroundColor: "transparent",
   },
   emptyDescription: {
     textAlign: "center",
@@ -213,6 +214,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+    backgroundColor: "transparent",
   },
   categoryChip: {
     height: 32,
@@ -234,6 +236,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+    backgroundColor: "transparent",
   },
   metricName: {
     flex: 1,
@@ -242,6 +245,7 @@ const styles = StyleSheet.create({
   pointsContainer: {
     flexDirection: "row",
     alignItems: "baseline",
+    backgroundColor: "transparent",
   },
   points: {
     fontSize: 24,

@@ -178,7 +178,7 @@ export function convertHistoricalDataToHistoryItems(
         shouldInclude = true;
       } else if (
         item.category === "Activity & Training" &&
-        (item.metric === "Monthly Training Time" ||
+        (item.metric === "Daily Training Time" ||
           item.metric === "Training Intensity") &&
         (dayMetrics.monthlyTrainingTime > 0 || dayMetrics.trainingIntensity > 0)
       ) {

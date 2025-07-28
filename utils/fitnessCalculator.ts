@@ -107,8 +107,27 @@ export {
   getZeroHealthMetrics,
 } from './mockData';
 
-export {
-  calculateMonthlyAverage,
-  generateSampleHistoryData,
-  convertHistoricalDataToHistoryItems,
-} from './legacyCalculators';
+// Legacy calculator functions with dependency injection to avoid circular imports
+export const calculateMonthlyAverage = (
+  historyItems: any[],
+  currentMetrics: HealthMetrics
+) => {
+  const { calculateMonthlyAverage: legacyCalc } = require('./legacyCalculators');
+  return legacyCalc(historyItems, currentMetrics, calculateFitnessScore);
+};
+
+export const generateSampleHistoryData = () => {
+  const { generateSampleHistoryData: legacyGen } = require('./legacyCalculators');
+  return legacyGen(calculateFitnessScore);
+};
+
+export const convertHistoricalDataToHistoryItems = (
+  historicalData: Array<{
+    date: Date;
+    stepsData: any[];
+    sleepData: any[];
+  }>
+) => {
+  const { convertHistoricalDataToHistoryItems: legacyConvert } = require('./legacyCalculators');
+  return legacyConvert(historicalData, calculateFitnessScore);
+};

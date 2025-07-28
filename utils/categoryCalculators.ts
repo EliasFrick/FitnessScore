@@ -4,20 +4,20 @@
  */
 
 import {
-  calculateRestingHeartRatePoints,
-  calculateHeartRateVariabilityPoints,
-  calculateVO2MaxPoints,
-  calculateDeepSleepPoints,
-  calculateREMSleepPoints,
-  calculateSleepConsistencyPoints,
-  calculateDailyTrainingTimePoints,
-  calculateTrainingIntensityPoints,
-  calculateDailyStepsPoints,
   calculateBonusPoints,
-  createHistoryItem,
+  calculateDailyStepsPoints,
+  calculateDailyTrainingTimePoints,
+  calculateDeepSleepPoints,
+  calculateHeartRateVariabilityPoints,
+  calculateREMSleepPoints,
+  calculateRestingHeartRatePoints,
+  calculateSleepConsistencyPoints,
+  calculateTrainingIntensityPoints,
+  calculateVO2MaxPoints,
   CategoryScoringResult,
+  createHistoryItem,
   HistoryItem,
-} from './scoringUtils';
+} from "./scoringUtils";
 
 /**
  * Calculate cardiovascular health category points (30 points max)
@@ -31,33 +31,39 @@ export function calculateCardiovascularPoints(
 
   // Resting Heart Rate (10 points max)
   const rhrResult = calculateRestingHeartRatePoints(restingHeartRate);
-  items.push(createHistoryItem(
-    "Cardiovascular Health",
-    "Resting Heart Rate",
-    rhrResult.points,
-    10,
-    rhrResult.reason
-  ));
+  items.push(
+    createHistoryItem(
+      "Cardiovascular Health",
+      "Resting Heart Rate",
+      rhrResult.points,
+      10,
+      rhrResult.reason
+    )
+  );
 
   // Heart Rate Variability (10 points max)
   const hrvResult = calculateHeartRateVariabilityPoints(heartRateVariability);
-  items.push(createHistoryItem(
-    "Cardiovascular Health",
-    "Heart Rate Variability",
-    hrvResult.points,
-    10,
-    hrvResult.reason
-  ));
+  items.push(
+    createHistoryItem(
+      "Cardiovascular Health",
+      "Heart Rate Variability",
+      hrvResult.points,
+      10,
+      hrvResult.reason
+    )
+  );
 
   // VO2 Max (10 points max)
   const vo2Result = calculateVO2MaxPoints(vo2Max);
-  items.push(createHistoryItem(
-    "Cardiovascular Health",
-    "VO2 Max",
-    vo2Result.points,
-    10,
-    vo2Result.reason
-  ));
+  items.push(
+    createHistoryItem(
+      "Cardiovascular Health",
+      "VO2 Max",
+      vo2Result.points,
+      10,
+      vo2Result.reason
+    )
+  );
 
   const total = rhrResult.points + hrvResult.points + vo2Result.points;
 
@@ -76,35 +82,45 @@ export function calculateRecoveryPoints(
 
   // Deep Sleep (15 points max)
   const deepSleepResult = calculateDeepSleepPoints(deepSleepPercentage);
-  items.push(createHistoryItem(
-    "Recovery & Regeneration",
-    "Deep Sleep",
-    deepSleepResult.points,
-    15,
-    deepSleepResult.reason
-  ));
+  items.push(
+    createHistoryItem(
+      "Recovery & Regeneration",
+      "Deep Sleep",
+      deepSleepResult.points,
+      15,
+      deepSleepResult.reason
+    )
+  );
 
   // REM Sleep (12 points max)
   const remSleepResult = calculateREMSleepPoints(remSleepPercentage);
-  items.push(createHistoryItem(
-    "Recovery & Regeneration",
-    "REM Sleep",
-    remSleepResult.points,
-    12,
-    remSleepResult.reason
-  ));
+  items.push(
+    createHistoryItem(
+      "Recovery & Regeneration",
+      "REM Sleep",
+      remSleepResult.points,
+      12,
+      remSleepResult.reason
+    )
+  );
 
   // Sleep Consistency (8 points max)
-  const sleepConsistencyResult = calculateSleepConsistencyPoints(sleepConsistency);
-  items.push(createHistoryItem(
-    "Recovery & Regeneration",
-    "Sleep Consistency",
-    sleepConsistencyResult.points,
-    8,
-    sleepConsistencyResult.reason
-  ));
+  const sleepConsistencyResult =
+    calculateSleepConsistencyPoints(sleepConsistency);
+  items.push(
+    createHistoryItem(
+      "Recovery & Regeneration",
+      "Sleep Consistency",
+      sleepConsistencyResult.points,
+      8,
+      sleepConsistencyResult.reason
+    )
+  );
 
-  const total = deepSleepResult.points + remSleepResult.points + sleepConsistencyResult.points;
+  const total =
+    deepSleepResult.points +
+    remSleepResult.points +
+    sleepConsistencyResult.points;
 
   return { total, items };
 }
@@ -120,36 +136,45 @@ export function calculateActivityPoints(
   const items: HistoryItem[] = [];
 
   // Daily Training Time (12 points max)
-  const trainingTimeResult = calculateDailyTrainingTimePoints(dailyTrainingTime);
-  items.push(createHistoryItem(
-    "Activity & Training",
-    "Daily Training Time",
-    trainingTimeResult.points,
-    12,
-    trainingTimeResult.reason
-  ));
+  const trainingTimeResult =
+    calculateDailyTrainingTimePoints(dailyTrainingTime);
+
+  items.push(
+    createHistoryItem(
+      "Activity & Training",
+      "Daily Training Time",
+      trainingTimeResult.points,
+      12,
+      trainingTimeResult.reason
+    )
+  );
 
   // Training Intensity (12 points max)
   const intensityResult = calculateTrainingIntensityPoints(trainingIntensity);
-  items.push(createHistoryItem(
-    "Activity & Training",
-    "Training Intensity",
-    intensityResult.points,
-    12,
-    intensityResult.reason
-  ));
+  items.push(
+    createHistoryItem(
+      "Activity & Training",
+      "Training Intensity",
+      intensityResult.points,
+      12,
+      intensityResult.reason
+    )
+  );
 
   // Daily Steps (6 points max)
   const stepsResult = calculateDailyStepsPoints(dailySteps);
-  items.push(createHistoryItem(
-    "Activity & Training",
-    "Daily Steps",
-    stepsResult.points,
-    6,
-    stepsResult.reason
-  ));
+  items.push(
+    createHistoryItem(
+      "Activity & Training",
+      "Daily Steps",
+      stepsResult.points,
+      6,
+      stepsResult.reason
+    )
+  );
 
-  const total = trainingTimeResult.points + intensityResult.points + stepsResult.points;
+  const total =
+    trainingTimeResult.points + intensityResult.points + stepsResult.points;
 
   return { total, items };
 }
@@ -162,8 +187,12 @@ export function createBonusHistoryItem(
   recoveryPoints: number,
   activityPoints: number
 ): HistoryItem {
-  const bonusResult = calculateBonusPoints(cardiovascularPoints, recoveryPoints, activityPoints);
-  
+  const bonusResult = calculateBonusPoints(
+    cardiovascularPoints,
+    recoveryPoints,
+    activityPoints
+  );
+
   return createHistoryItem(
     "Bonus Metric",
     "Overall Consistency",

@@ -4,11 +4,12 @@
 
 import { HistoryItem } from "@/contexts/HistoryContext";
 import { HealthValue } from "react-native-health";
-import { HealthMetrics, MonthlyAverageResult } from '@/types/health';
-import { calculateFitnessScore } from './fitnessCalculator';
+import { HealthMetrics, MonthlyAverageResult, FitnessScoreResult } from '@/types/health';
 
 // Generate sample historical data for demonstration
-export function generateSampleHistoryData(): Array<{
+export function generateSampleHistoryData(
+  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
+): Array<{
   category:
     | "Cardiovascular Health"
     | "Recovery & Regeneration"
@@ -73,7 +74,8 @@ export function convertHistoricalDataToHistoryItems(
     date: Date;
     stepsData: HealthValue[];
     sleepData: any[];
-  }>
+  }>,
+  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
 ): Array<{
   category:
     | "Cardiovascular Health"
@@ -231,7 +233,8 @@ export function convertHistoricalDataToHistoryItems(
  */
 export function calculateMonthlyAverage(
   historyItems: HistoryItem[],
-  currentMetrics: HealthMetrics
+  currentMetrics: HealthMetrics,
+  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
 ): MonthlyAverageResult {
   // Filter history items from the last 30 days
   const thirtyDaysAgo = new Date();

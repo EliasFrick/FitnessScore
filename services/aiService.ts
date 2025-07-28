@@ -40,7 +40,6 @@ export class AIService {
     });
 
     this.isConfigured = true;
-    console.log('AI Service configured successfully');
   }
 
   private getSystemPrompt(): string {

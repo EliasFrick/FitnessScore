@@ -88,7 +88,6 @@ export class StorageService {
         CREATE INDEX IF NOT EXISTS idx_ai_timestamp ON ai_responses(timestamp);
       `);
 
-      console.log('Database initialized successfully');
     } catch (error) {
       console.error('Error initializing database:', error);
       throw error;
@@ -120,7 +119,6 @@ export class StorageService {
         [thirtyDaysAgo]
       );
 
-      console.log('Health data stored successfully');
     } catch (error) {
       console.error('Error storing health data:', error);
       throw error;
@@ -320,7 +318,6 @@ export class StorageService {
         await this.db!.runAsync(`DELETE FROM ai_responses WHERE id IN (${idsToDelete})`);
       }
 
-      console.log('AI response stored successfully');
     } catch (error) {
       console.error('Error storing AI response:', error);
       throw error;
@@ -375,7 +372,6 @@ export class StorageService {
       await this.db!.runAsync('DELETE FROM health_data');
       await this.db!.runAsync('DELETE FROM ai_responses');
       await AsyncStorage.removeItem('health_data_consent');
-      console.log('All data cleared successfully');
     } catch (error) {
       console.error('Error clearing data:', error);
       throw error;

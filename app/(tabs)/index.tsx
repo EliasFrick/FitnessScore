@@ -1,3 +1,5 @@
+import { router } from "expo-router";
+import { useEffect, useRef } from "react";
 import {
   RefreshControl,
   SafeAreaView,
@@ -7,35 +9,43 @@ import {
   View,
 } from "react-native";
 import { Card, Chip, ProgressBar, Text } from "react-native-paper";
-import { useEffect, useRef } from "react";
-import { router } from "expo-router";
 
 import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useHistory } from "@/contexts/HistoryContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useHistory } from "@/contexts/HistoryContext";
-import { calculateFitnessScore, calculateMonthlyAverage } from "@/utils/fitnessCalculator";
+import {
+  calculateFitnessScore,
+  calculateMonthlyAverage,
+} from "@/utils/fitnessCalculator";
 
 export default function OverviewScreen() {
   const { healthMetrics, isLoading, error, isHealthKitAvailable, refreshData } =
     useHealthData();
   const { addHistoryItem, historyItems } = useHistory();
+  const { themeMode, colorScheme, setThemeMode } = useTheme();
   const fitnessResult = calculateFitnessScore(healthMetrics);
   const monthlyAverage = calculateMonthlyAverage(historyItems, healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+  const tintColor = useThemeColor({}, "tint");
 
   const lastScoreRef = useRef<number>(-1);
-  const lastHistoryUpdateRef = useRef<string>('');
+  const lastHistoryUpdateRef = useRef<string>("");
 
   useEffect(() => {
     // Add history items daily (check if we've already added for today)
     const today = new Date().toDateString();
-    
-    if (lastHistoryUpdateRef.current !== today && fitnessResult.historyItems.length > 0) {
+
+    if (
+      lastHistoryUpdateRef.current !== today &&
+      fitnessResult.historyItems.length > 0
+    ) {
       lastHistoryUpdateRef.current = today;
-      fitnessResult.historyItems.forEach(item => {
+      fitnessResult.historyItems.forEach((item) => {
         addHistoryItem(item);
       });
     }
@@ -56,7 +66,36 @@ export default function OverviewScreen() {
       >
         <ThemedView style={styles.content}>
           <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">VitalityScore Overview</ThemedText>
+            <View style={styles.switchContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.customSwitch,
+                  colorScheme === "dark" ? styles.switchDark : styles.switchLight,
+                ]}
+                onPress={() =>
+                  setThemeMode(colorScheme === "dark" ? "light" : "dark")
+                }
+                activeOpacity={0.8}
+              >
+                <View style={styles.switchTrack}>
+                  <View style={styles.switchIconContainer}>
+                    <IconSymbol name="sun.max" size={16} color="#FFA500" />
+                  </View>
+                  <View style={styles.switchIconContainer}>
+                    <IconSymbol name="moon" size={16} color="#87CEEB" />
+                  </View>
+                </View>
+                <View
+                  style={[
+                    styles.switchThumb,
+                    colorScheme === "dark" ? styles.thumbDark : styles.thumbLight,
+                  ]}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.titleRow}>
+              <ThemedText type="title">VitalityScore Overview</ThemedText>
+            </View>
             {!isHealthKitAvailable && (
               <Text variant="bodySmall" style={styles.statusText}>
                 📱 Apple Health not available on this platform
@@ -103,7 +142,10 @@ export default function OverviewScreen() {
                     Aktivität: {monthlyAverage.activityPoints}/30
                   </Text>
                   {monthlyAverage.isEstimated && (
-                    <Text variant="bodySmall" style={[styles.detailText, { fontStyle: 'italic' }]}>
+                    <Text
+                      variant="bodySmall"
+                      style={[styles.detailText, { fontStyle: "italic" }]}
+                    >
                       * Basiert auf aktuellen Daten
                     </Text>
                   )}
@@ -119,7 +161,12 @@ export default function OverviewScreen() {
             </ThemedText>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Cardiovascular Health')}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() =>
+                  navigateToFilteredHistory("Cardiovascular Health")
+                }
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -136,7 +183,12 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Recovery & Regeneration')}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() =>
+                  navigateToFilteredHistory("Recovery & Regeneration")
+                }
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -155,7 +207,10 @@ export default function OverviewScreen() {
             </View>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Activity & Training')}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() => navigateToFilteredHistory("Activity & Training")}
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -172,7 +227,10 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Bonus Metric')}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() => navigateToFilteredHistory("Bonus Metric")}
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -214,11 +272,13 @@ export default function OverviewScreen() {
                 </View>
 
                 <ThemedText style={styles.insightText}>
-                  Dein VitalityScore basiert auf dem Durchschnitt der letzten 30 Tage.
-                  {monthlyAverage.isEstimated 
-                    ? ' Bei wenigen Daten werden aktuelle Werte verwendet.'
-                    : ` Basiert auf ${monthlyAverage.dataPointsCount} Datenpunkten.`
-                  } Arbeite kontinuierlich an allen Bereichen für optimale Ergebnisse.
+                  Dein VitalityScore basiert auf dem Durchschnitt der letzten 30
+                  Tage.
+                  {monthlyAverage.isEstimated
+                    ? " Bei wenigen Daten werden aktuelle Werte verwendet."
+                    : ` Basiert auf ${monthlyAverage.dataPointsCount} Datenpunkten.`}{" "}
+                  Arbeite kontinuierlich an allen Bereichen für optimale
+                  Ergebnisse.
                 </ThemedText>
               </Card.Content>
             </Card>
@@ -239,11 +299,70 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     gap: 20,
-    paddingBottom: 100, 
+    paddingBottom: 20,
   },
   titleContainer: {
     alignItems: "center",
     marginBottom: 10,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    marginBottom: 8,
+  },
+  switchContainer: {
+    width: "100%",
+    alignItems: "flex-end",
+    marginBottom: 10,
+  },
+  customSwitch: {
+    width: 60,
+    height: 30,
+    borderRadius: 15,
+    position: "relative",
+    justifyContent: "center",
+  },
+  switchLight: {
+    backgroundColor: "#E5E5EA",
+  },
+  switchDark: {
+    backgroundColor: "#2C2C2E",
+  },
+  switchTrack: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 6,
+    height: "100%",
+  },
+  switchIconContainer: {
+    width: 18,
+    height: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  switchThumb: {
+    position: "absolute",
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  thumbLight: {
+    left: 2,
+  },
+  thumbDark: {
+    right: 2,
   },
   statusText: {
     marginTop: 8,

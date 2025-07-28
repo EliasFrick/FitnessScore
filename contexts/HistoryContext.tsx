@@ -108,17 +108,13 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
 
   const refreshHistoricalData = async () => {
     try {
-      console.log('Starting to refresh historical data...');
       
       if (Platform.OS === 'ios') {
-        console.log('iOS platform detected, fetching HealthKit data...');
         // Try to fetch real historical data from HealthKit
         const historicalData = await HealthService.getHistoricalHealthData(30);
-        console.log(`Fetched ${historicalData.length} days of historical data from HealthKit`);
         
         if (historicalData.length > 0) {
           const realHistoryData = convertHistoricalDataToHistoryItems(historicalData);
-          console.log(`Converted to ${realHistoryData.length} history items`);
           
           const realHistory: HistoryItem[] = realHistoryData.map(item => ({
             ...item,
@@ -127,10 +123,8 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
           
           await saveHistoryToStorage(realHistory);
           setHistoryItems(realHistory);
-          console.log('Successfully saved real historical data');
           return;
         } else {
-          console.log('No historical data available from HealthKit, using sample data');
         }
       }
     } catch (error) {
@@ -138,7 +132,6 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
     }
 
     // Fallback to sample data if real data isn't available
-    console.log('Falling back to sample data');
     const sampleData = generateSampleHistoryData();
     const sampleHistory: HistoryItem[] = sampleData.map(item => ({
       ...item,
@@ -147,7 +140,6 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
     
     await saveHistoryToStorage(sampleHistory);
     setHistoryItems(sampleHistory);
-    console.log(`Generated ${sampleHistory.length} sample history items`);
   };
 
   return (

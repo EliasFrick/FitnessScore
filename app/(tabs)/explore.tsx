@@ -87,7 +87,6 @@ export default function SettingsScreen() {
               description="Force refresh health history from HealthKit"
               left={() => <IconSymbol name="arrow.clockwise" size={24} color="#FF9500" />}
               onPress={async () => {
-                console.log('Manual refresh triggered by user');
                 await refreshHistoricalData();
               }}
             />

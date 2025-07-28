@@ -325,7 +325,6 @@ export class HealthService {
       }
     }
 
-    console.log(`Historical steps data fetched: ${stepsData.length} days`);
     return stepsData;
   }
 
@@ -347,7 +346,6 @@ export class HealthService {
             console.error("Error getting historical heart rate:", callbackError);
             resolve([]);
           } else {
-            console.log(`Historical heart rate data fetched: ${results?.length || 0} samples`);
             resolve(results || []);
           }
         }

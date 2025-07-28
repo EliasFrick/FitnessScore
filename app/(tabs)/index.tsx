@@ -119,7 +119,7 @@ export default function OverviewScreen() {
             </ThemedText>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity onPress={() => navigateToFilteredHistory('Cardiovascular Health')}>
+              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Cardiovascular Health')}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -136,7 +136,7 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigateToFilteredHistory('Recovery & Regeneration')}>
+              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Recovery & Regeneration')}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -155,7 +155,7 @@ export default function OverviewScreen() {
             </View>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity onPress={() => navigateToFilteredHistory('Activity & Training')}>
+              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Activity & Training')}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -172,7 +172,7 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigateToFilteredHistory('Bonus Metric')}>
+              <TouchableOpacity style={styles.metricTouchable} onPress={() => navigateToFilteredHistory('Bonus Metric')}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -299,8 +299,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
   },
-  metricCard: {
+  metricTouchable: {
     flex: 1,
+  },
+  metricCard: {
+    height: 120,
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: {
@@ -314,6 +317,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 12,
     alignItems: "center",
+    height: "100%",
+    justifyContent: "center",
   },
   metricLabel: {
     opacity: 0.7,

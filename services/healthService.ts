@@ -448,41 +448,20 @@ export class HealthService {
             // Process workout data from getAnchoredWorkouts
             const workouts = results.data || results || [];
             
-            console.log("=== WORKOUT DEBUG INFO ===");
-            console.log("Date range:", options.startDate, "to", options.endDate);
-            console.log("Raw workout data:", JSON.stringify(workouts, null, 2));
-            console.log("Total workouts found:", workouts.length);
-            
             if (!Array.isArray(workouts) || workouts.length === 0) {
               console.log("No workouts found or invalid workout array");
               resolve({ monthlyTrainingTime: 0, trainingIntensity: 0 });
               return;
             }
 
-            workouts.forEach((workout: any, index: number) => {
-              console.log(`\n--- Workout ${index + 1} ---`);
-              console.log("Raw workout object:", JSON.stringify(workout, null, 2));
-              
+            workouts.forEach((workout: any) => {
               if (!workout || !workout.end || !workout.start) {
-                console.log("❌ Skipping invalid workout - missing start/end dates");
                 return; // Skip invalid workout data
               }
 
               const duration = workout.duration / 60; // Convert seconds to minutes
-              const startDate = new Date(workout.start);
-              const endDate = new Date(workout.end);
-              const calculatedDuration = (endDate.getTime() - startDate.getTime()) / (1000 * 60);
-
-              console.log("Activity:", workout.activityName || "Unknown");
-              console.log("Start:", startDate.toLocaleString());
-              console.log("End:", endDate.toLocaleString());
-              console.log("Duration (from API):", workout.duration, "seconds =", duration.toFixed(1), "minutes");
-              console.log("Duration (calculated):", calculatedDuration.toFixed(1), "minutes");
-              console.log("Calories:", workout.calories || 0);
-              console.log("Distance:", workout.distance || 0);
-
+              
               if (duration > 0 && !isNaN(duration)) {
-                console.log("✅ Including this workout in totals");
                 totalDuration += duration;
                 totalCalories += workout.calories || 0;
                 totalDistance += workout.distance || 0;
@@ -492,9 +471,6 @@ export class HealthService {
                 const caloriesPerMinute =
                   (workout.calories || 0) / Math.max(duration, 1);
                 const activityName = workout.activityName || "";
-
-                console.log("Calories per minute:", caloriesPerMinute.toFixed(2));
-                console.log("Activity name:", activityName);
 
                 // High intensity activities or high calorie burn rate
                 if (
@@ -508,13 +484,8 @@ export class HealthService {
                     "TraditionalStrengthTraining",
                   ].includes(activityName)
                 ) {
-                  console.log("🔥 High intensity workout detected");
                   highIntensityWorkouts++;
-                } else {
-                  console.log("💪 Regular intensity workout");
                 }
-              } else {
-                console.log("❌ Skipping workout - invalid duration:", duration);
               }
             });
 
@@ -556,16 +527,11 @@ export class HealthService {
               ? 0
               : Math.min(100, Math.max(0, Math.round(rawIntensityScore)));
 
-            console.log("\n=== FINAL CALCULATIONS ===");
-            console.log("Total workouts processed:", workoutCount);
-            console.log("Total duration over 30 days (minutes):", totalDuration.toFixed(1));
-            console.log("Monthly training time:", monthlyTrainingTime);
-            console.log("Total calories:", totalCalories);
-            console.log("High intensity workouts:", highIntensityWorkouts);
-            console.log("High intensity ratio:", (safeHighIntensityRatio * 100).toFixed(1) + "%");
-            console.log("Avg calories per minute:", safeAvgCaloriesPerMinute.toFixed(2));
+            console.log("\n=== WORKOUT SUMMARY ===");
+            console.log("Monthly training time:", monthlyTrainingTime, "minutes");
             console.log("Training intensity score:", intensityScore);
-            console.log("========================\n");
+            console.log("Total workouts:", workoutCount);
+            console.log("=======================");
 
             resolve({
               monthlyTrainingTime,

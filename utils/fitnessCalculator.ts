@@ -312,11 +312,12 @@ export function calculateFitnessScore(
 
   // C. Activity & Training (Max 30 Points)
   let activityPoints = 0;
-  console.log(metrics.monthlyTrainingTime);
+  
   // 1. Monthly Training Time (Max 12 Points)
   let trainingTimePoints = 0;
   let trainingTimeReason = "";
   if (metrics.monthlyTrainingTime >= 1200) { // ~300 min/week * 4 weeks
+    
     trainingTimePoints = 12;
     trainingTimeReason = `Outstanding training volume (${Math.round(
       metrics.monthlyTrainingTime
@@ -554,6 +555,7 @@ export function getMockHealthMetrics(): HealthMetrics {
   // Should get 0 bonus points (no categories ≥75%)
 }
 
+
 // Zero health metrics for no-data state
 export function getZeroHealthMetrics(): HealthMetrics {
   return {
@@ -665,7 +667,7 @@ export function convertHistoricalDataToHistoryItems(
   let daysWithData = 0;
   let daysWithoutData = 0;
 
-  historicalData.forEach((dayData, index) => {
+  historicalData.forEach((dayData) => {
     // Calculate daily steps average
     const dailySteps = dayData.stepsData.reduce(
       (sum, sample) => sum + (sample.value || 0),
@@ -764,7 +766,8 @@ export function convertHistoricalDataToHistoryItems(
       daysWithoutData++;
     }
 
-    const itemsAdded = dayResult.historyItems.filter((item) => {
+    // Track items that would be added for statistics
+    dayResult.historyItems.filter((item) => {
       if (
         item.category === "Activity & Training" &&
         item.metric === "Daily Steps"

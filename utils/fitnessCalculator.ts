@@ -1,3 +1,6 @@
+import { HistoryItem } from '@/contexts/HistoryContext';
+import { HealthValue } from 'react-native-health';
+
 export interface HealthMetrics {
   // Cardiovascular Health
   restingHeartRate: number;
@@ -29,6 +32,17 @@ export interface FitnessScoreResult {
     maxPoints: number;
     reason: string;
   }>;
+}
+
+export interface MonthlyAverageResult {
+  totalScore: number;
+  cardiovascularPoints: number;
+  recoveryPoints: number;
+  activityPoints: number;
+  bonusPoints: number;
+  fitnessLevel: string;
+  dataPointsCount: number;
+  isEstimated: boolean;
 }
 
 export function calculateFitnessScore(metrics: HealthMetrics): FitnessScoreResult {
@@ -257,21 +271,33 @@ export function calculateFitnessScore(metrics: HealthMetrics): FitnessScoreResul
     reason: intensityReason,
   });
   
-  // 9. Daily Activity (Today's steps)
+  // 9. Daily Activity (Today's steps) - More realistic and stricter scoring
   let stepsPoints = 0;
   let stepsReason = '';
-  if (metrics.dailySteps > 10000) {
+  if (metrics.dailySteps >= 12000) {
     stepsPoints = 10;
+    stepsReason = `Outstanding daily activity (${metrics.dailySteps.toLocaleString()} steps) - exceptionally active lifestyle`;
+  } else if (metrics.dailySteps >= 10000) {
+    stepsPoints = 9;
     stepsReason = `Excellent daily activity (${metrics.dailySteps.toLocaleString()} steps) - very active lifestyle`;
-  } else if (metrics.dailySteps >= 7500 && metrics.dailySteps <= 10000) {
-    stepsPoints = 8;
+  } else if (metrics.dailySteps >= 8000) {
+    stepsPoints = 7;
     stepsReason = `Good daily activity (${metrics.dailySteps.toLocaleString()} steps) - active lifestyle`;
-  } else if (metrics.dailySteps >= 5000 && metrics.dailySteps <= 7499) {
-    stepsPoints = 6;
+  } else if (metrics.dailySteps >= 6000) {
+    stepsPoints = 5;
     stepsReason = `Moderate daily activity (${metrics.dailySteps.toLocaleString()} steps) - try to walk more throughout the day`;
+  } else if (metrics.dailySteps >= 4000) {
+    stepsPoints = 3;
+    stepsReason = `Below average activity (${metrics.dailySteps.toLocaleString()} steps) - aim for more daily movement`;
+  } else if (metrics.dailySteps >= 2000) {
+    stepsPoints = 2;
+    stepsReason = `Low daily activity (${metrics.dailySteps.toLocaleString()} steps) - significantly increase daily walking`;
+  } else if (metrics.dailySteps >= 500) {
+    stepsPoints = 1;
+    stepsReason = `Very low daily activity (${metrics.dailySteps.toLocaleString()} steps) - start with small walks and build up`;
   } else {
-    stepsPoints = 4;
-    stepsReason = `Low daily activity (${metrics.dailySteps.toLocaleString()} steps) - increase daily movement and walking`;
+    stepsPoints = 0;
+    stepsReason = `Minimal daily activity (${metrics.dailySteps.toLocaleString()} steps) - urgent need to increase movement`;
   }
   activityPoints += stepsPoints;
   historyItems.push({
@@ -372,5 +398,285 @@ export function getZeroHealthMetrics(): HealthMetrics {
     weeklyTrainingTime: 0,
     trainingIntensity: 0,
     dailySteps: 0,
+  };
+}
+
+// Generate sample historical data for demonstration
+export function generateSampleHistoryData(): Array<{
+  category: 'Cardiovascular Health' | 'Recovery & Regeneration' | 'Activity & Training' | 'Bonus Metric';
+  metric: string;
+  points: number;
+  maxPoints: number;
+  reason: string;
+  timestamp: Date;
+}> {
+  const history: Array<{
+    category: 'Cardiovascular Health' | 'Recovery & Regeneration' | 'Activity & Training' | 'Bonus Metric';
+    metric: string;
+    points: number;
+    maxPoints: number;
+    reason: string;
+    timestamp: Date;
+  }> = [];
+
+  // Generate data for the last 30 days
+  for (let i = 0; i < 30; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    
+    // Generate varying health metrics for each day
+    const dailyVariation = Math.random() * 0.4 - 0.2; // -20% to +20% variation
+    
+    const mockMetrics: HealthMetrics = {
+      restingHeartRate: 55 + Math.floor(Math.random() * 10 - 5), // 50-60
+      heartRateVariability: 45 + Math.floor(Math.random() * 20 - 10), // 35-55
+      vo2Max: 40 + Math.floor(Math.random() * 10 - 5), // 35-45
+      deepSleepPercentage: 18 + Math.floor(Math.random() * 8 - 4), // 14-22
+      remSleepPercentage: 22 + Math.floor(Math.random() * 8 - 4), // 18-26
+      sleepConsistency: 75 + Math.floor(Math.random() * 20 - 10), // 65-85
+      weeklyTrainingTime: 200 + Math.floor(Math.random() * 100 - 50), // 150-250
+      trainingIntensity: 60 + Math.floor(Math.random() * 20 - 10), // 50-70
+      dailySteps: 8500 + Math.floor(Math.random() * 3000 - 1500), // 7000-10000
+    };
+
+    const dayResult = calculateFitnessScore(mockMetrics);
+    
+    // Add each metric with the historical timestamp
+    dayResult.historyItems.forEach(item => {
+      history.push({
+        ...item,
+        timestamp: new Date(date.getTime() + Math.random() * 24 * 60 * 60 * 1000), // Random time during the day
+      });
+    });
+  }
+
+  return history;
+}
+
+// Convert historical health data to history items
+export function convertHistoricalDataToHistoryItems(
+  historicalData: Array<{
+    date: Date;
+    stepsData: HealthValue[];
+    heartRateData: HealthValue[];
+    hrvData: HealthValue[];
+    sleepData: any[];
+  }>
+): Array<{
+  category: 'Cardiovascular Health' | 'Recovery & Regeneration' | 'Activity & Training' | 'Bonus Metric';
+  metric: string;
+  points: number;
+  maxPoints: number;
+  reason: string;
+  timestamp: Date;
+}> {
+  const historyItems: Array<{
+    category: 'Cardiovascular Health' | 'Recovery & Regeneration' | 'Activity & Training' | 'Bonus Metric';
+    metric: string;
+    points: number;
+    maxPoints: number;
+    reason: string;
+    timestamp: Date;
+  }> = [];
+
+  console.log(`Converting ${historicalData.length} days of historical data to history items`);
+
+  let daysWithData = 0;
+  let daysWithoutData = 0;
+
+  historicalData.forEach((dayData, index) => {
+    // Calculate daily steps average
+    const dailySteps = dayData.stepsData.reduce((sum, sample) => sum + (sample.value || 0), 0);
+    
+    // Calculate daily heart rate average
+    const avgHeartRate = dayData.heartRateData.length > 0 
+      ? dayData.heartRateData.reduce((sum, sample) => sum + sample.value, 0) / dayData.heartRateData.length 
+      : 0;
+    
+    // Calculate daily HRV average
+    const avgHRV = dayData.hrvData.length > 0 
+      ? dayData.hrvData.reduce((sum, sample) => sum + sample.value, 0) / dayData.hrvData.length 
+      : 0;
+
+    console.log(`Day ${index} (${dayData.date.toDateString()}): Steps=${dailySteps}, HR=${avgHeartRate}, HRV=${avgHRV}, Sleep samples=${dayData.sleepData.length}`);
+
+    // Calculate sleep data (simplified)
+    let totalSleep = 0;
+    let totalDeepSleep = 0;
+    let totalRemSleep = 0;
+
+    dayData.sleepData.forEach(sample => {
+      const duration = (new Date(sample.endDate).getTime() - new Date(sample.startDate).getTime()) / (1000 * 60 * 60);
+      totalSleep += duration;
+      
+      if (sample.value === "DEEP") {
+        totalDeepSleep += duration;
+      } else if (sample.value === "REM") {
+        totalRemSleep += duration;
+      }
+    });
+
+    const deepSleepPercentage = totalSleep > 0 ? (totalDeepSleep / totalSleep) * 100 : 0;
+    const remSleepPercentage = totalSleep > 0 ? (totalRemSleep / totalSleep) * 100 : 0;
+
+    // Create metrics for this day
+    const dayMetrics: HealthMetrics = {
+      restingHeartRate: Math.round(avgHeartRate),
+      heartRateVariability: Math.round(avgHRV),
+      vo2Max: 0, // VO2Max is usually calculated less frequently
+      deepSleepPercentage: Math.round(deepSleepPercentage * 10) / 10,
+      remSleepPercentage: Math.round(remSleepPercentage * 10) / 10,
+      sleepConsistency: 75, // Default value, would need more complex calculation
+      weeklyTrainingTime: 0, // Would need workout data
+      trainingIntensity: 0, // Would need workout data
+      dailySteps: dailySteps,
+    };
+
+    // Only create history items for metrics that have actual data (not zeros)
+    const dayResult = calculateFitnessScore(dayMetrics);
+    
+    dayResult.historyItems.forEach(item => {
+      // Only add history items if the metric has meaningful data
+      let shouldInclude = false;
+      
+      if (item.category === 'Activity & Training' && item.metric === 'Daily Steps' && dailySteps > 0) {
+        shouldInclude = true;
+      } else if (item.category === 'Cardiovascular Health') {
+        if ((item.metric === 'Resting Heart Rate' && avgHeartRate > 0) ||
+            (item.metric === 'Heart Rate Variability' && avgHRV > 0) ||
+            (item.metric === 'VO2 Max' && dayMetrics.vo2Max > 0)) {
+          shouldInclude = true;
+        }
+      } else if (item.category === 'Recovery & Regeneration' && totalSleep > 0) {
+        shouldInclude = true;
+      } else if (item.category === 'Activity & Training' && 
+                 (item.metric === 'Weekly Training Time' || item.metric === 'Training Intensity') &&
+                 (dayMetrics.weeklyTrainingTime > 0 || dayMetrics.trainingIntensity > 0)) {
+        shouldInclude = true;
+      } else if (item.category === 'Bonus Metric' && 
+                 (dailySteps > 0 || avgHeartRate > 0 || avgHRV > 0 || totalSleep > 0)) {
+        shouldInclude = true;
+      }
+      
+      if (shouldInclude) {
+        historyItems.push({
+          ...item,
+          timestamp: dayData.date,
+        });
+      }
+    });
+
+    const hasAnyData = dailySteps > 0 || avgHeartRate > 0 || avgHRV > 0 || totalSleep > 0;
+    if (hasAnyData) {
+      daysWithData++;
+    } else {
+      daysWithoutData++;
+    }
+
+    const itemsAdded = dayResult.historyItems.filter(item => {
+      if (item.category === 'Activity & Training' && item.metric === 'Daily Steps') return dailySteps > 0;
+      if (item.category === 'Cardiovascular Health' && item.metric === 'Resting Heart Rate') return avgHeartRate > 0;
+      if (item.category === 'Cardiovascular Health' && item.metric === 'Heart Rate Variability') return avgHRV > 0;
+      if (item.category === 'Recovery & Regeneration') return totalSleep > 0;
+      return false;
+    }).length;
+
+    if (hasAnyData) {
+      console.log(`Day ${index}: Added ${itemsAdded} out of ${dayResult.historyItems.length} possible history items`);
+    }
+  });
+
+  console.log(`Summary: ${daysWithData} days with data, ${daysWithoutData} days without data. Generated ${historyItems.length} history items total.`);
+
+  return historyItems;
+}
+
+export function calculateMonthlyAverage(
+  historyItems: HistoryItem[], 
+  currentMetrics: HealthMetrics
+): MonthlyAverageResult {
+  // Filter history items from the last 30 days
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  const recentHistory = historyItems.filter(
+    item => item.timestamp >= thirtyDaysAgo
+  );
+
+  // If no historical data, use current metrics
+  if (recentHistory.length === 0) {
+    const currentResult = calculateFitnessScore(currentMetrics);
+    return {
+      totalScore: currentResult.totalScore,
+      cardiovascularPoints: currentResult.cardiovascularPoints,
+      recoveryPoints: currentResult.recoveryPoints,
+      activityPoints: currentResult.activityPoints,
+      bonusPoints: currentResult.bonusPoints,
+      fitnessLevel: currentResult.fitnessLevel,
+      dataPointsCount: 0,
+      isEstimated: true,
+    };
+  }
+
+  // Group history items by category
+  const categoryTotals = {
+    'Cardiovascular Health': { points: 0, maxPoints: 0, count: 0 },
+    'Recovery & Regeneration': { points: 0, maxPoints: 0, count: 0 },
+    'Activity & Training': { points: 0, maxPoints: 0, count: 0 },
+    'Bonus Metric': { points: 0, maxPoints: 0, count: 0 },
+  };
+
+  // Sum up points for each category
+  recentHistory.forEach(item => {
+    if (categoryTotals[item.category]) {
+      categoryTotals[item.category].points += item.points;
+      categoryTotals[item.category].maxPoints += item.maxPoints;
+      categoryTotals[item.category].count += 1;
+    }
+  });
+
+  // Calculate averages for each category based on actual average points achieved
+  // Only calculate if we have data, otherwise use current metrics as fallback
+  const cardiovascularPoints = categoryTotals['Cardiovascular Health'].count > 0 
+    ? Math.round(categoryTotals['Cardiovascular Health'].points / categoryTotals['Cardiovascular Health'].count)
+    : Math.round(calculateFitnessScore(currentMetrics).cardiovascularPoints);
+  
+  const recoveryPoints = categoryTotals['Recovery & Regeneration'].count > 0
+    ? Math.round(categoryTotals['Recovery & Regeneration'].points / categoryTotals['Recovery & Regeneration'].count)
+    : Math.round(calculateFitnessScore(currentMetrics).recoveryPoints);
+  
+  const activityPoints = categoryTotals['Activity & Training'].count > 0
+    ? Math.round(categoryTotals['Activity & Training'].points / categoryTotals['Activity & Training'].count)
+    : Math.round(calculateFitnessScore(currentMetrics).activityPoints);
+  
+  const bonusPoints = categoryTotals['Bonus Metric'].count > 0
+    ? Math.round(categoryTotals['Bonus Metric'].points / categoryTotals['Bonus Metric'].count)
+    : Math.round(calculateFitnessScore(currentMetrics).bonusPoints);
+
+  const totalScore = cardiovascularPoints + recoveryPoints + activityPoints + bonusPoints;
+
+  // Determine fitness level based on total score
+  let fitnessLevel: string;
+  if (totalScore >= 90) {
+    fitnessLevel = "Topform!";
+  } else if (totalScore >= 70) {
+    fitnessLevel = "Stark & Aktiv";
+  } else if (totalScore >= 50) {
+    fitnessLevel = "Solide Fortschritte";
+  } else if (totalScore >= 30) {
+    fitnessLevel = "Auf dem Weg";
+  } else {
+    fitnessLevel = "Zeit für Veränderung";
+  }
+
+  return {
+    totalScore,
+    cardiovascularPoints,
+    recoveryPoints,
+    activityPoints,
+    bonusPoints,
+    fitnessLevel,
+    dataPointsCount: recentHistory.length,
+    isEstimated: false,
   };
 }

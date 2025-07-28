@@ -9,9 +9,11 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { useHistory } from '@/contexts/HistoryContext';
 
 export default function SettingsScreen() {
   const { themeMode, setThemeMode } = useTheme();
+  const { refreshHistoricalData } = useHistory();
   const [themeDialogVisible, setThemeDialogVisible] = useState(false);
   const backgroundColor = useThemeColor({}, 'background');
   const insets = useSafeAreaInsets();
@@ -72,12 +74,22 @@ export default function SettingsScreen() {
               onPress={() => setThemeDialogVisible(true)}
             />
             
+            
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.settingsCard}>
+          <Card.Content>
+            <ThemedText type="subtitle" style={styles.sectionTitle}>Debug</ThemedText>
+            
             <List.Item
-              title="History"
-              description="View your scoring history"
-              left={() => <IconSymbol name="clock.fill" size={24} color="#34C759" />}
-              right={() => <IconSymbol name="chevron.right" size={16} color="#666" />}
-              onPress={() => router.push('/history')}
+              title="Refresh Historical Data"
+              description="Force refresh health history from HealthKit"
+              left={() => <IconSymbol name="arrow.clockwise" size={24} color="#FF9500" />}
+              onPress={async () => {
+                console.log('Manual refresh triggered by user');
+                await refreshHistoricalData();
+              }}
             />
             
           </Card.Content>

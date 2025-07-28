@@ -3,10 +3,12 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { Card, Chip, ProgressBar, Text } from "react-native-paper";
 import { useEffect, useRef } from "react";
+import { router } from "expo-router";
 
 import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
@@ -14,26 +16,34 @@ import { ThemedView } from "@/components/ThemedView";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useHistory } from "@/contexts/HistoryContext";
-import { calculateFitnessScore } from "@/utils/fitnessCalculator";
+import { calculateFitnessScore, calculateMonthlyAverage } from "@/utils/fitnessCalculator";
 
 export default function OverviewScreen() {
   const { healthMetrics, isLoading, error, isHealthKitAvailable, refreshData } =
     useHealthData();
-  const { addHistoryItem } = useHistory();
+  const { addHistoryItem, historyItems } = useHistory();
   const fitnessResult = calculateFitnessScore(healthMetrics);
+  const monthlyAverage = calculateMonthlyAverage(historyItems, healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
 
   const lastScoreRef = useRef<number>(-1);
+  const lastHistoryUpdateRef = useRef<string>('');
 
   useEffect(() => {
-    // Only add history items when the score actually changes
-    if (fitnessResult.totalScore !== lastScoreRef.current && fitnessResult.historyItems.length > 0) {
-      lastScoreRef.current = fitnessResult.totalScore;
+    // Add history items daily (check if we've already added for today)
+    const today = new Date().toDateString();
+    
+    if (lastHistoryUpdateRef.current !== today && fitnessResult.historyItems.length > 0) {
+      lastHistoryUpdateRef.current = today;
       fitnessResult.historyItems.forEach(item => {
         addHistoryItem(item);
       });
     }
-  }, [fitnessResult.totalScore, addHistoryItem]);
+  }, [fitnessResult.historyItems, addHistoryItem]);
+
+  const navigateToFilteredHistory = (category: string) => {
+    router.push(`/filtered-history?filter=${encodeURIComponent(category)}`);
+  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -71,27 +81,32 @@ export default function OverviewScreen() {
             <Card style={styles.fitnessCard}>
               <Card.Content style={styles.cardContent}>
                 <FitnessRings
-                  fitnessScore={fitnessResult.totalScore}
-                  regenerationScore={fitnessResult.recoveryPoints}
-                  overallLevel={fitnessResult.totalScore}
+                  fitnessScore={monthlyAverage.totalScore}
+                  regenerationScore={monthlyAverage.recoveryPoints}
+                  overallLevel={monthlyAverage.totalScore}
                   size={140}
                 />
                 <View style={styles.fitnessInfo}>
                   <Text variant="headlineSmall" style={styles.fitnessLevel}>
-                    {fitnessResult.fitnessLevel}
+                    {monthlyAverage.fitnessLevel}
                   </Text>
                   <Text variant="bodyMedium" style={styles.scoreText}>
-                    Gesamt-Score: {fitnessResult.totalScore}/100
+                    Monats-Durchschnitt: {monthlyAverage.totalScore}/100
                   </Text>
                   <Text variant="bodySmall" style={styles.detailText}>
-                    Herz-Kreislauf: {fitnessResult.cardiovascularPoints}/30
+                    Herz-Kreislauf: {monthlyAverage.cardiovascularPoints}/30
                   </Text>
                   <Text variant="bodySmall" style={styles.detailText}>
-                    Regeneration: {fitnessResult.recoveryPoints}/35
+                    Regeneration: {monthlyAverage.recoveryPoints}/35
                   </Text>
                   <Text variant="bodySmall" style={styles.detailText}>
-                    Aktivität: {fitnessResult.activityPoints}/30
+                    Aktivität: {monthlyAverage.activityPoints}/30
                   </Text>
+                  {monthlyAverage.isEstimated && (
+                    <Text variant="bodySmall" style={[styles.detailText, { fontStyle: 'italic' }]}>
+                      * Basiert auf aktuellen Daten
+                    </Text>
+                  )}
                 </View>
               </Card.Content>
             </Card>
@@ -100,71 +115,79 @@ export default function OverviewScreen() {
           {/* Metrics Overview Cards */}
           <ThemedView style={styles.metricsContainer}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Gesundheits-Übersicht
+              Monats-Übersicht
             </ThemedText>
 
             <View style={styles.metricsGrid}>
-              <Card style={styles.metricCard}>
-                <Card.Content style={styles.metricContent}>
-                  <Text variant="labelMedium" style={styles.metricLabel}>
-                    Herz-Kreislauf
-                  </Text>
-                  <Text variant="headlineSmall" style={styles.metricValue}>
-                    {fitnessResult.cardiovascularPoints}/30
-                  </Text>
-                  <ProgressBar
-                    progress={fitnessResult.cardiovascularPoints / 30}
-                    style={styles.progressBar}
-                  />
-                </Card.Content>
-              </Card>
+              <TouchableOpacity onPress={() => navigateToFilteredHistory('Cardiovascular Health')}>
+                <Card style={styles.metricCard}>
+                  <Card.Content style={styles.metricContent}>
+                    <Text variant="labelMedium" style={styles.metricLabel}>
+                      Herz-Kreislauf
+                    </Text>
+                    <Text variant="headlineSmall" style={styles.metricValue}>
+                      {monthlyAverage.cardiovascularPoints}/30
+                    </Text>
+                    <ProgressBar
+                      progress={monthlyAverage.cardiovascularPoints / 30}
+                      style={styles.progressBar}
+                    />
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
 
-              <Card style={styles.metricCard}>
-                <Card.Content style={styles.metricContent}>
-                  <Text variant="labelMedium" style={styles.metricLabel}>
-                    Regeneration
-                  </Text>
-                  <Text variant="headlineSmall" style={styles.metricValue}>
-                    {fitnessResult.recoveryPoints}/35
-                  </Text>
-                  <ProgressBar
-                    progress={fitnessResult.recoveryPoints / 35}
-                    style={styles.progressBar}
-                  />
-                </Card.Content>
-              </Card>
+              <TouchableOpacity onPress={() => navigateToFilteredHistory('Recovery & Regeneration')}>
+                <Card style={styles.metricCard}>
+                  <Card.Content style={styles.metricContent}>
+                    <Text variant="labelMedium" style={styles.metricLabel}>
+                      Regeneration
+                    </Text>
+                    <Text variant="headlineSmall" style={styles.metricValue}>
+                      {monthlyAverage.recoveryPoints}/35
+                    </Text>
+                    <ProgressBar
+                      progress={monthlyAverage.recoveryPoints / 35}
+                      style={styles.progressBar}
+                    />
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.metricsGrid}>
-              <Card style={styles.metricCard}>
-                <Card.Content style={styles.metricContent}>
-                  <Text variant="labelMedium" style={styles.metricLabel}>
-                    Aktivität
-                  </Text>
-                  <Text variant="headlineSmall" style={styles.metricValue}>
-                    {fitnessResult.activityPoints}/30
-                  </Text>
-                  <ProgressBar
-                    progress={fitnessResult.activityPoints / 30}
-                    style={styles.progressBar}
-                  />
-                </Card.Content>
-              </Card>
+              <TouchableOpacity onPress={() => navigateToFilteredHistory('Activity & Training')}>
+                <Card style={styles.metricCard}>
+                  <Card.Content style={styles.metricContent}>
+                    <Text variant="labelMedium" style={styles.metricLabel}>
+                      Aktivität
+                    </Text>
+                    <Text variant="headlineSmall" style={styles.metricValue}>
+                      {monthlyAverage.activityPoints}/30
+                    </Text>
+                    <ProgressBar
+                      progress={monthlyAverage.activityPoints / 30}
+                      style={styles.progressBar}
+                    />
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
 
-              <Card style={styles.metricCard}>
-                <Card.Content style={styles.metricContent}>
-                  <Text variant="labelMedium" style={styles.metricLabel}>
-                    Bonus
-                  </Text>
-                  <Text variant="headlineSmall" style={styles.metricValue}>
-                    {fitnessResult.bonusPoints}/5
-                  </Text>
-                  <ProgressBar
-                    progress={fitnessResult.bonusPoints / 5}
-                    style={styles.progressBar}
-                  />
-                </Card.Content>
-              </Card>
+              <TouchableOpacity onPress={() => navigateToFilteredHistory('Bonus Metric')}>
+                <Card style={styles.metricCard}>
+                  <Card.Content style={styles.metricContent}>
+                    <Text variant="labelMedium" style={styles.metricLabel}>
+                      Bonus
+                    </Text>
+                    <Text variant="headlineSmall" style={styles.metricValue}>
+                      {monthlyAverage.bonusPoints}/5
+                    </Text>
+                    <ProgressBar
+                      progress={monthlyAverage.bonusPoints / 5}
+                      style={styles.progressBar}
+                    />
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
             </View>
           </ThemedView>
 
@@ -178,17 +201,24 @@ export default function OverviewScreen() {
               <Card.Content>
                 <View style={styles.chipContainer}>
                   <Chip icon="heart" mode="outlined" style={styles.chip}>
-                    {fitnessResult.fitnessLevel}
+                    {monthlyAverage.fitnessLevel}
                   </Chip>
                   <Chip icon="trending-up" mode="outlined" style={styles.chip}>
-                    {fitnessResult.totalScore} Punkte
+                    {monthlyAverage.totalScore} Punkte (Ø Monat)
                   </Chip>
+                  {monthlyAverage.dataPointsCount > 0 && (
+                    <Chip icon="database" mode="outlined" style={styles.chip}>
+                      {monthlyAverage.dataPointsCount} Datenpunkte
+                    </Chip>
+                  )}
                 </View>
 
                 <ThemedText style={styles.insightText}>
-                  Die äußere Ring zeigt deine Regeneration, der innere Ring
-                  deine Gesamtfitness. Arbeite kontinuierlich an allen Bereichen
-                  für optimale Ergebnisse.
+                  Dein VitalityScore basiert auf dem Durchschnitt der letzten 30 Tage.
+                  {monthlyAverage.isEstimated 
+                    ? ' Bei wenigen Daten werden aktuelle Werte verwendet.'
+                    : ` Basiert auf ${monthlyAverage.dataPointsCount} Datenpunkten.`
+                  } Arbeite kontinuierlich an allen Bereichen für optimale Ergebnisse.
                 </ThemedText>
               </Card.Content>
             </Card>

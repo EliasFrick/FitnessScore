@@ -1,6 +1,6 @@
 import { HealthMetrics } from './healthService';
 import StorageService from './storageService';
-import { calculateFitnessScore, getFitnessLevel } from '@/utils/fitnessCalculator';
+import { calculateFitnessScore } from '@/utils/fitnessCalculator';
 
 export interface HealthSummary {
   currentMetrics: HealthMetrics;
@@ -47,8 +47,9 @@ export class HealthAggregationService {
   }
 
   async createHealthSummary(currentMetrics: HealthMetrics): Promise<HealthSummary> {
-    const vitalityScore = calculateFitnessScore(currentMetrics);
-    const fitnessLevel = getFitnessLevel(vitalityScore);
+    const fitnessResult = calculateFitnessScore(currentMetrics);
+    const vitalityScore = fitnessResult.totalScore;
+    const fitnessLevel = fitnessResult.fitnessLevel;
     
     // Get aggregated data for trends
     const aggregatedData = await this.storageService.getAggregatedHealthData();
@@ -72,8 +73,9 @@ export class HealthAggregationService {
   }
 
   async createHealthContext(currentMetrics: HealthMetrics): Promise<HealthContext> {
-    const vitalityScore = calculateFitnessScore(currentMetrics);
-    const fitnessLevel = getFitnessLevel(vitalityScore);
+    const fitnessResult = calculateFitnessScore(currentMetrics);
+    const vitalityScore = fitnessResult.totalScore;
+    const fitnessLevel = fitnessResult.fitnessLevel;
     
     // Get aggregated data for trends
     const aggregatedData = await this.storageService.getAggregatedHealthData();

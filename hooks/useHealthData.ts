@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Platform } from 'react-native';
 import HealthService from '@/services/healthService';
 import { HealthMetrics, getZeroHealthMetrics } from '@/utils/fitnessCalculator';
+import { useHistory } from '@/contexts/HistoryContext';
 
 export function useHealthData() {
   const [healthMetrics, setHealthMetrics] = useState<HealthMetrics>(getZeroHealthMetrics());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isHealthKitAvailable, setIsHealthKitAvailable] = useState(Platform.OS === 'ios');
+  const { refreshHistoricalData } = useHistory();
 
   const fetchHealthData = async () => {
     if (Platform.OS !== 'ios') {
@@ -24,6 +26,9 @@ export function useHealthData() {
       
       const data = await HealthService.getAllHealthMetrics();
       setHealthMetrics(data);
+      
+      // Also refresh historical data when we fetch current data
+      await refreshHistoricalData();
     } catch (err) {
       console.error('Error fetching health data:', err);
       setError('No data available - please allow Apple Health access');

@@ -107,7 +107,7 @@ Latest Health Metrics:
 - Deep Sleep: ${context.currentMetrics.deepSleepPercentage}%
 - REM Sleep: ${context.currentMetrics.remSleepPercentage}%
 - Sleep Consistency: ${context.currentMetrics.sleepConsistency}%
-- Weekly Training Time: ${context.currentMetrics.weeklyTrainingTime} minutes
+- Monthly Training Time: ${context.currentMetrics.monthlyTrainingTime} minutes
 - Daily Steps: ${context.currentMetrics.dailySteps}
 
 Recent Trends (past month):
@@ -168,8 +168,6 @@ Key Strengths: ${context.strengths.join(', ') || 'Building healthy foundations'}
       };
 
     } catch (error: any) {
-      console.error('Error generating AI response:', error);
-      
       // Fallback to rule-based response
       return this.generateFallbackResponse(userMessage, healthContext);
     }
@@ -223,7 +221,7 @@ Key Strengths: ${context.strengths.join(', ') || 'Building healthy foundations'}
     // Activity and training questions
     if (input.includes('training') || input.includes('exercise') || input.includes('activity') || input.includes('steps')) {
       const steps = healthContext.currentMetrics.dailySteps;
-      const training = healthContext.currentMetrics.weeklyTrainingTime;
+      const training = healthContext.currentMetrics.monthlyTrainingTime / 4; // Convert monthly to weekly
       
       return {
         message: `Your activity levels show ${steps} daily steps and ${training} minutes of weekly training. ${steps >= 8000 ? 'Great job on your daily activity!' : 'Try to increase your daily steps toward 8,000-10,000.'} ${training >= 150 ? 'You\'re meeting the recommended exercise guidelines!' : 'Aim for 150+ minutes of exercise weekly for optimal health.'} Your activity trend is ${healthContext.recentTrends.activityTrend}. Consistency is key for long-term health benefits.`,

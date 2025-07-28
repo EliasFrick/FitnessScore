@@ -42,7 +42,6 @@ export default function AISettingsScreen() {
       
       setHasConsent(consent);
     } catch (error) {
-      console.error('Error loading settings:', error);
     }
   };
 
@@ -64,7 +63,6 @@ export default function AISettingsScreen() {
       setIsConfigured(true);
       Alert.alert('Success', 'API key saved successfully! You can now use AI features.');
     } catch (error) {
-      console.error('Error saving API key:', error);
       Alert.alert('Error', 'Failed to save API key. Please try again.');
     } finally {
       setIsLoading(false);
@@ -87,7 +85,6 @@ export default function AISettingsScreen() {
               setIsConfigured(false);
               Alert.alert('Success', 'API key removed successfully.');
             } catch (error) {
-              console.error('Error removing API key:', error);
               Alert.alert('Error', 'Failed to remove API key.');
             }
           },
@@ -108,7 +105,6 @@ export default function AISettingsScreen() {
         Alert.alert('Privacy Consent', 'Data processing disabled. AI features will use only basic health summaries.');
       }
     } catch (error) {
-      console.error('Error updating consent:', error);
       Alert.alert('Error', 'Failed to update privacy settings.');
     }
   };
@@ -128,7 +124,6 @@ export default function AISettingsScreen() {
               setHasConsent(false);
               Alert.alert('Success', 'All data cleared successfully.');
             } catch (error) {
-              console.error('Error clearing data:', error);
               Alert.alert('Error', 'Failed to clear data.');
             }
           },

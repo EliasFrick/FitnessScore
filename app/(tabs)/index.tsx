@@ -27,17 +27,16 @@ export default function OverviewScreen() {
   const { healthMetrics, isLoading, error, isHealthKitAvailable, refreshData } =
     useHealthData();
   const { addHistoryItem, historyItems } = useHistory();
-  const { themeMode, colorScheme, setThemeMode } = useTheme();
+  const { colorScheme, setThemeMode } = useTheme();
   const fitnessResult = calculateFitnessScore(healthMetrics);
   const monthlyAverage = calculateMonthlyAverage(historyItems, healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
-  const tintColor = useThemeColor({}, "tint");
 
-  const lastScoreRef = useRef<number>(-1);
   const lastHistoryUpdateRef = useRef<string>("");
 
+  console.log(healthMetrics);
+
   useEffect(() => {
-    // Add history items daily (check if we've already added for today)
     const today = new Date().toDateString();
 
     if (
@@ -70,7 +69,9 @@ export default function OverviewScreen() {
               <TouchableOpacity
                 style={[
                   styles.customSwitch,
-                  colorScheme === "dark" ? styles.switchDark : styles.switchLight,
+                  colorScheme === "dark"
+                    ? styles.switchDark
+                    : styles.switchLight,
                 ]}
                 onPress={() =>
                   setThemeMode(colorScheme === "dark" ? "light" : "dark")
@@ -88,7 +89,9 @@ export default function OverviewScreen() {
                 <View
                   style={[
                     styles.switchThumb,
-                    colorScheme === "dark" ? styles.thumbDark : styles.thumbLight,
+                    colorScheme === "dark"
+                      ? styles.thumbDark
+                      : styles.thumbLight,
                   ]}
                 />
               </TouchableOpacity>
@@ -128,18 +131,6 @@ export default function OverviewScreen() {
                 <View style={styles.fitnessInfo}>
                   <Text variant="headlineSmall" style={styles.fitnessLevel}>
                     {monthlyAverage.fitnessLevel}
-                  </Text>
-                  <Text variant="bodyMedium" style={styles.scoreText}>
-                    Monats-Durchschnitt: {monthlyAverage.totalScore}/100
-                  </Text>
-                  <Text variant="bodySmall" style={styles.detailText}>
-                    Herz-Kreislauf: {monthlyAverage.cardiovascularPoints}/30
-                  </Text>
-                  <Text variant="bodySmall" style={styles.detailText}>
-                    Regeneration: {monthlyAverage.recoveryPoints}/35
-                  </Text>
-                  <Text variant="bodySmall" style={styles.detailText}>
-                    Aktivität: {monthlyAverage.activityPoints}/30
                   </Text>
                   {monthlyAverage.isEstimated && (
                     <Text

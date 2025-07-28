@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Platform } from 'react-native';
 import HealthService from '@/services/healthService';
-import { HealthMetrics, getZeroHealthMetrics } from '@/utils/fitnessCalculator';
+import { HealthMetrics } from '@/types/health';
+import { getZeroHealthMetrics } from '@/utils/fitnessCalculator';
 import { useHistory } from '@/contexts/HistoryContext';
 
 export function useHealthData() {
@@ -30,7 +31,6 @@ export function useHealthData() {
       // Also refresh historical data when we fetch current data
       await refreshHistoricalData();
     } catch (err) {
-      console.error('Error fetching health data:', err);
       setError('No data available - please allow Apple Health access');
       // Use zero metrics when no data is available
       setHealthMetrics(getZeroHealthMetrics());

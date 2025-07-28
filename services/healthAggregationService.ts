@@ -1,4 +1,4 @@
-import { HealthMetrics } from './healthService';
+import { HealthMetrics } from '@/types/health';
 import StorageService from './storageService';
 import { calculateFitnessScore } from '@/utils/fitnessCalculator';
 
@@ -136,7 +136,7 @@ export class HealthAggregationService {
     }
 
     // Activity Insights
-    if (metrics.dailySteps > 10000 && metrics.weeklyTrainingTime > 150) {
+    if (metrics.dailySteps > 10000 && metrics.monthlyTrainingTime > 600) {
       insights.push("Outstanding activity levels - you're exceeding recommended guidelines!");
     } else if (metrics.dailySteps < 5000) {
       insights.push("Increasing daily movement could significantly boost your vitality score.");
@@ -183,8 +183,8 @@ export class HealthAggregationService {
     if (metrics.dailySteps < 8000) {
       recommendations.push("Aim for 8,000-10,000 steps daily by adding short walks throughout the day.");
     }
-    if (metrics.weeklyTrainingTime < 150) {
-      recommendations.push("Target 150 minutes of moderate exercise or 75 minutes of vigorous exercise weekly.");
+    if (metrics.monthlyTrainingTime < 600) {
+      recommendations.push("Target 600 minutes of moderate exercise or 300 minutes of vigorous exercise monthly.");
     }
 
     // Declining Trend Recommendations
@@ -213,7 +213,7 @@ export class HealthAggregationService {
     if (metrics.deepSleepPercentage < 10) concerns.push("Insufficient deep sleep");
     if (metrics.sleepConsistency < 60) concerns.push("Inconsistent sleep schedule");
     if (metrics.dailySteps < 5000) concerns.push("Low daily activity");
-    if (metrics.weeklyTrainingTime < 60) concerns.push("Insufficient exercise");
+    if (metrics.monthlyTrainingTime < 240) concerns.push("Insufficient exercise");
 
     if (trends.heartHealthTrend === 'declining') concerns.push("Declining cardiovascular health");
     if (trends.sleepTrend === 'declining') concerns.push("Worsening sleep quality");
@@ -235,7 +235,7 @@ export class HealthAggregationService {
     if (metrics.remSleepPercentage > 20) strengths.push("Adequate REM sleep");
     if (metrics.sleepConsistency > 85) strengths.push("Consistent sleep schedule");
     if (metrics.dailySteps > 10000) strengths.push("High daily activity");
-    if (metrics.weeklyTrainingTime > 200) strengths.push("Excellent exercise routine");
+    if (metrics.monthlyTrainingTime > 800) strengths.push("Excellent exercise routine");
 
     if (trends.heartHealthTrend === 'improving') strengths.push("Improving cardiovascular health");
     if (trends.sleepTrend === 'improving') strengths.push("Better sleep quality");
@@ -245,7 +245,7 @@ export class HealthAggregationService {
   }
 
   private determineActivityLevel(metrics: HealthMetrics): 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active' {
-    const weeklyMinutes = metrics.weeklyTrainingTime;
+    const weeklyMinutes = metrics.monthlyTrainingTime / 4;
     const dailySteps = metrics.dailySteps;
 
     if (weeklyMinutes >= 300 && dailySteps >= 12000) return 'very_active';
@@ -272,7 +272,7 @@ Current Metrics:
 - Deep Sleep: ${context.currentMetrics.deepSleepPercentage}%
 - REM Sleep: ${context.currentMetrics.remSleepPercentage}%
 - Sleep Consistency: ${context.currentMetrics.sleepConsistency}%
-- Weekly Training: ${context.currentMetrics.weeklyTrainingTime} minutes
+- Monthly Training: ${context.currentMetrics.monthlyTrainingTime} minutes
 - Daily Steps: ${context.currentMetrics.dailySteps}
 
 Recent Trends:

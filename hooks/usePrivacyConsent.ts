@@ -24,7 +24,6 @@ export function usePrivacyConsent() {
         }
       }
     } catch (error) {
-      console.error('Error checking consent:', error);
       setHasConsent(false);
     } finally {
       setIsLoading(false);
@@ -37,7 +36,6 @@ export function usePrivacyConsent() {
       setHasConsent(consent);
       setShowConsentModal(false);
     } catch (error) {
-      console.error('Error setting consent:', error);
       throw error;
     }
   };
@@ -51,7 +49,6 @@ export function usePrivacyConsent() {
       await StorageService.setUserConsent(false);
       setHasConsent(false);
     } catch (error) {
-      console.error('Error revoking consent:', error);
       throw error;
     }
   };

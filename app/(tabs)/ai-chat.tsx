@@ -106,7 +106,6 @@ export default function AIChatScreen() {
       await HealthAggregationService.storeAndAggregate(healthMetrics);
 
     } catch (error) {
-      console.error('Error getting AI response:', error);
       
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),

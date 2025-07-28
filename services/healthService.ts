@@ -1,12 +1,35 @@
+/**
+ * Health Service
+ * Main service for accessing health data from HealthKit
+ */
+
 import { NativeModules, Platform } from "react-native";
 import AppleHealthKit, {
-  HealthInputOptions,
   HealthKitPermissions,
   HealthValue,
 } from "react-native-health";
+import { HealthMetrics } from '@/types/health';
+import { HealthKitInitializationError } from '@/types/errors';
+import {
+  getRestingHeartRateData,
+  getHeartRateVariabilityData,
+  getVO2MaxData,
+  getSleepAnalysisData,
+  getTodaysStepCount,
+} from './healthDataProviders';
+import {
+  getMonthlyWorkoutData,
+  getTodaysWorkoutData,
+} from './workoutDataProviders';
+import {
+  getHistoricalStepsData,
+  getHistoricalHeartRateData,
+  getHistoricalHRVData,
+  getHistoricalSleepData,
+  getHistoricalWorkoutData,
+} from './historicalDataProviders';
 
 // Workaround for react-native-health missing functions
-// This fixes the interface issues with the abandoned package
 if (Platform.OS === "ios" && NativeModules.AppleHealthKit) {
   for (let key of [
     "initHealthKit",
@@ -22,18 +45,6 @@ if (Platform.OS === "ios" && NativeModules.AppleHealthKit) {
       (AppleHealthKit as any)[key] = NativeModules.AppleHealthKit[key];
     }
   }
-}
-
-export interface HealthMetrics {
-  restingHeartRate: number;
-  heartRateVariability: number;
-  vo2Max: number;
-  deepSleepPercentage: number;
-  remSleepPercentage: number;
-  sleepConsistency: number;
-  monthlyTrainingTime: number;
-  trainingIntensity: number;
-  dailySteps: number;
 }
 
 const permissions: HealthKitPermissions = {
@@ -53,7 +64,7 @@ const permissions: HealthKitPermissions = {
 
 export class HealthService {
   private static instance: HealthService;
-  private isInitialized = false;
+  private isHealthKitInitialized = false;
 
   private constructor() {}
 
@@ -66,488 +77,30 @@ export class HealthService {
 
   async initialize(): Promise<boolean> {
     if (Platform.OS !== "ios") {
-      console.warn("Apple Health is only available on iOS");
       return false;
     }
 
     return new Promise((resolve) => {
       AppleHealthKit.initHealthKit(permissions, (error: string) => {
         if (error) {
-          console.error("Cannot grant permissions!", error);
-          this.isInitialized = false;
+          this.isHealthKitInitialized = false;
           resolve(false);
         } else {
-          this.isInitialized = true;
+          this.isHealthKitInitialized = true;
           resolve(true);
         }
       });
     });
   }
 
-  async getRestingHeartRate(): Promise<number> {
-    if (!this.isInitialized) return 0;
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // Last 7 days
-        endDate: new Date().toISOString(),
-        ascending: false,
-        limit: 7,
-      };
-
-      AppleHealthKit.getRestingHeartRateSamples(
-        options,
-        (callbackError: string, results: HealthValue[]) => {
-          if (callbackError) {
-            console.error("Error getting resting heart rate:", callbackError);
-            resolve(0);
-          } else {
-            const avgRhr =
-              results.length > 0
-                ? results.reduce((sum, sample) => sum + sample.value, 0) /
-                  results.length
-                : 0;
-            resolve(Math.round(avgRhr));
-          }
-        }
-      );
-    });
-  }
-
-  async getHeartRateVariability(): Promise<number> {
-    if (!this.isInitialized) return 0;
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // Last 7 days
-        endDate: new Date().toISOString(),
-        ascending: false,
-        limit: 7,
-      };
-
-      AppleHealthKit.getHeartRateVariabilitySamples(
-        options,
-        (callbackError: string, results: HealthValue[]) => {
-          if (callbackError) {
-            console.error("Error getting HRV:", callbackError);
-            resolve(0);
-          } else {
-            const avgHrv =
-              results.length > 0
-                ? results.reduce((sum, sample) => sum + sample.value, 0) /
-                  results.length
-                : 0;
-            resolve(Math.round(avgHrv));
-          }
-        }
-      );
-    });
-  }
-
-  async getVO2Max(): Promise<number> {
-    if (!this.isInitialized) return 0;
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        startDate: new Date(
-          Date.now() - 30 * 24 * 60 * 60 * 1000
-        ).toISOString(), // Last 30 days
-        endDate: new Date().toISOString(),
-        ascending: false,
-        limit: 5,
-      };
-
-      AppleHealthKit.getVo2MaxSamples(
-        options,
-        (callbackError: string, results: HealthValue[]) => {
-          if (callbackError) {
-            console.error("Error getting VO2Max:", callbackError);
-            resolve(0);
-          } else {
-            const avgVO2Max =
-              results.length > 0
-                ? results.reduce((sum, sample) => sum + sample.value, 0) /
-                  results.length
-                : 0;
-            resolve(Math.round(avgVO2Max * 10) / 10); // Round to 1 decimal
-          }
-        }
-      );
-    });
-  }
-
-  async getSleepData(): Promise<{
-    deepSleepPercentage: number;
-    remSleepPercentage: number;
-    sleepConsistency: number;
-  }> {
-    if (!this.isInitialized)
-      return {
-        deepSleepPercentage: 0,
-        remSleepPercentage: 0,
-        sleepConsistency: 0,
-      };
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // Last 7 days
-        endDate: new Date().toISOString(),
-      };
-
-      AppleHealthKit.getSleepSamples(
-        options,
-        (callbackError: string, results: any[]) => {
-          if (callbackError) {
-            console.error("Error getting sleep data:", callbackError);
-            resolve({
-              deepSleepPercentage: 0,
-              remSleepPercentage: 0,
-              sleepConsistency: 0,
-            });
-          } else {
-            // Calculate sleep metrics from raw data
-            let totalDeepSleep = 0;
-            let totalRemSleep = 0;
-            let totalSleep = 0;
-            const sleepDurations: number[] = [];
-
-            results.forEach((sample) => {
-              const duration =
-                new Date(sample.endDate).getTime() -
-                new Date(sample.startDate).getTime();
-              const hours = duration / (1000 * 60 * 60);
-
-              totalSleep += hours;
-
-              // Note: Sleep analysis values would need to be checked against actual API
-              // This is simplified for demonstration
-              if (sample.value === "DEEP") {
-                totalDeepSleep += hours;
-              } else if (sample.value === "REM") {
-                totalRemSleep += hours;
-              }
-
-              sleepDurations.push(hours);
-            });
-
-            const deepSleepPercentage =
-              totalSleep > 0 ? (totalDeepSleep / totalSleep) * 100 : 0;
-            const remSleepPercentage =
-              totalSleep > 0 ? (totalRemSleep / totalSleep) * 100 : 0;
-
-            // Calculate sleep consistency (lower standard deviation = better consistency)
-            const avgSleep =
-              sleepDurations.length > 0
-                ? sleepDurations.reduce((a, b) => a + b, 0) /
-                  sleepDurations.length
-                : 0;
-            const variance =
-              sleepDurations.length > 0
-                ? sleepDurations.reduce(
-                    (sum, duration) => sum + Math.pow(duration - avgSleep, 2),
-                    0
-                  ) / sleepDurations.length
-                : 0;
-            const stdDev = Math.sqrt(variance);
-            const sleepConsistency = Math.max(0, 100 - stdDev * 20); // Convert to 0-100 scale
-
-            resolve({
-              deepSleepPercentage: Math.round(deepSleepPercentage * 10) / 10,
-              remSleepPercentage: Math.round(remSleepPercentage * 10) / 10,
-              sleepConsistency: Math.round(sleepConsistency),
-            });
-          }
-        }
-      );
-    });
-  }
-
-  async getStepsData(): Promise<number> {
-    if (!this.isInitialized) return 0;
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        date: new Date().toISOString(),
-      };
-
-      AppleHealthKit.getStepCount(
-        options,
-        (callbackError: string, results: HealthValue) => {
-          if (callbackError) {
-            console.error("Error getting steps:", callbackError);
-            resolve(0);
-          } else {
-            resolve(results.value || 0);
-          }
-        }
-      );
-    });
-  }
-
-  async getHistoricalStepsData(days: number = 30): Promise<HealthValue[]> {
-    if (!this.isInitialized) return [];
-
-    const stepsData: HealthValue[] = [];
-
-    // Get daily step counts for each day
-    for (let i = 0; i < days; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      date.setHours(0, 0, 0, 0);
-
-      try {
-        const dailySteps = await new Promise<number>((resolve) => {
-          const options: HealthInputOptions = {
-            date: date.toISOString(),
-          };
-
-          AppleHealthKit.getStepCount(
-            options,
-            (callbackError: string, results: HealthValue) => {
-              if (callbackError) {
-                console.error(
-                  `Error getting steps for ${date.toDateString()}:`,
-                  callbackError
-                );
-                resolve(0);
-              } else {
-                resolve(results?.value || 0);
-              }
-            }
-          );
-        });
-
-        if (dailySteps > 0) {
-          stepsData.push({
-            value: dailySteps,
-            startDate: date.toISOString(),
-            endDate: new Date(
-              date.getTime() + 24 * 60 * 60 * 1000
-            ).toISOString(),
-          });
-        }
-      } catch (error) {
-        console.error(
-          `Error fetching steps for ${date.toDateString()}:`,
-          error
-        );
-      }
-    }
-
-    return stepsData;
-  }
-
-  async getHistoricalHeartRateData(days: number = 30): Promise<HealthValue[]> {
-    if (!this.isInitialized) return [];
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        startDate: new Date(
-          Date.now() - days * 24 * 60 * 60 * 1000
-        ).toISOString(),
-        endDate: new Date().toISOString(),
-        ascending: false,
-        limit: days * 3, // More samples for better coverage
-      };
-
-      AppleHealthKit.getRestingHeartRateSamples(
-        options,
-        (callbackError: string, results: HealthValue[]) => {
-          if (callbackError) {
-            console.error(
-              "Error getting historical heart rate:",
-              callbackError
-            );
-            resolve([]);
-          } else {
-            resolve(results || []);
-          }
-        }
-      );
-    });
-  }
-
-  async getHistoricalHRVData(days: number = 30): Promise<HealthValue[]> {
-    if (!this.isInitialized) return [];
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        startDate: new Date(
-          Date.now() - days * 24 * 60 * 60 * 1000
-        ).toISOString(),
-        endDate: new Date().toISOString(),
-        ascending: false,
-        limit: days * 2, // More samples for better averaging
-      };
-
-      AppleHealthKit.getHeartRateVariabilitySamples(
-        options,
-        (callbackError: string, results: HealthValue[]) => {
-          if (callbackError) {
-            console.error("Error getting historical HRV:", callbackError);
-            resolve([]);
-          } else {
-            resolve(results || []);
-          }
-        }
-      );
-    });
-  }
-
-  async getHistoricalSleepData(days: number = 30): Promise<any[]> {
-    if (!this.isInitialized) return [];
-
-    return new Promise((resolve) => {
-      const options: HealthInputOptions = {
-        startDate: new Date(
-          Date.now() - days * 24 * 60 * 60 * 1000
-        ).toISOString(),
-        endDate: new Date().toISOString(),
-      };
-
-      AppleHealthKit.getSleepSamples(
-        options,
-        (callbackError: string, results: any[]) => {
-          if (callbackError) {
-            console.error("Error getting historical sleep:", callbackError);
-            resolve([]);
-          } else {
-            resolve(results || []);
-          }
-        }
-      );
-    });
-  }
-
-  async getWorkoutData(): Promise<{
-    monthlyTrainingTime: number;
-    trainingIntensity: number;
-  }> {
-    if (!this.isInitialized) {
-      return { monthlyTrainingTime: 0, trainingIntensity: 0 };
-    }
-    return new Promise((resolve) => {
-      const options = {
-        startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // Last 30 days
-        endDate: new Date().toISOString(),
-      };
-
-      (AppleHealthKit as any).getAnchoredWorkouts(
-        options,
-        (callbackError: string, results: any) => {
-          if (callbackError) {
-            console.error("Error getting workout data:", callbackError);
-            resolve({ monthlyTrainingTime: 0, trainingIntensity: 0 });
-          } else {
-            let totalDuration = 0;
-            let totalCalories = 0;
-            let totalDistance = 0;
-            let workoutCount = 0;
-            let highIntensityWorkouts = 0;
-
-            // Process workout data from getAnchoredWorkouts
-            const workouts = results.data || results || [];
-            
-            if (!Array.isArray(workouts) || workouts.length === 0) {
-              console.log("No workouts found or invalid workout array");
-              resolve({ monthlyTrainingTime: 0, trainingIntensity: 0 });
-              return;
-            }
-
-            workouts.forEach((workout: any) => {
-              if (!workout || !workout.end || !workout.start) {
-                return; // Skip invalid workout data
-              }
-
-              const duration = workout.duration / 60; // Convert seconds to minutes
-              
-              if (duration > 0 && !isNaN(duration)) {
-                totalDuration += duration;
-                totalCalories += workout.calories || 0;
-                totalDistance += workout.distance || 0;
-                workoutCount++;
-
-                // Consider high intensity based on workout type and calories per minute
-                const caloriesPerMinute =
-                  (workout.calories || 0) / Math.max(duration, 1);
-                const activityName = workout.activityName || "";
-
-                // High intensity activities or high calorie burn rate
-                if (
-                  caloriesPerMinute > 8 ||
-                  [
-                    "Running",
-                    "Cycling",
-                    "Swimming",
-                    "HIIT",
-                    "CrossTraining",
-                    "TraditionalStrengthTraining",
-                  ].includes(activityName)
-                ) {
-                  highIntensityWorkouts++;
-                }
-              }
-            });
-
-            // Use total 30-day duration as monthly training time
-            const monthlyTrainingTime =
-              totalDuration > 0 && !isNaN(totalDuration)
-                ? Math.round(totalDuration)
-                : 0;
-
-            // Improved intensity calculation based on:
-            // 1. Calories per minute average
-            // 2. Percentage of high-intensity workouts
-            // 3. Workout frequency
-            const avgCaloriesPerMinute =
-              workoutCount > 0 && totalDuration > 0
-                ? totalCalories / totalDuration
-                : 0;
-            const highIntensityRatio =
-              workoutCount > 0 ? highIntensityWorkouts / workoutCount : 0;
-            const frequencyBonus = Math.min(workoutCount * 5, 20); // Up to 20 points for frequency
-
-            // Ensure all values are valid numbers before calculation
-            const safeAvgCaloriesPerMinute = isNaN(avgCaloriesPerMinute)
-              ? 0
-              : avgCaloriesPerMinute;
-            const safeHighIntensityRatio = isNaN(highIntensityRatio)
-              ? 0
-              : highIntensityRatio;
-            const safeFrequencyBonus = isNaN(frequencyBonus)
-              ? 0
-              : frequencyBonus;
-
-            const baseIntensity = safeAvgCaloriesPerMinute * 5;
-            const intensityBonus = safeHighIntensityRatio * 30;
-            const rawIntensityScore =
-              baseIntensity + intensityBonus + safeFrequencyBonus;
-
-            const intensityScore = isNaN(rawIntensityScore)
-              ? 0
-              : Math.min(100, Math.max(0, Math.round(rawIntensityScore)));
-
-            console.log("\n=== WORKOUT SUMMARY ===");
-            console.log("Monthly training time:", monthlyTrainingTime, "minutes");
-            console.log("Training intensity score:", intensityScore);
-            console.log("Total workouts:", workoutCount);
-            console.log("=======================");
-
-            resolve({
-              monthlyTrainingTime,
-              trainingIntensity: intensityScore,
-            });
-          }
-        }
-      );
-    });
-  }
-
+  /**
+   * Get all health metrics for fitness score calculation
+   */
   async getAllHealthMetrics(): Promise<HealthMetrics> {
-    if (!this.isInitialized) {
+    if (!this.isHealthKitInitialized) {
       const initialized = await this.initialize();
       if (!initialized) {
-        throw new Error("Failed to initialize HealthKit");
+        throw new HealthKitInitializationError("Failed to initialize HealthKit");
       }
     }
 
@@ -560,12 +113,12 @@ export class HealthService {
         dailySteps,
         workoutData,
       ] = await Promise.all([
-        this.getRestingHeartRate(),
-        this.getHeartRateVariability(),
-        this.getVO2Max(),
-        this.getSleepData(),
-        this.getStepsData(),
-        this.getWorkoutData(),
+        getRestingHeartRateData(),
+        getHeartRateVariabilityData(),
+        getVO2MaxData(),
+        getSleepAnalysisData(),
+        getTodaysStepCount(),
+        getMonthlyWorkoutData(),
       ]);
 
       return {
@@ -580,11 +133,67 @@ export class HealthService {
         dailySteps,
       };
     } catch (error) {
-      console.error("Error fetching health metrics:", error);
       throw error;
     }
   }
 
+  /**
+   * Get current day's health metrics optimized for widget display
+   */
+  async getTodaysHealthMetrics(): Promise<{
+    dailySteps: number;
+    dailyTrainingTime: number;
+    trainingIntensity: number;
+    restingHeartRate: number;
+    heartRateVariability: number;
+  }> {
+    if (!this.isHealthKitInitialized) {
+      const initialized = await this.initialize();
+      if (!initialized) {
+        return {
+          dailySteps: 0,
+          dailyTrainingTime: 0,
+          trainingIntensity: 0,
+          restingHeartRate: 0,
+          heartRateVariability: 0,
+        };
+      }
+    }
+
+    try {
+      const [
+        dailySteps,
+        todaysTraining,
+        restingHeartRate,
+        heartRateVariability,
+      ] = await Promise.all([
+        getTodaysStepCount(),
+        getTodaysWorkoutData(),
+        getRestingHeartRateData(),
+        getHeartRateVariabilityData(),
+      ]);
+
+      return {
+        dailySteps,
+        dailyTrainingTime: todaysTraining.dailyTrainingTime,
+        trainingIntensity: todaysTraining.trainingIntensity,
+        restingHeartRate,
+        heartRateVariability,
+      };
+    } catch (error) {
+      return {
+        dailySteps: 0,
+        dailyTrainingTime: 0,
+        trainingIntensity: 0,
+        restingHeartRate: 0,
+        heartRateVariability: 0,
+      };
+    }
+  }
+
+  /**
+   * Get historical health data for trend analysis
+   */
   async getHistoricalHealthData(days: number = 30): Promise<
     Array<{
       date: Date;
@@ -594,19 +203,19 @@ export class HealthService {
       sleepData: any[];
     }>
   > {
-    if (!this.isInitialized) {
+    if (!this.isHealthKitInitialized) {
       const initialized = await this.initialize();
       if (!initialized) {
-        throw new Error("Failed to initialize HealthKit");
+        throw new HealthKitInitializationError("Failed to initialize HealthKit");
       }
     }
 
     try {
       const [stepsData, heartRateData, hrvData, sleepData] = await Promise.all([
-        this.getHistoricalStepsData(days),
-        this.getHistoricalHeartRateData(days),
-        this.getHistoricalHRVData(days),
-        this.getHistoricalSleepData(days),
+        getHistoricalStepsData(days),
+        getHistoricalHeartRateData(days),
+        getHistoricalHRVData(days),
+        getHistoricalSleepData(days),
       ]);
 
       // Group data by date
@@ -684,7 +293,45 @@ export class HealthService {
         (a, b) => b.date.getTime() - a.date.getTime()
       );
     } catch (error) {
-      console.error("Error fetching historical health data:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get comprehensive historical data including workouts
+   */
+  async getComprehensiveHistoricalData(days: number = 30): Promise<{
+    historicalData: Array<{
+      date: Date;
+      stepsData: HealthValue[];
+      heartRateData: HealthValue[];
+      hrvData: HealthValue[];
+      sleepData: any[];
+    }>;
+    workoutData: Array<{
+      date: Date;
+      duration: number;
+      intensity: number;
+    }>;
+  }> {
+    if (!this.isHealthKitInitialized) {
+      const initialized = await this.initialize();
+      if (!initialized) {
+        throw new HealthKitInitializationError("Failed to initialize HealthKit");
+      }
+    }
+
+    try {
+      const [historicalData, workoutData] = await Promise.all([
+        this.getHistoricalHealthData(days),
+        getHistoricalWorkoutData(days),
+      ]);
+
+      return {
+        historicalData,
+        workoutData,
+      };
+    } catch (error) {
       throw error;
     }
   }

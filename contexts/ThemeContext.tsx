@@ -38,7 +38,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         setThemeModeState(storedTheme as ThemeMode);
       }
     } catch (error) {
-      console.warn('Failed to load theme from storage:', error);
+      // Silently handle theme loading error
     }
   };
 
@@ -47,7 +47,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       setThemeModeState(mode);
       await AsyncStorage.setItem(THEME_STORAGE_KEY, mode);
     } catch (error) {
-      console.warn('Failed to save theme to storage:', error);
+      // Silently handle theme saving error
     }
   };
 

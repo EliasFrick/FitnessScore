@@ -1,60 +1,19 @@
-import { HistoryItem } from "@/contexts/HistoryContext";
-import { HealthValue } from "react-native-health";
+/**
+ * Main Fitness Score Calculator
+ * Clean, focused implementation using modular calculators
+ */
 
-export interface HealthMetrics {
-  // Cardiovascular Health
-  restingHeartRate: number; // RHR in bpm
-  heartRateVariability: number; // HRV in ms
-  vo2Max: number;
-
-  // Recovery & Regeneration
-  deepSleepPercentage: number; // 0-100 (percentage)
-  remSleepPercentage: number; // 0-100 (percentage)
-  sleepConsistency: number; // 0-100 (consistency score)
-
-  // Activity & Training
-  monthlyTrainingTime: number; // in minutes
-  trainingIntensity: number; // 0-100 (intensity score)
-  dailySteps: number; // today's steps
-}
-
-export interface FitnessScoreResult {
-  totalScore: number;
-  cardiovascularPoints: number;
-  recoveryPoints: number;
-  activityPoints: number;
-  bonusPoints: number;
-  fitnessLevel: string;
-  bonusBreakdown?: {
-    cardiovascularPercent: number;
-    recoveryPercent: number;
-    activityPercent: number;
-    excellentCategories: string[];
-    requirementsExplanation: string;
-  };
-  historyItems: Array<{
-    category:
-      | "Cardiovascular Health"
-      | "Recovery & Regeneration"
-      | "Activity & Training"
-      | "Bonus Metric";
-    metric: string;
-    points: number;
-    maxPoints: number;
-    reason: string;
-  }>;
-}
-
-export interface MonthlyAverageResult {
-  totalScore: number;
-  cardiovascularPoints: number;
-  recoveryPoints: number;
-  activityPoints: number;
-  bonusPoints: number;
-  fitnessLevel: string;
-  dataPointsCount: number;
-  isEstimated: boolean;
-}
+import { HealthMetrics, FitnessScoreResult } from '@/types/health';
+import {
+  calculateCardiovascularPoints,
+  calculateRecoveryPoints,
+  calculateActivityPoints,
+  createBonusHistoryItem,
+} from './categoryCalculators';
+import {
+  determineFitnessLevel,
+  calculateBonusPoints,
+} from './scoringUtils';
 
 /**
  * Calculate comprehensive fitness score based on health metrics
@@ -71,828 +30,85 @@ export interface MonthlyAverageResult {
 export function calculateFitnessScore(
   metrics: HealthMetrics
 ): FitnessScoreResult {
-  let totalScore = 0;
-  const historyItems: Array<{
-    category:
-      | "Cardiovascular Health"
-      | "Recovery & Regeneration"
-      | "Activity & Training"
-      | "Bonus Metric";
-    metric: string;
-    points: number;
-    maxPoints: number;
-    reason: string;
-  }> = [];
+  // Calculate each category using focused calculators
+  const cardiovascularResult = calculateCardiovascularPoints(
+    metrics.restingHeartRate,
+    metrics.heartRateVariability,
+    metrics.vo2Max
+  );
 
-  // A. Cardiovascular Health (Max 30 Points)
-  let cardiovascularPoints = 0;
+  const recoveryResult = calculateRecoveryPoints(
+    metrics.deepSleepPercentage,
+    metrics.remSleepPercentage,
+    metrics.sleepConsistency
+  );
 
-  // 1. Resting Heart Rate (Max 10 Points)
-  let rhrPoints = 0;
-  let rhrReason = "";
-  if (metrics.restingHeartRate > 0) {
-    if (metrics.restingHeartRate <= 50) {
-      rhrPoints = 10;
-      rhrReason = `Excellent RHR (${metrics.restingHeartRate} bpm) - athlete-level cardiovascular fitness`;
-    } else if (metrics.restingHeartRate <= 60) {
-      rhrPoints = 8;
-      rhrReason = `Very good RHR (${metrics.restingHeartRate} bpm) - excellent cardiovascular health`;
-    } else if (metrics.restingHeartRate <= 70) {
-      rhrPoints = 6;
-      rhrReason = `Good RHR (${metrics.restingHeartRate} bpm) - healthy cardiovascular range`;
-    } else if (metrics.restingHeartRate <= 80) {
-      rhrPoints = 4;
-      rhrReason = `Average RHR (${metrics.restingHeartRate} bpm) - room for improvement with cardio training`;
-    } else if (metrics.restingHeartRate <= 90) {
-      rhrPoints = 2;
-      rhrReason = `Elevated RHR (${metrics.restingHeartRate} bpm) - focus on cardiovascular conditioning`;
-    } else {
-      rhrPoints = 1;
-      rhrReason = `High RHR (${metrics.restingHeartRate} bpm) - consult healthcare provider`;
-    }
-  } else {
-    rhrPoints = 0;
-    rhrReason = `No resting heart rate data available`;
-  }
-  cardiovascularPoints += rhrPoints;
-  historyItems.push({
-    category: "Cardiovascular Health",
-    metric: "Resting Heart Rate",
-    points: rhrPoints,
-    maxPoints: 10,
-    reason: rhrReason,
-  });
+  const activityResult = calculateActivityPoints(
+    metrics.monthlyTrainingTime / 30, // Convert monthly to daily average
+    metrics.trainingIntensity,
+    metrics.dailySteps
+  );
 
-  // 2. Heart Rate Variability (Max 10 Points)
-  let hrvPoints = 0;
-  let hrvReason = "";
-  if (metrics.heartRateVariability > 0) {
-    if (metrics.heartRateVariability >= 50) {
-      hrvPoints = 10;
-      hrvReason = `Outstanding HRV (${metrics.heartRateVariability} ms) - excellent autonomic nervous system recovery`;
-    } else if (metrics.heartRateVariability >= 35) {
-      hrvPoints = 8;
-      hrvReason = `Very good HRV (${metrics.heartRateVariability} ms) - strong recovery capacity`;
-    } else if (metrics.heartRateVariability >= 25) {
-      hrvPoints = 6;
-      hrvReason = `Good HRV (${metrics.heartRateVariability} ms) - adequate recovery signals`;
-    } else if (metrics.heartRateVariability >= 15) {
-      hrvPoints = 4;
-      hrvReason = `Below average HRV (${metrics.heartRateVariability} ms) - focus on stress management and recovery`;
-    } else {
-      hrvPoints = 2;
-      hrvReason = `Low HRV (${metrics.heartRateVariability} ms) - prioritize sleep, stress reduction, and recovery`;
-    }
-  } else {
-    hrvPoints = 0;
-    hrvReason = `No heart rate variability data available`;
-  }
-  cardiovascularPoints += hrvPoints;
-  historyItems.push({
-    category: "Cardiovascular Health",
-    metric: "Heart Rate Variability",
-    points: hrvPoints,
-    maxPoints: 10,
-    reason: hrvReason,
-  });
+  // Calculate bonus points
+  const bonusResult = calculateBonusPoints(
+    cardiovascularResult.total,
+    recoveryResult.total,
+    activityResult.total
+  );
 
-  // 3. VO2 Max (Max 10 Points)
-  let vo2Points = 0;
-  let vo2Reason = "";
-  if (metrics.vo2Max > 0) {
-    if (metrics.vo2Max >= 50) {
-      vo2Points = 10;
-      vo2Reason = `Outstanding VO2 Max (${metrics.vo2Max} ml/kg/min) - superior aerobic fitness`;
-    } else if (metrics.vo2Max >= 40) {
-      vo2Points = 8;
-      vo2Reason = `Excellent VO2 Max (${metrics.vo2Max} ml/kg/min) - very high aerobic capacity`;
-    } else if (metrics.vo2Max >= 30) {
-      vo2Points = 6;
-      vo2Reason = `Good VO2 Max (${metrics.vo2Max} ml/kg/min) - solid aerobic fitness`;
-    } else if (metrics.vo2Max >= 20) {
-      vo2Points = 4;
-      vo2Reason = `Average VO2 Max (${metrics.vo2Max} ml/kg/min) - increase cardio training intensity`;
-    } else {
-      vo2Points = 2;
-      vo2Reason = `Low VO2 Max (${metrics.vo2Max} ml/kg/min) - focus on building aerobic endurance`;
-    }
-  } else {
-    vo2Points = 0;
-    vo2Reason = `No VO2 Max data available - consider fitness assessment`;
-  }
-  cardiovascularPoints += vo2Points;
-  historyItems.push({
-    category: "Cardiovascular Health",
-    metric: "VO2 Max",
-    points: vo2Points,
-    maxPoints: 10,
-    reason: vo2Reason,
-  });
+  const bonusHistoryItem = createBonusHistoryItem(
+    cardiovascularResult.total,
+    recoveryResult.total,
+    activityResult.total
+  );
 
-  totalScore += cardiovascularPoints;
+  // Combine all results
+  const totalScore = cardiovascularResult.total + recoveryResult.total + activityResult.total + bonusResult.points;
+  const fitnessLevel = determineFitnessLevel(totalScore);
 
-  // B. Recovery & Regeneration (Max 35 Points)
-  let recoveryPoints = 0;
-
-  // 1. Deep Sleep Percentage (Max 15 Points)
-  let deepSleepPoints = 0;
-  let deepSleepReason = "";
-  if (metrics.deepSleepPercentage >= 23) {
-    deepSleepPoints = 15;
-    deepSleepReason = `Excellent deep sleep (${metrics.deepSleepPercentage}%) - optimal physical recovery`;
-  } else if (
-    metrics.deepSleepPercentage >= 18 &&
-    metrics.deepSleepPercentage < 23
-  ) {
-    deepSleepPoints = 12;
-    deepSleepReason = `Very good deep sleep (${metrics.deepSleepPercentage}%) - great physical recovery`;
-  } else if (
-    metrics.deepSleepPercentage >= 13 &&
-    metrics.deepSleepPercentage < 18
-  ) {
-    deepSleepPoints = 10;
-    deepSleepReason = `Good deep sleep (${metrics.deepSleepPercentage}%) - adequate physical recovery`;
-  } else if (
-    metrics.deepSleepPercentage >= 10 &&
-    metrics.deepSleepPercentage < 13
-  ) {
-    deepSleepPoints = 7;
-    deepSleepReason = `Average deep sleep (${metrics.deepSleepPercentage}%) - improve sleep environment and routine`;
-  } else if (
-    metrics.deepSleepPercentage >= 6 &&
-    metrics.deepSleepPercentage < 10
-  ) {
-    deepSleepPoints = 4;
-    deepSleepReason = `Below average deep sleep (${metrics.deepSleepPercentage}%) - focus on sleep quality improvement`;
-  } else if (metrics.deepSleepPercentage > 0) {
-    deepSleepPoints = 2;
-    deepSleepReason = `Low deep sleep (${metrics.deepSleepPercentage}%) - significant sleep quality concerns`;
-  } else {
-    deepSleepPoints = 0;
-    deepSleepReason = `No deep sleep data available`;
-  }
-  recoveryPoints += deepSleepPoints;
-  historyItems.push({
-    category: "Recovery & Regeneration",
-    metric: "Deep Sleep",
-    points: deepSleepPoints,
-    maxPoints: 15,
-    reason: deepSleepReason,
-  });
-
-  // 2. REM Sleep Percentage (Max 12 Points)
-  let remSleepPoints = 0;
-  let remSleepReason = "";
-  if (metrics.remSleepPercentage >= 25) {
-    remSleepPoints = 12;
-    remSleepReason = `Excellent REM sleep (${metrics.remSleepPercentage}%) - optimal mental recovery and memory consolidation`;
-  } else if (
-    metrics.remSleepPercentage >= 20 &&
-    metrics.remSleepPercentage < 25
-  ) {
-    remSleepPoints = 10;
-    remSleepReason = `Very good REM sleep (${metrics.remSleepPercentage}%) - great mental recovery`;
-  } else if (
-    metrics.remSleepPercentage >= 15 &&
-    metrics.remSleepPercentage < 20
-  ) {
-    remSleepPoints = 8;
-    remSleepReason = `Good REM sleep (${metrics.remSleepPercentage}%) - adequate mental recovery`;
-  } else if (
-    metrics.remSleepPercentage >= 10 &&
-    metrics.remSleepPercentage < 15
-  ) {
-    remSleepPoints = 5;
-    remSleepReason = `Average REM sleep (${metrics.remSleepPercentage}%) - reduce stress and screen time before bed`;
-  } else if (metrics.remSleepPercentage > 0) {
-    remSleepPoints = 3;
-    remSleepReason = `Low REM sleep (${metrics.remSleepPercentage}%) - address sleep disturbances and stress levels`;
-  } else {
-    remSleepPoints = 0;
-    remSleepReason = `No REM sleep data available`;
-  }
-  recoveryPoints += remSleepPoints;
-  historyItems.push({
-    category: "Recovery & Regeneration",
-    metric: "REM Sleep",
-    points: remSleepPoints,
-    maxPoints: 12,
-    reason: remSleepReason,
-  });
-
-  // 3. Sleep Consistency (Max 8 Points)
-  let sleepConsistencyPoints = 0;
-  let sleepConsistencyReason = "";
-  if (metrics.sleepConsistency >= 85) {
-    sleepConsistencyPoints = 8;
-    sleepConsistencyReason = `Excellent sleep consistency (${metrics.sleepConsistency}%) - regular sleep schedule optimizes recovery`;
-  } else if (metrics.sleepConsistency >= 70 && metrics.sleepConsistency < 85) {
-    sleepConsistencyPoints = 6;
-    sleepConsistencyReason = `Good sleep consistency (${metrics.sleepConsistency}%) - maintain regular bedtime routine`;
-  } else if (metrics.sleepConsistency >= 50 && metrics.sleepConsistency < 70) {
-    sleepConsistencyPoints = 4;
-    sleepConsistencyReason = `Moderate sleep consistency (${metrics.sleepConsistency}%) - work on more regular schedule`;
-  } else if (metrics.sleepConsistency > 0) {
-    sleepConsistencyPoints = 2;
-    sleepConsistencyReason = `Poor sleep consistency (${metrics.sleepConsistency}%) - establish a regular sleep schedule`;
-  } else {
-    sleepConsistencyPoints = 0;
-    sleepConsistencyReason = `No sleep consistency data available`;
-  }
-  recoveryPoints += sleepConsistencyPoints;
-  historyItems.push({
-    category: "Recovery & Regeneration",
-    metric: "Sleep Consistency",
-    points: sleepConsistencyPoints,
-    maxPoints: 8,
-    reason: sleepConsistencyReason,
-  });
-
-  totalScore += recoveryPoints;
-
-  // C. Activity & Training (Max 30 Points)
-  let activityPoints = 0;
-  
-  // 1. Monthly Training Time (Max 12 Points)
-  let trainingTimePoints = 0;
-  let trainingTimeReason = "";
-  if (metrics.monthlyTrainingTime >= 1200) { // ~300 min/week * 4 weeks
-    
-    trainingTimePoints = 12;
-    trainingTimeReason = `Outstanding training volume (${Math.round(
-      metrics.monthlyTrainingTime
-    )} min/month) - exceptional fitness commitment`;
-  } else if (metrics.monthlyTrainingTime >= 960) { // ~240 min/week * 4 weeks
-    trainingTimePoints = 10;
-    trainingTimeReason = `Excellent training volume (${Math.round(
-      metrics.monthlyTrainingTime
-    )} min/month) - great commitment to fitness`;
-  } else if (metrics.monthlyTrainingTime >= 720) { // ~180 min/week * 4 weeks
-    trainingTimePoints = 8;
-    trainingTimeReason = `Good training volume (${Math.round(
-      metrics.monthlyTrainingTime
-    )} min/month) - solid fitness routine`;
-  } else if (metrics.monthlyTrainingTime >= 600) { // ~150 min/week * 4 weeks
-    trainingTimePoints = 6;
-    trainingTimeReason = `Moderate training volume (${Math.round(
-      metrics.monthlyTrainingTime
-    )} min/month) - meets WHO minimum`;
-  } else if (metrics.monthlyTrainingTime >= 360) { // ~90 min/week * 4 weeks
-    trainingTimePoints = 4;
-    trainingTimeReason = `Below recommended volume (${Math.round(
-      metrics.monthlyTrainingTime
-    )} min/month) - increase frequency`;
-  } else if (metrics.monthlyTrainingTime >= 120) { // ~30 min/week * 4 weeks
-    trainingTimePoints = 2;
-    trainingTimeReason = `Low training volume (${Math.round(
-      metrics.monthlyTrainingTime
-    )} min/month) - aim for more consistent training`;
-  } else if (metrics.monthlyTrainingTime > 0) {
-    trainingTimePoints = 1;
-    trainingTimeReason = `Very low training volume (${Math.round(
-      metrics.monthlyTrainingTime
-    )} min/month) - start building routine`;
-  } else {
-    trainingTimePoints = 0;
-    trainingTimeReason = `No training data available`;
-  }
-  activityPoints += trainingTimePoints;
-  historyItems.push({
-    category: "Activity & Training",
-    metric: "Monthly Training Time",
-    points: trainingTimePoints,
-    maxPoints: 12,
-    reason: trainingTimeReason,
-  });
-
-  // 2. Training Intensity (Max 12 Points)
-  let intensityPoints = 0;
-  let intensityReason = "";
-  if (metrics.trainingIntensity >= 85) {
-    intensityPoints = 12;
-    intensityReason = `Exceptional training intensity (${metrics.trainingIntensity}%) - outstanding workout quality and effort`;
-  } else if (metrics.trainingIntensity >= 70) {
-    intensityPoints = 10;
-    intensityReason = `High training intensity (${metrics.trainingIntensity}%) - excellent workout quality and effort`;
-  } else if (metrics.trainingIntensity >= 55) {
-    intensityPoints = 7;
-    intensityReason = `Good training intensity (${metrics.trainingIntensity}%) - effective workout sessions`;
-  } else if (metrics.trainingIntensity >= 40) {
-    intensityPoints = 4;
-    intensityReason = `Moderate training intensity (${metrics.trainingIntensity}%) - push yourself harder during workouts`;
-  } else if (metrics.trainingIntensity > 0) {
-    intensityPoints = 2;
-    intensityReason = `Low training intensity (${metrics.trainingIntensity}%) - focus on challenging yourself more`;
-  } else {
-    intensityPoints = 0;
-    intensityReason = `No training intensity data available`;
-  }
-  activityPoints += intensityPoints;
-  historyItems.push({
-    category: "Activity & Training",
-    metric: "Training Intensity",
-    points: intensityPoints,
-    maxPoints: 12,
-    reason: intensityReason,
-  });
-
-  // 3. Daily Activity (Max 6 Points)
-  let stepsPoints = 0;
-  let stepsReason = "";
-  if (metrics.dailySteps >= 12000) {
-    stepsPoints = 6;
-    stepsReason = `Outstanding daily activity (${metrics.dailySteps.toLocaleString()} steps) - exceptional health benefits`;
-  } else if (metrics.dailySteps >= 10000) {
-    stepsPoints = 5;
-    stepsReason = `Excellent daily activity (${metrics.dailySteps.toLocaleString()} steps) - optimal WHO range for health`;
-  } else if (metrics.dailySteps >= 8000) {
-    stepsPoints = 4;
-    stepsReason = `Very good daily activity (${metrics.dailySteps.toLocaleString()} steps) - significant health benefits`;
-  } else if (metrics.dailySteps >= 6000) {
-    stepsPoints = 3;
-    stepsReason = `Good daily activity (${metrics.dailySteps.toLocaleString()} steps) - moderate health benefits`;
-  } else if (metrics.dailySteps >= 4000) {
-    stepsPoints = 2;
-    stepsReason = `Moderate activity (${metrics.dailySteps.toLocaleString()} steps) - some health benefits, aim higher`;
-  } else if (metrics.dailySteps >= 2000) {
-    stepsPoints = 1;
-    stepsReason = `Low daily activity (${metrics.dailySteps.toLocaleString()} steps) - minimal benefits, increase gradually`;
-  } else if (metrics.dailySteps > 0) {
-    stepsPoints = 1;
-    stepsReason = `Very low daily activity (${metrics.dailySteps.toLocaleString()} steps) - start building movement habits`;
-  } else {
-    stepsPoints = 0;
-    stepsReason = `No step data available`;
-  }
-  activityPoints += stepsPoints;
-  historyItems.push({
-    category: "Activity & Training",
-    metric: "Daily Steps",
-    points: stepsPoints,
-    maxPoints: 6,
-    reason: stepsReason,
-  });
-
-  totalScore += activityPoints;
-
-  // D. Bonus Metric - Overall Consistency (Max 5 Points)
-  let bonusPoints = 0;
-
-  // Calculate percentage performance in each category
-  const cardiovascularPercent = Math.round((cardiovascularPoints / 30) * 100);
-  const recoveryPercent = Math.round((recoveryPoints / 35) * 100);
-  const activityPercent = Math.round((activityPoints / 30) * 100);
-
-  let bonusReason = "";
-  let detailedExplanation = "";
-
-  // Bonus Points Logic (Transparent Requirements):
-  // 5 Points: All three categories ≥ 75% (Cardiovascular ≥ 22.5/30, Recovery ≥ 26.25/35, Activity ≥ 22.5/30)
-  // 3 Points: Any two categories ≥ 75%
-  // 1 Point: One category ≥ 75%
-  // 0 Points: No categories ≥ 75%
-
-  const excellentCategories = [];
-  if (cardiovascularPercent >= 75) excellentCategories.push("Cardiovascular");
-  if (recoveryPercent >= 75) excellentCategories.push("Recovery");
-  if (activityPercent >= 75) excellentCategories.push("Activity");
-
-  if (excellentCategories.length === 3) {
-    bonusPoints = 5;
-    bonusReason = `Outstanding consistency across all categories! Cardiovascular: ${cardiovascularPercent}%, Recovery: ${recoveryPercent}%, Activity: ${activityPercent}%`;
-    detailedExplanation =
-      "Achieved ≥75% in all three health categories - maximum bonus achieved!";
-  } else if (excellentCategories.length === 2) {
-    bonusPoints = 3;
-    const categoryPercentages = excellentCategories.map((cat) =>
-      cat === "Cardiovascular"
-        ? `${cardiovascularPercent}%`
-        : cat === "Recovery"
-        ? `${recoveryPercent}%`
-        : `${activityPercent}%`
-    );
-    bonusReason = `Excellent performance in ${excellentCategories.join(
-      " & "
-    )} (${categoryPercentages.join(", ")}) - strong consistency!`;
-    detailedExplanation =
-      "Achieved ≥75% in two health categories - great progress toward full consistency!";
-  } else if (excellentCategories.length === 1) {
-    bonusPoints = 1;
-    const categoryPercent =
-      excellentCategories[0] === "Cardiovascular"
-        ? cardiovascularPercent
-        : excellentCategories[0] === "Recovery"
-        ? recoveryPercent
-        : activityPercent;
-    bonusReason = `Good performance in ${excellentCategories[0]} (${categoryPercent}%) - build consistency in other areas`;
-    detailedExplanation =
-      "Achieved ≥75% in one health category - focus on improving other areas for more bonus points!";
-  } else {
-    bonusPoints = 0;
-    bonusReason = `Work toward consistency bonus: Cardiovascular ${cardiovascularPercent}%, Recovery ${recoveryPercent}%, Activity ${activityPercent}%. Target: Get any category to ≥75% for bonus points!`;
-    detailedExplanation =
-      "Bonus Requirements: Cardiovascular ≥22.5pts (75%), Recovery ≥26.25pts (75%), Activity ≥22.5pts (75%). Achieve these thresholds in 1, 2, or 3 categories for 1, 3, or 5 bonus points respectively.";
-  }
-
-  // Always show bonus metric for transparency
-  historyItems.push({
-    category: "Bonus Metric",
-    metric: "Overall Consistency",
-    points: bonusPoints,
-    maxPoints: 5,
-    reason: bonusReason + " | " + detailedExplanation,
-  });
-
-  totalScore += bonusPoints;
-
-  // Determine Fitness Level
-  let fitnessLevel: string;
-  if (totalScore >= 90) {
-    fitnessLevel = "Topform!";
-  } else if (totalScore >= 70) {
-    fitnessLevel = "Stark & Aktiv";
-  } else if (totalScore >= 50) {
-    fitnessLevel = "Solide Fortschritte";
-  } else if (totalScore >= 30) {
-    fitnessLevel = "Auf dem Weg";
-  } else {
-    fitnessLevel = "Zeit für Veränderung";
-  }
+  const historyItems = [
+    ...cardiovascularResult.items,
+    ...recoveryResult.items,
+    ...activityResult.items,
+    bonusHistoryItem,
+  ];
 
   return {
     totalScore,
-    cardiovascularPoints,
-    recoveryPoints,
-    activityPoints,
-    bonusPoints,
+    cardiovascularPoints: cardiovascularResult.total,
+    recoveryPoints: recoveryResult.total,
+    activityPoints: activityResult.total,
+    bonusPoints: bonusResult.points,
     fitnessLevel,
     bonusBreakdown: {
-      cardiovascularPercent,
-      recoveryPercent,
-      activityPercent,
-      excellentCategories,
-      requirementsExplanation:
-        "Bonus Requirements: Cardiovascular ≥22.5pts (75%), Recovery ≥26.25pts (75%), Activity ≥22.5pts (75%). Achieve 1/2/3 categories for 1/3/5 bonus points.",
+      cardiovascularPercent: Math.round((cardiovascularResult.total / 30) * 100),
+      recoveryPercent: Math.round((recoveryResult.total / 35) * 100),
+      activityPercent: Math.round((activityResult.total / 30) * 100),
+      excellentCategories: bonusResult.detailedExplanation.includes("all three") ? ["Cardiovascular", "Recovery", "Activity"] : [],
+      requirementsExplanation: bonusResult.detailedExplanation,
     },
     historyItems,
   };
 }
 
-// Example/mock data for demonstration
-export function getMockHealthMetrics(): HealthMetrics {
-  return {
-    restingHeartRate: 65, // 6/10 points (60%)
-    heartRateVariability: 30, // 6/10 points (60%)
-    vo2Max: 40, // 8/10 points (80%)
-    deepSleepPercentage: 18, // 10/15 points (67%)
-    remSleepPercentage: 22, // 10/12 points (83%)
-    sleepConsistency: 75, // 6/8 points (75%)
-    monthlyTrainingTime: 800, // 8/12 points (67%) - ~200 min/week * 4 weeks
-    trainingIntensity: 60, // 7/12 points (58%)
-    dailySteps: 8500, // 4/6 points (67%)
-  };
-  // Expected: Cardiovascular ~67%, Recovery ~74%, Activity ~63%
-  // Should get 0 bonus points (no categories ≥75%)
-}
+// Re-export commonly used functions for convenience
+export {
+  calculateDailyBasedMonthlyAverage,
+  calculateDailyScoresFromHistoricalData,
+  calculateMonthlyAverageFromDailyScores,
+} from './historicalDataCalculators';
 
+export {
+  calculateDailyFitnessScore,
+} from './dailyFitnessCalculator';
 
-// Zero health metrics for no-data state
-export function getZeroHealthMetrics(): HealthMetrics {
-  return {
-    restingHeartRate: 0,
-    heartRateVariability: 0,
-    vo2Max: 0,
-    deepSleepPercentage: 0,
-    remSleepPercentage: 0,
-    sleepConsistency: 0,
-    monthlyTrainingTime: 0,
-    trainingIntensity: 0,
-    dailySteps: 0,
-  };
-}
+export {
+  getMockHealthMetrics,
+  getZeroHealthMetrics,
+} from './mockData';
 
-// Generate sample historical data for demonstration
-export function generateSampleHistoryData(): Array<{
-  category:
-    | "Cardiovascular Health"
-    | "Recovery & Regeneration"
-    | "Activity & Training"
-    | "Bonus Metric";
-  metric: string;
-  points: number;
-  maxPoints: number;
-  reason: string;
-  timestamp: Date;
-}> {
-  const history: Array<{
-    category:
-      | "Cardiovascular Health"
-      | "Recovery & Regeneration"
-      | "Activity & Training"
-      | "Bonus Metric";
-    metric: string;
-    points: number;
-    maxPoints: number;
-    reason: string;
-    timestamp: Date;
-  }> = [];
-
-  // Generate data for the last 30 days
-  for (let i = 0; i < 30; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-
-    // Generate varying health metrics for each day
-
-    const mockMetrics: HealthMetrics = {
-      restingHeartRate: 65 + Math.floor(Math.random() * 20 - 10), // 55-75
-      heartRateVariability: 30 + Math.floor(Math.random() * 20 - 10), // 20-40
-      vo2Max: 40 + Math.floor(Math.random() * 10 - 5), // 35-45
-      deepSleepPercentage: 18 + Math.floor(Math.random() * 8 - 4), // 14-22
-      remSleepPercentage: 22 + Math.floor(Math.random() * 8 - 4), // 18-26
-      sleepConsistency: 75 + Math.floor(Math.random() * 20 - 10), // 65-85
-      monthlyTrainingTime: 800 + Math.floor(Math.random() * 400 - 200), // 600-1000
-      trainingIntensity: 60 + Math.floor(Math.random() * 20 - 10), // 50-70
-      dailySteps: 8500 + Math.floor(Math.random() * 3000 - 1500), // 7000-10000
-    };
-
-    const dayResult = calculateFitnessScore(mockMetrics);
-
-    // Add each metric with the historical timestamp
-    dayResult.historyItems.forEach((item) => {
-      history.push({
-        ...item,
-        timestamp: new Date(
-          date.getTime() + Math.random() * 24 * 60 * 60 * 1000
-        ), // Random time during the day
-      });
-    });
-  }
-
-  return history;
-}
-
-// Convert historical health data to history items
-export function convertHistoricalDataToHistoryItems(
-  historicalData: Array<{
-    date: Date;
-    stepsData: HealthValue[];
-    sleepData: any[];
-  }>
-): Array<{
-  category:
-    | "Cardiovascular Health"
-    | "Recovery & Regeneration"
-    | "Activity & Training"
-    | "Bonus Metric";
-  metric: string;
-  points: number;
-  maxPoints: number;
-  reason: string;
-  timestamp: Date;
-}> {
-  const historyItems: Array<{
-    category:
-      | "Cardiovascular Health"
-      | "Recovery & Regeneration"
-      | "Activity & Training"
-      | "Bonus Metric";
-    metric: string;
-    points: number;
-    maxPoints: number;
-    reason: string;
-    timestamp: Date;
-  }> = [];
-
-  let daysWithData = 0;
-  let daysWithoutData = 0;
-
-  historicalData.forEach((dayData) => {
-    // Calculate daily steps average
-    const dailySteps = dayData.stepsData.reduce(
-      (sum, sample) => sum + (sample.value || 0),
-      0
-    );
-
-    // Calculate sleep data (simplified)
-    let totalSleep = 0;
-    let totalDeepSleep = 0;
-    let totalRemSleep = 0;
-
-    dayData.sleepData.forEach((sample) => {
-      const duration =
-        (new Date(sample.endDate).getTime() -
-          new Date(sample.startDate).getTime()) /
-        (1000 * 60 * 60);
-      totalSleep += duration;
-
-      if (sample.value === "DEEP") {
-        totalDeepSleep += duration;
-      } else if (sample.value === "REM") {
-        totalRemSleep += duration;
-      }
-    });
-
-    const deepSleepPercentage =
-      totalSleep > 0 ? (totalDeepSleep / totalSleep) * 100 : 0;
-    const remSleepPercentage =
-      totalSleep > 0 ? (totalRemSleep / totalSleep) * 100 : 0;
-
-    // Create metrics for this day
-    const dayMetrics: HealthMetrics = {
-      restingHeartRate: 0, // RHR is usually calculated less frequently
-      heartRateVariability: 0, // HRV is usually calculated less frequently
-      vo2Max: 0, // VO2Max is usually calculated less frequently
-      deepSleepPercentage: Math.round(deepSleepPercentage * 10) / 10,
-      remSleepPercentage: Math.round(remSleepPercentage * 10) / 10,
-      sleepConsistency: 75, // Default value, would need more complex calculation
-      monthlyTrainingTime: 0, // Would need workout data
-      trainingIntensity: 0, // Would need workout data
-      dailySteps: dailySteps,
-    };
-
-    // Only create history items for metrics that have actual data (not zeros)
-    const dayResult = calculateFitnessScore(dayMetrics);
-
-    dayResult.historyItems.forEach((item) => {
-      // Only add history items if the metric has meaningful data
-      let shouldInclude = false;
-
-      if (
-        item.category === "Activity & Training" &&
-        item.metric === "Daily Steps" &&
-        dailySteps > 0
-      ) {
-        shouldInclude = true;
-      } else if (item.category === "Cardiovascular Health") {
-        if (
-          (item.metric === "Resting Heart Rate" &&
-            dayMetrics.restingHeartRate > 0) ||
-          (item.metric === "Heart Rate Variability" &&
-            dayMetrics.heartRateVariability > 0) ||
-          (item.metric === "VO2 Max" && dayMetrics.vo2Max > 0)
-        ) {
-          shouldInclude = true;
-        }
-      } else if (
-        item.category === "Recovery & Regeneration" &&
-        totalSleep > 0
-      ) {
-        shouldInclude = true;
-      } else if (
-        item.category === "Activity & Training" &&
-        (item.metric === "Monthly Training Time" ||
-          item.metric === "Training Intensity") &&
-        (dayMetrics.monthlyTrainingTime > 0 || dayMetrics.trainingIntensity > 0)
-      ) {
-        shouldInclude = true;
-      } else if (item.category === "Bonus Metric") {
-        // Always include bonus metric for transparency
-        shouldInclude = true;
-      }
-
-      if (shouldInclude) {
-        historyItems.push({
-          ...item,
-          timestamp: dayData.date,
-        });
-      }
-    });
-
-    const hasAnyData = dailySteps > 0 || totalSleep > 0;
-    if (hasAnyData) {
-      daysWithData++;
-    } else {
-      daysWithoutData++;
-    }
-
-    // Track items that would be added for statistics
-    dayResult.historyItems.filter((item) => {
-      if (
-        item.category === "Activity & Training" &&
-        item.metric === "Daily Steps"
-      )
-        return dailySteps > 0;
-      if (item.category === "Cardiovascular Health") {
-        return (
-          (item.metric === "Resting Heart Rate" &&
-            dayMetrics.restingHeartRate > 0) ||
-          (item.metric === "Heart Rate Variability" &&
-            dayMetrics.heartRateVariability > 0) ||
-          (item.metric === "VO2 Max" && dayMetrics.vo2Max > 0)
-        );
-      }
-      if (item.category === "Recovery & Regeneration") return totalSleep > 0;
-      return false;
-    }).length;
-  });
-
-  return historyItems;
-}
-
-export function calculateMonthlyAverage(
-  historyItems: HistoryItem[],
-  currentMetrics: HealthMetrics
-): MonthlyAverageResult {
-  // Filter history items from the last 30 days
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  const recentHistory = historyItems.filter(
-    (item) => item.timestamp >= thirtyDaysAgo
-  );
-
-  // If no historical data, use current metrics
-  if (recentHistory.length === 0) {
-    const currentResult = calculateFitnessScore(currentMetrics);
-    return {
-      totalScore: currentResult.totalScore,
-      cardiovascularPoints: currentResult.cardiovascularPoints,
-      recoveryPoints: currentResult.recoveryPoints,
-      activityPoints: currentResult.activityPoints,
-      bonusPoints: currentResult.bonusPoints,
-      fitnessLevel: currentResult.fitnessLevel,
-      dataPointsCount: 0,
-      isEstimated: true,
-    };
-  }
-
-  // Group history items by category
-  const categoryTotals = {
-    "Cardiovascular Health": { points: 0, maxPoints: 0, count: 0 },
-    "Recovery & Regeneration": { points: 0, maxPoints: 0, count: 0 },
-    "Activity & Training": { points: 0, maxPoints: 0, count: 0 },
-    "Bonus Metric": { points: 0, maxPoints: 0, count: 0 },
-  };
-
-  // Sum up points for each category
-  recentHistory.forEach((item) => {
-    if (categoryTotals[item.category]) {
-      categoryTotals[item.category].points += item.points;
-      categoryTotals[item.category].maxPoints += item.maxPoints;
-      categoryTotals[item.category].count += 1;
-    }
-  });
-
-  // Calculate averages for each category based on actual average points achieved
-  // Only calculate if we have data, otherwise use current metrics as fallback
-  const cardiovascularPoints =
-    categoryTotals["Cardiovascular Health"].count > 0
-      ? Math.round(
-          categoryTotals["Cardiovascular Health"].points /
-            categoryTotals["Cardiovascular Health"].count
-        )
-      : Math.round(calculateFitnessScore(currentMetrics).cardiovascularPoints);
-
-  const recoveryPoints =
-    categoryTotals["Recovery & Regeneration"].count > 0
-      ? Math.round(
-          categoryTotals["Recovery & Regeneration"].points /
-            categoryTotals["Recovery & Regeneration"].count
-        )
-      : Math.round(calculateFitnessScore(currentMetrics).recoveryPoints);
-
-  const activityPoints =
-    categoryTotals["Activity & Training"].count > 0
-      ? Math.round(
-          categoryTotals["Activity & Training"].points /
-            categoryTotals["Activity & Training"].count
-        )
-      : Math.round(calculateFitnessScore(currentMetrics).activityPoints);
-
-  const bonusPoints =
-    categoryTotals["Bonus Metric"].count > 0
-      ? Math.round(
-          categoryTotals["Bonus Metric"].points /
-            categoryTotals["Bonus Metric"].count
-        )
-      : Math.round(calculateFitnessScore(currentMetrics).bonusPoints);
-
-  const totalScore =
-    cardiovascularPoints + recoveryPoints + activityPoints + bonusPoints;
-
-  // Determine fitness level based on total score
-  let fitnessLevel: string;
-  if (totalScore >= 90) {
-    fitnessLevel = "Topform!";
-  } else if (totalScore >= 70) {
-    fitnessLevel = "Stark & Aktiv";
-  } else if (totalScore >= 50) {
-    fitnessLevel = "Solide Fortschritte";
-  } else if (totalScore >= 30) {
-    fitnessLevel = "Auf dem Weg";
-  } else {
-    fitnessLevel = "Zeit für Veränderung";
-  }
-
-  return {
-    totalScore,
-    cardiovascularPoints,
-    recoveryPoints,
-    activityPoints,
-    bonusPoints,
-    fitnessLevel,
-    dataPointsCount: recentHistory.length,
-    isEstimated: false,
-  };
-}
+export {
+  calculateMonthlyAverage,
+  generateSampleHistoryData,
+  convertHistoricalDataToHistoryItems,
+} from './legacyCalculators';

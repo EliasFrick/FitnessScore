@@ -62,12 +62,11 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
         await refreshHistoricalData();
       }
     } catch (error) {
-      console.error('Error loading history from storage:', error);
       // Fallback to sample data on error
       try {
         await refreshHistoricalData();
       } catch (fallbackError) {
-        console.error('Error generating fallback data:', fallbackError);
+        // Silently handle fallback error
       }
     } finally {
       setIsLoading(false);
@@ -78,7 +77,7 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
     try {
       await AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
     } catch (error) {
-      console.error('Error saving history to storage:', error);
+      // Silently handle storage error
     }
   };
 
@@ -102,7 +101,7 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
       await AsyncStorage.removeItem(HISTORY_STORAGE_KEY);
       setHistoryItems([]);
     } catch (error) {
-      console.error('Error clearing history:', error);
+      // Silently handle clear error
     }
   };
 
@@ -128,7 +127,7 @@ export function HistoryProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Error fetching real historical data:', error);
+      // Silently handle historical data fetch error
     }
 
     // Fallback to sample data if real data isn't available

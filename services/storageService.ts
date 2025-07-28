@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HealthMetrics } from './healthService';
+import { HealthMetrics } from '@/types/health';
 
 interface StoredHealthData {
   id: string;
@@ -89,7 +89,6 @@ export class StorageService {
       `);
 
     } catch (error) {
-      console.error('Error initializing database:', error);
       throw error;
     }
   }
@@ -120,7 +119,6 @@ export class StorageService {
       );
 
     } catch (error) {
-      console.error('Error storing health data:', error);
       throw error;
     }
   }
@@ -170,7 +168,7 @@ export class StorageService {
         );
       }
     } catch (error) {
-      console.error('Error updating aggregated data:', error);
+      // Silently handle aggregation errors
     }
   }
 
@@ -183,7 +181,7 @@ export class StorageService {
         deepSleepPercentage: acc.deepSleepPercentage + curr.deepSleepPercentage,
         remSleepPercentage: acc.remSleepPercentage + curr.remSleepPercentage,
         sleepConsistency: acc.sleepConsistency + curr.sleepConsistency,
-        weeklyTrainingTime: acc.weeklyTrainingTime + curr.weeklyTrainingTime,
+        monthlyTrainingTime: acc.monthlyTrainingTime + curr.monthlyTrainingTime,
         trainingIntensity: acc.trainingIntensity + curr.trainingIntensity,
         dailySteps: acc.dailySteps + curr.dailySteps,
       }),
@@ -194,7 +192,7 @@ export class StorageService {
         deepSleepPercentage: 0,
         remSleepPercentage: 0,
         sleepConsistency: 0,
-        weeklyTrainingTime: 0,
+        monthlyTrainingTime: 0,
         trainingIntensity: 0,
         dailySteps: 0,
       }
@@ -208,7 +206,7 @@ export class StorageService {
       avgDeepSleepPercentage: Math.round((sum.deepSleepPercentage / count) * 10) / 10,
       avgRemSleepPercentage: Math.round((sum.remSleepPercentage / count) * 10) / 10,
       avgSleepConsistency: Math.round(sum.sleepConsistency / count),
-      totalTrainingTime: Math.round(sum.weeklyTrainingTime / count),
+      totalTrainingTime: Math.round(sum.monthlyTrainingTime / count),
       avgTrainingIntensity: Math.round(sum.trainingIntensity / count),
       avgDailySteps: Math.round(sum.dailySteps / count),
     };
@@ -289,7 +287,6 @@ export class StorageService {
 
       return null;
     } catch (error) {
-      console.error('Error getting aggregated health data:', error);
       return null;
     }
   }
@@ -319,7 +316,6 @@ export class StorageService {
       }
 
     } catch (error) {
-      console.error('Error storing AI response:', error);
       throw error;
     }
   }
@@ -339,7 +335,6 @@ export class StorageService {
 
       return result?.ai_response || null;
     } catch (error) {
-      console.error('Error getting cached AI response:', error);
       return null;
     }
   }
@@ -349,7 +344,6 @@ export class StorageService {
       const consent = await AsyncStorage.getItem('health_data_consent');
       return consent === 'true';
     } catch (error) {
-      console.error('Error getting user consent:', error);
       return false;
     }
   }
@@ -358,7 +352,6 @@ export class StorageService {
     try {
       await AsyncStorage.setItem('health_data_consent', consent.toString());
     } catch (error) {
-      console.error('Error setting user consent:', error);
       throw error;
     }
   }
@@ -373,7 +366,6 @@ export class StorageService {
       await this.db!.runAsync('DELETE FROM ai_responses');
       await AsyncStorage.removeItem('health_data_consent');
     } catch (error) {
-      console.error('Error clearing data:', error);
       throw error;
     }
   }

@@ -1,5 +1,5 @@
-import { router, useLocalSearchParams } from "expo-router";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Card, Chip, Divider } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -8,9 +8,6 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useHistory } from "@/contexts/HistoryContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useEffect } from "react";
-
-type FilterCategory = 'Cardiovascular Health' | 'Recovery & Regeneration' | 'Activity & Training' | 'Bonus Metric';
 
 export default function FilteredHistoryScreen() {
   const { filter } = useLocalSearchParams<{ filter: string }>();
@@ -19,9 +16,7 @@ export default function FilteredHistoryScreen() {
   const insets = useSafeAreaInsets();
 
   // Filter history items based on the category
-  const filteredItems = historyItems.filter(item => 
-    item.category === filter
-  );
+  const filteredItems = historyItems.filter((item) => item.category === filter);
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -70,20 +65,6 @@ export default function FilteredHistoryScreen() {
           { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 20 },
         ]}
       >
-        <ThemedView style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <IconSymbol name="arrow.left" size={24} color="#666" />
-          </TouchableOpacity>
-          <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">{getCategoryTitle(filter || '')}</ThemedText>
-            <ThemedText style={styles.subtitle}>Verlauf (30 Tage)</ThemedText>
-          </ThemedView>
-          <View style={styles.placeholder} />
-        </ThemedView>
-
         {isLoading ? (
           <Card style={styles.emptyCard}>
             <Card.Content style={styles.emptyContent}>
@@ -104,8 +85,8 @@ export default function FilteredHistoryScreen() {
                 Noch keine Daten
               </ThemedText>
               <ThemedText style={styles.emptyDescription}>
-                Der Verlauf für {getCategoryTitle(filter || '')} wird hier angezeigt, 
-                sobald Gesundheitsdaten verfügbar sind.
+                Der Verlauf für {getCategoryTitle(filter || "")} wird hier
+                angezeigt, sobald Gesundheitsdaten verfügbar sind.
               </ThemedText>
             </Card.Content>
           </Card>

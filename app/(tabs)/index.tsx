@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     gap: 20,
-    paddingBottom: 100, // Extra space for tab bar
+    paddingBottom: 100, 
   },
   titleContainer: {
     alignItems: "center",

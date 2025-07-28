@@ -13,7 +13,7 @@ export interface HealthMetrics {
   sleepConsistency: number; // 0-100 (consistency score)
 
   // Activity & Training
-  weeklyTrainingTime: number; // in minutes
+  monthlyTrainingTime: number; // in minutes
   trainingIntensity: number; // 0-100 (intensity score)
   dailySteps: number; // today's steps
 }
@@ -62,7 +62,7 @@ export interface MonthlyAverageResult {
  * Scoring System (Total: 100 points):
  * - Cardiovascular Health: 30 points (RHR 10pts, HRV 10pts, VO2 Max 10pts)
  * - Recovery & Regeneration: 35 points (Deep Sleep 15pts, REM Sleep 12pts, Sleep Consistency 8pts)
- * - Activity & Training: 30 points (Training Time 12pts, Training Intensity 12pts, Daily Steps 6pts)
+ * - Activity & Training: 30 points (Monthly Training Time 12pts, Training Intensity 12pts, Daily Steps 6pts)
  * - Bonus Consistency: 5 points (1pt for 1 category ≥75%, 3pts for 2 categories ≥75%, 5pts for all 3 categories ≥75%)
  *
  * @param metrics - Health metrics data
@@ -312,45 +312,45 @@ export function calculateFitnessScore(
 
   // C. Activity & Training (Max 30 Points)
   let activityPoints = 0;
-
-  // 1. Weekly Training Time (Max 12 Points)
+  console.log(metrics.monthlyTrainingTime);
+  // 1. Monthly Training Time (Max 12 Points)
   let trainingTimePoints = 0;
   let trainingTimeReason = "";
-  if (metrics.weeklyTrainingTime >= 300) {
+  if (metrics.monthlyTrainingTime >= 1200) { // ~300 min/week * 4 weeks
     trainingTimePoints = 12;
     trainingTimeReason = `Outstanding training volume (${Math.round(
-      metrics.weeklyTrainingTime
-    )} min/week) - exceptional fitness commitment`;
-  } else if (metrics.weeklyTrainingTime >= 240) {
+      metrics.monthlyTrainingTime
+    )} min/month) - exceptional fitness commitment`;
+  } else if (metrics.monthlyTrainingTime >= 960) { // ~240 min/week * 4 weeks
     trainingTimePoints = 10;
     trainingTimeReason = `Excellent training volume (${Math.round(
-      metrics.weeklyTrainingTime
-    )} min/week) - great commitment to fitness`;
-  } else if (metrics.weeklyTrainingTime >= 180) {
+      metrics.monthlyTrainingTime
+    )} min/month) - great commitment to fitness`;
+  } else if (metrics.monthlyTrainingTime >= 720) { // ~180 min/week * 4 weeks
     trainingTimePoints = 8;
     trainingTimeReason = `Good training volume (${Math.round(
-      metrics.weeklyTrainingTime
-    )} min/week) - solid fitness routine`;
-  } else if (metrics.weeklyTrainingTime >= 150) {
+      metrics.monthlyTrainingTime
+    )} min/month) - solid fitness routine`;
+  } else if (metrics.monthlyTrainingTime >= 600) { // ~150 min/week * 4 weeks
     trainingTimePoints = 6;
     trainingTimeReason = `Moderate training volume (${Math.round(
-      metrics.weeklyTrainingTime
-    )} min/week) - meets WHO minimum`;
-  } else if (metrics.weeklyTrainingTime >= 90) {
+      metrics.monthlyTrainingTime
+    )} min/month) - meets WHO minimum`;
+  } else if (metrics.monthlyTrainingTime >= 360) { // ~90 min/week * 4 weeks
     trainingTimePoints = 4;
     trainingTimeReason = `Below recommended volume (${Math.round(
-      metrics.weeklyTrainingTime
-    )} min/week) - increase frequency`;
-  } else if (metrics.weeklyTrainingTime >= 30) {
+      metrics.monthlyTrainingTime
+    )} min/month) - increase frequency`;
+  } else if (metrics.monthlyTrainingTime >= 120) { // ~30 min/week * 4 weeks
     trainingTimePoints = 2;
     trainingTimeReason = `Low training volume (${Math.round(
-      metrics.weeklyTrainingTime
-    )} min/week) - aim for more consistent training`;
-  } else if (metrics.weeklyTrainingTime > 0) {
+      metrics.monthlyTrainingTime
+    )} min/month) - aim for more consistent training`;
+  } else if (metrics.monthlyTrainingTime > 0) {
     trainingTimePoints = 1;
     trainingTimeReason = `Very low training volume (${Math.round(
-      metrics.weeklyTrainingTime
-    )} min/week) - start building routine`;
+      metrics.monthlyTrainingTime
+    )} min/month) - start building routine`;
   } else {
     trainingTimePoints = 0;
     trainingTimeReason = `No training data available`;
@@ -358,7 +358,7 @@ export function calculateFitnessScore(
   activityPoints += trainingTimePoints;
   historyItems.push({
     category: "Activity & Training",
-    metric: "Weekly Training Time",
+    metric: "Monthly Training Time",
     points: trainingTimePoints,
     maxPoints: 12,
     reason: trainingTimeReason,
@@ -546,7 +546,7 @@ export function getMockHealthMetrics(): HealthMetrics {
     deepSleepPercentage: 18, // 10/15 points (67%)
     remSleepPercentage: 22, // 10/12 points (83%)
     sleepConsistency: 75, // 6/8 points (75%)
-    weeklyTrainingTime: 200, // 8/12 points (67%)
+    monthlyTrainingTime: 800, // 8/12 points (67%) - ~200 min/week * 4 weeks
     trainingIntensity: 60, // 7/12 points (58%)
     dailySteps: 8500, // 4/6 points (67%)
   };
@@ -563,7 +563,7 @@ export function getZeroHealthMetrics(): HealthMetrics {
     deepSleepPercentage: 0,
     remSleepPercentage: 0,
     sleepConsistency: 0,
-    weeklyTrainingTime: 0,
+    monthlyTrainingTime: 0,
     trainingIntensity: 0,
     dailySteps: 0,
   };
@@ -609,7 +609,7 @@ export function generateSampleHistoryData(): Array<{
       deepSleepPercentage: 18 + Math.floor(Math.random() * 8 - 4), // 14-22
       remSleepPercentage: 22 + Math.floor(Math.random() * 8 - 4), // 18-26
       sleepConsistency: 75 + Math.floor(Math.random() * 20 - 10), // 65-85
-      weeklyTrainingTime: 200 + Math.floor(Math.random() * 100 - 50), // 150-250
+      monthlyTrainingTime: 800 + Math.floor(Math.random() * 400 - 200), // 600-1000
       trainingIntensity: 60 + Math.floor(Math.random() * 20 - 10), // 50-70
       dailySteps: 8500 + Math.floor(Math.random() * 3000 - 1500), // 7000-10000
     };
@@ -704,7 +704,7 @@ export function convertHistoricalDataToHistoryItems(
       deepSleepPercentage: Math.round(deepSleepPercentage * 10) / 10,
       remSleepPercentage: Math.round(remSleepPercentage * 10) / 10,
       sleepConsistency: 75, // Default value, would need more complex calculation
-      weeklyTrainingTime: 0, // Would need workout data
+      monthlyTrainingTime: 0, // Would need workout data
       trainingIntensity: 0, // Would need workout data
       dailySteps: dailySteps,
     };
@@ -739,9 +739,9 @@ export function convertHistoricalDataToHistoryItems(
         shouldInclude = true;
       } else if (
         item.category === "Activity & Training" &&
-        (item.metric === "Weekly Training Time" ||
+        (item.metric === "Monthly Training Time" ||
           item.metric === "Training Intensity") &&
-        (dayMetrics.weeklyTrainingTime > 0 || dayMetrics.trainingIntensity > 0)
+        (dayMetrics.monthlyTrainingTime > 0 || dayMetrics.trainingIntensity > 0)
       ) {
         shouldInclude = true;
       } else if (item.category === "Bonus Metric") {
@@ -783,7 +783,6 @@ export function convertHistoricalDataToHistoryItems(
       return false;
     }).length;
   });
-
 
   return historyItems;
 }

@@ -17,8 +17,8 @@ if (Platform.OS === "ios" && NativeModules.AppleHealthKit) {
     "getStepCount",
     "getSamples",
   ]) {
-    if (!AppleHealthKit[key] && NativeModules.AppleHealthKit[key]) {
-      AppleHealthKit[key] = NativeModules.AppleHealthKit[key];
+    if (!(AppleHealthKit as any)[key] && NativeModules.AppleHealthKit[key]) {
+      (AppleHealthKit as any)[key] = NativeModules.AppleHealthKit[key];
     }
   }
 }

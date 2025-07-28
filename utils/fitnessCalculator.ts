@@ -425,7 +425,6 @@ export function generateSampleHistoryData(): Array<{
     date.setDate(date.getDate() - i);
     
     // Generate varying health metrics for each day
-    const dailyVariation = Math.random() * 0.4 - 0.2; // -20% to +20% variation
     
     const mockMetrics: HealthMetrics = {
       restingHeartRate: 55 + Math.floor(Math.random() * 10 - 5), // 50-60

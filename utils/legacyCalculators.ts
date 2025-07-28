@@ -3,8 +3,12 @@
  */
 
 import { HistoryItem } from "@/contexts/HistoryContext";
+import {
+  FitnessScoreResult,
+  HealthMetrics,
+  MonthlyAverageResult,
+} from "@/types/health";
 import { HealthValue } from "react-native-health";
-import { HealthMetrics, MonthlyAverageResult, FitnessScoreResult } from '@/types/health';
 
 // Generate sample historical data for demonstration
 export function generateSampleHistoryData(
@@ -74,6 +78,10 @@ export function convertHistoricalDataToHistoryItems(
     date: Date;
     stepsData: HealthValue[];
     sleepData: any[];
+    heartRateData?: HealthValue[];
+    hrvData?: HealthValue[];
+    vo2MaxData?: HealthValue[];
+    workoutData?: any[];
   }>,
   calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
 ): Array<{
@@ -135,16 +143,56 @@ export function convertHistoricalDataToHistoryItems(
     const remSleepPercentage =
       totalSleep > 0 ? (totalRemSleep / totalSleep) * 100 : 0;
 
+    // Calculate cardiovascular metrics
+    const restingHeartRate = dayData.heartRateData
+      ? dayData.heartRateData.reduce(
+          (sum, sample) => sum + (sample.value || 0),
+          0
+        ) / Math.max(dayData.heartRateData.length, 1)
+      : 0;
+
+    const heartRateVariability = dayData.hrvData
+      ? dayData.hrvData.reduce((sum, sample) => sum + (sample.value || 0), 0) /
+        Math.max(dayData.hrvData.length, 1)
+      : 0;
+
+    const vo2Max =
+      dayData.vo2MaxData && dayData.vo2MaxData.length > 0
+        ? dayData.vo2MaxData[dayData.vo2MaxData.length - 1].value || 0 // Take latest value
+        : 0;
+
+    // Calculate training metrics
+    let dailyTrainingTime = 0;
+    let trainingIntensitySum = 0;
+    let workoutCount = 0;
+
+    if (dayData.workoutData) {
+      console.log("hama");
+      dayData.workoutData.forEach((workout) => {
+        const duration = workout.duration || 0; // Duration in minutes
+        const intensity = workout.intensity || 0; // Intensity percentage
+
+        dailyTrainingTime += duration;
+        if (intensity > 0) {
+          trainingIntensitySum += intensity;
+          workoutCount++;
+        }
+      });
+    }
+
+    const averageTrainingIntensity =
+      workoutCount > 0 ? trainingIntensitySum / workoutCount : 0;
+
     // Create metrics for this day
     const dayMetrics: HealthMetrics = {
-      restingHeartRate: 0, // RHR is usually calculated less frequently
-      heartRateVariability: 0, // HRV is usually calculated less frequently
-      vo2Max: 0, // VO2Max is usually calculated less frequently
+      restingHeartRate: Math.round(restingHeartRate * 10) / 10,
+      heartRateVariability: Math.round(heartRateVariability * 10) / 10,
+      vo2Max: Math.round(vo2Max * 10) / 10,
       deepSleepPercentage: Math.round(deepSleepPercentage * 10) / 10,
       remSleepPercentage: Math.round(remSleepPercentage * 10) / 10,
       sleepConsistency: 75, // Default value, would need more complex calculation
-      monthlyTrainingTime: 0, // Would need workout data
-      trainingIntensity: 0, // Would need workout data
+      monthlyTrainingTime: dailyTrainingTime * 30, // Convert daily to monthly estimate
+      trainingIntensity: Math.round(averageTrainingIntensity * 10) / 10,
       dailySteps: dailySteps,
     };
 
@@ -155,13 +203,7 @@ export function convertHistoricalDataToHistoryItems(
       // Only add history items if the metric has meaningful data
       let shouldInclude = false;
 
-      if (
-        item.category === "Activity & Training" &&
-        item.metric === "Daily Steps" &&
-        dailySteps > 0
-      ) {
-        shouldInclude = true;
-      } else if (item.category === "Cardiovascular Health") {
+      if (item.category === "Cardiovascular Health") {
         if (
           (item.metric === "Resting Heart Rate" &&
             dayMetrics.restingHeartRate > 0) ||
@@ -176,13 +218,14 @@ export function convertHistoricalDataToHistoryItems(
         totalSleep > 0
       ) {
         shouldInclude = true;
-      } else if (
-        item.category === "Activity & Training" &&
-        (item.metric === "Daily Training Time" ||
-          item.metric === "Training Intensity") &&
-        (dayMetrics.monthlyTrainingTime > 0 || dayMetrics.trainingIntensity > 0)
-      ) {
-        shouldInclude = true;
+      } else if (item.category === "Activity & Training") {
+        if (
+          (item.metric === "Daily Steps" && dailySteps > 0) ||
+          (item.metric === "Daily Training Time" && dailyTrainingTime > 0) ||
+          (item.metric === "Training Intensity" && averageTrainingIntensity > 0)
+        ) {
+          shouldInclude = true;
+        }
       } else if (item.category === "Bonus Metric") {
         // Always include bonus metric for transparency
         shouldInclude = true;
@@ -196,32 +239,20 @@ export function convertHistoricalDataToHistoryItems(
       }
     });
 
-    const hasAnyData = dailySteps > 0 || totalSleep > 0;
+    const hasAnyData =
+      dailySteps > 0 ||
+      totalSleep > 0 ||
+      dayMetrics.restingHeartRate > 0 ||
+      dayMetrics.heartRateVariability > 0 ||
+      dayMetrics.vo2Max > 0 ||
+      dailyTrainingTime > 0 ||
+      averageTrainingIntensity > 0;
+
     if (hasAnyData) {
       daysWithData++;
     } else {
       daysWithoutData++;
     }
-
-    // Track items that would be added for statistics
-    dayResult.historyItems.filter((item) => {
-      if (
-        item.category === "Activity & Training" &&
-        item.metric === "Daily Steps"
-      )
-        return dailySteps > 0;
-      if (item.category === "Cardiovascular Health") {
-        return (
-          (item.metric === "Resting Heart Rate" &&
-            dayMetrics.restingHeartRate > 0) ||
-          (item.metric === "Heart Rate Variability" &&
-            dayMetrics.heartRateVariability > 0) ||
-          (item.metric === "VO2 Max" && dayMetrics.vo2Max > 0)
-        );
-      }
-      if (item.category === "Recovery & Regeneration") return totalSleep > 0;
-      return false;
-    }).length;
   });
 
   return historyItems;
@@ -275,6 +306,8 @@ export function calculateMonthlyAverage(
       categoryTotals[item.category].count += 1;
     }
   });
+
+  console.log(categoryTotals["Activity & Training"]);
 
   // Calculate averages for each category based on actual average points achieved
   // Only calculate if we have data, otherwise use current metrics as fallback

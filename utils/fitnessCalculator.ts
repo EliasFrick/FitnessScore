@@ -3,17 +3,14 @@
  * Clean, focused implementation using modular calculators
  */
 
-import { HealthMetrics, FitnessScoreResult } from '@/types/health';
+import { FitnessScoreResult, HealthMetrics } from "@/types/health";
 import {
+  calculateActivityPoints,
   calculateCardiovascularPoints,
   calculateRecoveryPoints,
-  calculateActivityPoints,
   createBonusHistoryItem,
-} from './categoryCalculators';
-import {
-  determineFitnessLevel,
-  calculateBonusPoints,
-} from './scoringUtils';
+} from "./categoryCalculators";
+import { calculateBonusPoints, determineFitnessLevel } from "./scoringUtils";
 
 /**
  * Calculate comprehensive fitness score based on health metrics
@@ -63,7 +60,11 @@ export function calculateFitnessScore(
   );
 
   // Combine all results
-  const totalScore = cardiovascularResult.total + recoveryResult.total + activityResult.total + bonusResult.points;
+  const totalScore =
+    cardiovascularResult.total +
+    recoveryResult.total +
+    activityResult.total +
+    bonusResult.points;
   const fitnessLevel = determineFitnessLevel(totalScore);
 
   const historyItems = [
@@ -81,10 +82,14 @@ export function calculateFitnessScore(
     bonusPoints: bonusResult.points,
     fitnessLevel,
     bonusBreakdown: {
-      cardiovascularPercent: Math.round((cardiovascularResult.total / 30) * 100),
+      cardiovascularPercent: Math.round(
+        (cardiovascularResult.total / 30) * 100
+      ),
       recoveryPercent: Math.round((recoveryResult.total / 35) * 100),
       activityPercent: Math.round((activityResult.total / 30) * 100),
-      excellentCategories: bonusResult.detailedExplanation.includes("all three") ? ["Cardiovascular", "Recovery", "Activity"] : [],
+      excellentCategories: bonusResult.detailedExplanation.includes("all three")
+        ? ["Cardiovascular", "Recovery", "Activity"]
+        : [],
       requirementsExplanation: bonusResult.detailedExplanation,
     },
     historyItems,
@@ -96,28 +101,27 @@ export {
   calculateDailyBasedMonthlyAverage,
   calculateDailyScoresFromHistoricalData,
   calculateMonthlyAverageFromDailyScores,
-} from './historicalDataCalculators';
+} from "./historicalDataCalculators";
 
-export {
-  calculateDailyFitnessScore,
-} from './dailyFitnessCalculator';
+export { calculateDailyFitnessScore } from "./dailyFitnessCalculator";
 
-export {
-  getMockHealthMetrics,
-  getZeroHealthMetrics,
-} from './mockData';
+export { getMockHealthMetrics, getZeroHealthMetrics } from "./mockData";
 
 // Legacy calculator functions with dependency injection to avoid circular imports
 export const calculateMonthlyAverage = (
   historyItems: any[],
   currentMetrics: HealthMetrics
 ) => {
-  const { calculateMonthlyAverage: legacyCalc } = require('./legacyCalculators');
+  const {
+    calculateMonthlyAverage: legacyCalc,
+  } = require("./legacyCalculators");
   return legacyCalc(historyItems, currentMetrics, calculateFitnessScore);
 };
 
 export const generateSampleHistoryData = () => {
-  const { generateSampleHistoryData: legacyGen } = require('./legacyCalculators');
+  const {
+    generateSampleHistoryData: legacyGen,
+  } = require("./legacyCalculators");
   return legacyGen(calculateFitnessScore);
 };
 
@@ -128,6 +132,8 @@ export const convertHistoricalDataToHistoryItems = (
     sleepData: any[];
   }>
 ) => {
-  const { convertHistoricalDataToHistoryItems: legacyConvert } = require('./legacyCalculators');
+  const {
+    convertHistoricalDataToHistoryItems: legacyConvert,
+  } = require("./legacyCalculators");
   return legacyConvert(historicalData, calculateFitnessScore);
 };

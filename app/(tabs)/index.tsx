@@ -34,12 +34,10 @@ export default function OverviewScreen() {
 
   const lastHistoryUpdateRef = useRef<string>("");
 
-  console.log(healthMetrics);
-
   useEffect(() => {
     const today = new Date().toDateString();
-
-    if (
+    /*     console.log("Result: ", monthlyAverage);
+     */ if (
       lastHistoryUpdateRef.current !== today &&
       fitnessResult.historyItems.length > 0
     ) {

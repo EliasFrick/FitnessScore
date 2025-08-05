@@ -11,10 +11,10 @@ import AppleHealthKit, {
   HealthValue,
 } from "react-native-health";
 import {
+  getAverageStepCount,
   getHeartRateVariabilityData,
   getRestingHeartRateData,
   getSleepAnalysisData,
-  getTodaysStepCount,
   getVO2MaxData,
 } from "./healthDataProviders";
 import {
@@ -101,7 +101,7 @@ export class HealthService {
       const initialized = await this.initialize();
       if (!initialized) {
         throw new HealthKitInitializationError(
-          "Failed to initialize HealthKit"
+          "Failed to initialize HealthKit",
         );
       }
     }
@@ -112,14 +112,14 @@ export class HealthService {
         heartRateVariability,
         vo2Max,
         sleepData,
-        dailySteps,
+        averageSteps,
         workoutData,
       ] = await Promise.all([
         getRestingHeartRateData(),
         getHeartRateVariabilityData(),
         getVO2MaxData(),
         getSleepAnalysisData(),
-        getTodaysStepCount(),
+        getAverageStepCount(),
         getMonthlyWorkoutData(),
       ]);
       return {
@@ -131,7 +131,7 @@ export class HealthService {
         sleepConsistency: sleepData.sleepConsistency,
         monthlyTrainingTime: workoutData.monthlyTrainingTime,
         trainingIntensity: workoutData.trainingIntensity,
-        dailySteps,
+        averageSteps,
       };
     } catch (error) {
       throw error;
@@ -142,7 +142,7 @@ export class HealthService {
    * Get current day's health metrics optimized for widget display
    */
   async getTodaysHealthMetrics(): Promise<{
-    dailySteps: number;
+    averageSteps: number;
     dailyTrainingTime: number;
     trainingIntensity: number;
     restingHeartRate: number;
@@ -152,7 +152,7 @@ export class HealthService {
       const initialized = await this.initialize();
       if (!initialized) {
         return {
-          dailySteps: 0,
+          averageSteps: 0,
           dailyTrainingTime: 0,
           trainingIntensity: 0,
           restingHeartRate: 0,
@@ -163,19 +163,19 @@ export class HealthService {
 
     try {
       const [
-        dailySteps,
+        averageSteps,
         todaysTraining,
         restingHeartRate,
         heartRateVariability,
       ] = await Promise.all([
-        getTodaysStepCount(),
+        getAverageStepCount(),
         getTodaysWorkoutData(),
         getRestingHeartRateData(),
         getHeartRateVariabilityData(),
       ]);
 
       return {
-        dailySteps,
+        averageSteps,
         dailyTrainingTime: todaysTraining.dailyTrainingTime,
         trainingIntensity: todaysTraining.trainingIntensity,
         restingHeartRate,
@@ -183,7 +183,7 @@ export class HealthService {
       };
     } catch (error) {
       return {
-        dailySteps: 0,
+        averageSteps: 0,
         dailyTrainingTime: 0,
         trainingIntensity: 0,
         restingHeartRate: 0,
@@ -208,7 +208,7 @@ export class HealthService {
       const initialized = await this.initialize();
       if (!initialized) {
         throw new HealthKitInitializationError(
-          "Failed to initialize HealthKit"
+          "Failed to initialize HealthKit",
         );
       }
     }
@@ -293,7 +293,7 @@ export class HealthService {
       });
 
       return Object.values(dateGroups).sort(
-        (a, b) => b.date.getTime() - a.date.getTime()
+        (a, b) => b.date.getTime() - a.date.getTime(),
       );
     } catch (error) {
       throw error;
@@ -321,7 +321,7 @@ export class HealthService {
       const initialized = await this.initialize();
       if (!initialized) {
         throw new HealthKitInitializationError(
-          "Failed to initialize HealthKit"
+          "Failed to initialize HealthKit",
         );
       }
     }

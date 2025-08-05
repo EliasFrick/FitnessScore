@@ -172,11 +172,11 @@ export class HealthAggregationService {
     }
 
     // Activity Insights
-    if (metrics.dailySteps > 10000 && metrics.monthlyTrainingTime > 600) {
+    if (metrics.averageSteps > 10000 && metrics.monthlyTrainingTime > 600) {
       insights.push(
         "Outstanding activity levels - you're exceeding recommended guidelines!",
       );
-    } else if (metrics.dailySteps < 5000) {
+    } else if (metrics.averageSteps < 5000) {
       insights.push(
         "Increasing daily movement could significantly boost your vitality score.",
       );
@@ -236,7 +236,7 @@ export class HealthAggregationService {
     }
 
     // Activity Recommendations
-    if (metrics.dailySteps < 8000) {
+    if (metrics.averageSteps < 8000) {
       recommendations.push(
         "Aim for 8,000-10,000 steps daily by adding short walks throughout the day.",
       );
@@ -285,7 +285,7 @@ export class HealthAggregationService {
       concerns.push("Insufficient deep sleep");
     if (metrics.sleepConsistency < 60)
       concerns.push("Inconsistent sleep schedule");
-    if (metrics.dailySteps < 5000) concerns.push("Low daily activity");
+    if (metrics.averageSteps < 5000) concerns.push("Low daily activity");
     if (metrics.monthlyTrainingTime < 240)
       concerns.push("Insufficient exercise");
 
@@ -319,7 +319,7 @@ export class HealthAggregationService {
     if (metrics.remSleepPercentage > 20) strengths.push("Adequate REM sleep");
     if (metrics.sleepConsistency > 85)
       strengths.push("Consistent sleep schedule");
-    if (metrics.dailySteps > 10000) strengths.push("High daily activity");
+    if (metrics.averageSteps > 10000) strengths.push("High daily activity");
     if (metrics.monthlyTrainingTime > 800)
       strengths.push("Excellent exercise routine");
 
@@ -337,7 +337,7 @@ export class HealthAggregationService {
     metrics: HealthMetrics,
   ): "sedentary" | "light" | "moderate" | "active" | "very_active" {
     const weeklyMinutes = metrics.monthlyTrainingTime / 4;
-    const dailySteps = metrics.dailySteps;
+    const dailySteps = metrics.averageSteps;
 
     if (weeklyMinutes >= 300 && dailySteps >= 12000) return "very_active";
     if (weeklyMinutes >= 150 && dailySteps >= 8000) return "active";
@@ -364,7 +364,7 @@ Current Metrics:
 - REM Sleep: ${context.currentMetrics.remSleepPercentage}%
 - Sleep Consistency: ${context.currentMetrics.sleepConsistency}%
 - Monthly Training: ${context.currentMetrics.monthlyTrainingTime} minutes
-- Daily Steps: ${context.currentMetrics.dailySteps}
+- Daily Steps: ${context.currentMetrics.averageSteps}
 
 Recent Trends:
 - Heart Health: ${context.recentTrends.heartHealthTrend}

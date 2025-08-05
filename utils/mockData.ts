@@ -15,6 +15,6 @@ export function getZeroHealthMetrics(): HealthMetrics {
     sleepConsistency: 0,
     monthlyTrainingTime: 0,
     trainingIntensity: 0,
-    dailySteps: 0,
+    averageSteps: 0,
   };
 }

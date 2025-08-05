@@ -28,7 +28,7 @@ export function useHealthData() {
       setError(null);
 
       const data = await HealthService.getAllHealthMetrics();
-      console.log(data);
+
       setHealthMetrics(data);
     } catch (err) {
       setError("No data available - please allow Apple Health access");

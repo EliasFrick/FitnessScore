@@ -15,7 +15,7 @@ interface StoredHealthData {
     avgSleepConsistency: number;
     totalTrainingTime: number;
     avgTrainingIntensity: number;
-    avgDailySteps: number;
+    avgAverageSteps: number;
   };
   aggregatedMonthly?: {
     avgRestingHeartRate: number;
@@ -26,7 +26,7 @@ interface StoredHealthData {
     avgSleepConsistency: number;
     totalTrainingTime: number;
     avgTrainingIntensity: number;
-    avgDailySteps: number;
+    avgAverageSteps: number;
     trends: {
       heartHealthTrend: "improving" | "stable" | "declining";
       sleepTrend: "improving" | "stable" | "declining";
@@ -186,7 +186,7 @@ export class StorageService {
         sleepConsistency: acc.sleepConsistency + curr.sleepConsistency,
         monthlyTrainingTime: acc.monthlyTrainingTime + curr.monthlyTrainingTime,
         trainingIntensity: acc.trainingIntensity + curr.trainingIntensity,
-        dailySteps: acc.dailySteps + curr.dailySteps,
+        averageSteps: acc.averageSteps + curr.averageSteps,
       }),
       {
         restingHeartRate: 0,
@@ -197,7 +197,7 @@ export class StorageService {
         sleepConsistency: 0,
         monthlyTrainingTime: 0,
         trainingIntensity: 0,
-        dailySteps: 0,
+        averageSteps: 0,
       },
     );
 
@@ -213,7 +213,7 @@ export class StorageService {
       avgSleepConsistency: Math.round(sum.sleepConsistency / count),
       totalTrainingTime: Math.round(sum.monthlyTrainingTime / count),
       avgTrainingIntensity: Math.round(sum.trainingIntensity / count),
-      avgDailySteps: Math.round(sum.dailySteps / count),
+      avgAverageSteps: Math.round(sum.averageSteps / count),
     };
   }
 
@@ -280,8 +280,10 @@ export class StorageService {
           3,
       ),
       activityTrend: getTrend(
-        (firstHalfAvg.totalTrainingTime + firstHalfAvg.avgDailySteps / 100) / 2,
-        (secondHalfAvg.totalTrainingTime + secondHalfAvg.avgDailySteps / 100) /
+        (firstHalfAvg.totalTrainingTime + firstHalfAvg.avgAverageSteps / 100) /
+          2,
+        (secondHalfAvg.totalTrainingTime +
+          secondHalfAvg.avgAverageSteps / 100) /
           2,
       ),
     };

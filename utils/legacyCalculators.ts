@@ -1,15 +1,12 @@
-
-
 import {
   FitnessScoreResult,
   HealthMetrics,
   MonthlyAverageResult,
 } from "@/types/health";
 
-
 export function calculateMonthlyAverage(
   currentMetrics: HealthMetrics,
-  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
+  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult,
 ): MonthlyAverageResult {
   const currentResult = calculateFitnessScore(currentMetrics);
   return {

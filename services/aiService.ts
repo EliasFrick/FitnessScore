@@ -111,7 +111,7 @@ Latest Health Metrics:
 - REM Sleep: ${context.currentMetrics.remSleepPercentage}%
 - Sleep Consistency: ${context.currentMetrics.sleepConsistency}%
 - Monthly Training Time: ${context.currentMetrics.monthlyTrainingTime} minutes
-- Daily Steps: ${context.currentMetrics.dailySteps}
+- Daily Steps: ${context.currentMetrics.averageSteps}
 
 Recent Trends (past month):
 - Heart Health: ${context.recentTrends.heartHealthTrend}
@@ -254,7 +254,7 @@ Key Strengths: ${context.strengths.join(", ") || "Building healthy foundations"}
       input.includes("activity") ||
       input.includes("steps")
     ) {
-      const steps = healthContext.currentMetrics.dailySteps;
+      const steps = healthContext.currentMetrics.averageSteps;
       const training = healthContext.currentMetrics.monthlyTrainingTime / 4; // Convert monthly to weekly
 
       return {

@@ -16,7 +16,7 @@ export interface HealthMetrics {
   // Activity & Training
   monthlyTrainingTime: number; // in minutes
   trainingIntensity: number; // 0-100 (intensity score)
-  dailySteps: number; // today's steps
+  averageSteps: number; // average steps per day from last 30 days
 }
 
 export interface FitnessScoreResult {

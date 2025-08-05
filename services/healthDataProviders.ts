@@ -36,7 +36,7 @@ export async function getRestingHeartRateData(): Promise<number> {
               : 0;
           resolve(Math.round(averageRestingHeartRate));
         }
-      }
+      },
     );
   });
 }
@@ -69,7 +69,7 @@ export async function getHeartRateVariabilityData(): Promise<number> {
               : 0;
           resolve(Math.round(averageHeartRateVariability * 1000));
         }
-      }
+      },
     );
   });
 }
@@ -101,7 +101,7 @@ export async function getVO2MaxData(): Promise<number> {
               : 0;
           resolve(Math.round(averageVO2Max * 10) / 10);
         }
-      }
+      },
     );
   });
 }
@@ -175,7 +175,7 @@ export async function getSleepAnalysisData(): Promise<{
             sleepDurations.length > 0
               ? sleepDurations.reduce(
                   (sum, duration) => sum + Math.pow(duration - averageSleep, 2),
-                  0
+                  0,
                 ) / sleepDurations.length
               : 0;
           const standardDeviation = Math.sqrt(variance);
@@ -187,33 +187,32 @@ export async function getSleepAnalysisData(): Promise<{
             sleepConsistency: Math.round(sleepConsistency),
           });
         }
-      }
+      },
     );
   });
 }
 
 /**
- * Get today's step count
+ * Get average daily step count from the last 30 days
  */
-export async function getTodaysStepCount(): Promise<number> {
+export async function getAverageStepCount(): Promise<number> {
   if (Platform.OS !== "ios") return 0;
 
-  return new Promise((resolve) => {
-    const options: HealthInputOptions = {
-      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date().toISOString(),
-    };
-
-    AppleHealthKit.getStepCount(
-      options,
-      (callbackError: string, results: HealthValue) => {
-        if (callbackError) {
-          resolve(0);
-        } else {
-          console.log("Result: ", results);
-          resolve(results.value || 0);
-        }
-      }
+  try {
+    // Import dynamically to avoid circular dependency
+    const { getHistoricalStepsData } = await import(
+      "./historicalDataProviders"
     );
-  });
+    const stepsData = await getHistoricalStepsData(30);
+
+    if (stepsData.length === 0) return 0;
+
+    const totalSteps = stepsData.reduce((sum, day) => sum + day.value, 0);
+    const averageSteps = Math.round(totalSteps / stepsData.length);
+
+    return averageSteps;
+  } catch (error) {
+    console.error("Error fetching average step count:", error);
+    return 0;
+  }
 }

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Modal,
   RefreshControl,
   SafeAreaView,
   ScrollView,
@@ -7,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Card, Chip, ProgressBar, Text } from "react-native-paper";
+import { Card, ProgressBar, Text } from "react-native-paper";
 
 import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
@@ -24,6 +25,7 @@ export default function OverviewScreen() {
   const { colorScheme, setThemeMode } = useTheme();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -36,36 +38,50 @@ export default function OverviewScreen() {
       >
         <ThemedView style={styles.content}>
           <ThemedView style={styles.titleContainer}>
-            <View style={styles.switchContainer}>
+            <View style={styles.headerRow}>
               <TouchableOpacity
-                style={[
-                  styles.customSwitch,
-                  colorScheme === "dark"
-                    ? styles.switchDark
-                    : styles.switchLight,
-                ]}
-                onPress={() =>
-                  setThemeMode(colorScheme === "dark" ? "light" : "dark")
-                }
-                activeOpacity={0.8}
+                style={styles.infoButton}
+                onPress={() => setShowInfoModal(true)}
+                activeOpacity={0.7}
               >
-                <View style={styles.switchTrack}>
-                  <View style={styles.switchIconContainer}>
-                    <IconSymbol name="sun.max" size={16} color="#FFA500" />
-                  </View>
-                  <View style={styles.switchIconContainer}>
-                    <IconSymbol name="moon" size={16} color="#87CEEB" />
-                  </View>
-                </View>
-                <View
-                  style={[
-                    styles.switchThumb,
-                    colorScheme === "dark"
-                      ? styles.thumbDark
-                      : styles.thumbLight,
-                  ]}
+                <IconSymbol
+                  name="info.circle"
+                  size={24}
+                  color={colorScheme === "dark" ? "#FFFFFF" : "#000000"}
                 />
               </TouchableOpacity>
+
+              <View style={styles.switchContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.customSwitch,
+                    colorScheme === "dark"
+                      ? styles.switchDark
+                      : styles.switchLight,
+                  ]}
+                  onPress={() =>
+                    setThemeMode(colorScheme === "dark" ? "light" : "dark")
+                  }
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.switchTrack}>
+                    <View style={styles.switchIconContainer}>
+                      <IconSymbol name="sun.max" size={16} color="#FFA500" />
+                    </View>
+                    <View style={styles.switchIconContainer}>
+                      <IconSymbol name="moon" size={16} color="#87CEEB" />
+                    </View>
+                  </View>
+                  <View
+                    style={[
+                      styles.switchThumb,
+                      colorScheme === "dark"
+                        ? styles.thumbDark
+                        : styles.thumbLight,
+                    ]}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
             <View style={styles.titleRow}>
               <ThemedText type="title">VitalityScore Overview</ThemedText>
@@ -103,14 +119,32 @@ export default function OverviewScreen() {
                   <Text variant="headlineSmall" style={styles.fitnessLevel}>
                     {monthlyAverage.fitnessLevel}
                   </Text>
-                  {monthlyAverage.isEstimated && (
-                    <Text
-                      variant="bodySmall"
-                      style={[styles.detailText, { fontStyle: "italic" }]}
-                    >
-                      * Basiert auf aktuellen Daten
-                    </Text>
-                  )}
+
+                  {/* Legend */}
+                  <View style={styles.legend}>
+                    <View style={styles.legendItem}>
+                      <View
+                        style={[
+                          styles.legendColor,
+                          { backgroundColor: "#4CAF50" },
+                        ]}
+                      />
+                      <Text variant="bodySmall" style={styles.legendText}>
+                        Recovery & Regeneration
+                      </Text>
+                    </View>
+                    <View style={styles.legendItem}>
+                      <View
+                        style={[
+                          styles.legendColor,
+                          { backgroundColor: "#2196F3" },
+                        ]}
+                      />
+                      <Text variant="bodySmall" style={styles.legendText}>
+                        Overall Fitness Score
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </Card.Content>
             </Card>
@@ -119,7 +153,7 @@ export default function OverviewScreen() {
           {/* Metrics Overview Cards */}
           <ThemedView style={styles.metricsContainer}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Monats-Übersicht
+              Monthly Overview
             </ThemedText>
 
             <View style={styles.metricsGrid}>
@@ -127,7 +161,7 @@ export default function OverviewScreen() {
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
-                      Herz-Kreislauf
+                      Cardiovascular
                     </Text>
                     <Text variant="headlineSmall" style={styles.metricValue}>
                       {monthlyAverage.cardiovascularPoints}/30
@@ -144,7 +178,7 @@ export default function OverviewScreen() {
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
-                      Regeneration
+                      Recovery
                     </Text>
                     <Text variant="headlineSmall" style={styles.metricValue}>
                       {monthlyAverage.recoveryPoints}/35
@@ -163,7 +197,7 @@ export default function OverviewScreen() {
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
-                      Aktivität
+                      Activity
                     </Text>
                     <Text variant="headlineSmall" style={styles.metricValue}>
                       {monthlyAverage.activityPoints}/30
@@ -194,43 +228,87 @@ export default function OverviewScreen() {
               </TouchableOpacity>
             </View>
           </ThemedView>
-
-          {/* Insights Section */}
-          <ThemedView style={styles.insightsContainer}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Deine Fitness-Insights
-            </ThemedText>
-
-            <Card style={styles.insightCard}>
-              <Card.Content>
-                <View style={styles.chipContainer}>
-                  <Chip icon="heart" mode="outlined" style={styles.chip}>
-                    {monthlyAverage.fitnessLevel}
-                  </Chip>
-                  <Chip icon="trending-up" mode="outlined" style={styles.chip}>
-                    {monthlyAverage.totalScore} Punkte (Ø Monat)
-                  </Chip>
-                  {monthlyAverage.dataPointsCount > 0 && (
-                    <Chip icon="database" mode="outlined" style={styles.chip}>
-                      {monthlyAverage.dataPointsCount} Datenpunkte
-                    </Chip>
-                  )}
-                </View>
-
-                <ThemedText style={styles.insightText}>
-                  Dein VitalityScore basiert auf dem Durchschnitt der letzten 30
-                  Tage.
-                  {monthlyAverage.isEstimated
-                    ? " Bei wenigen Daten werden aktuelle Werte verwendet."
-                    : ` Basiert auf ${monthlyAverage.dataPointsCount} Datenpunkten.`}{" "}
-                  Arbeite kontinuierlich an allen Bereichen für optimale
-                  Ergebnisse.
-                </ThemedText>
-              </Card.Content>
-            </Card>
-          </ThemedView>
         </ThemedView>
       </ScrollView>
+
+      <Modal
+        visible={showInfoModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowInfoModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <ThemedView style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <ThemedText type="subtitle" style={styles.modalTitle}>
+                How VitalityScore Works
+              </ThemedText>
+              <TouchableOpacity
+                onPress={() => setShowInfoModal(false)}
+                style={styles.closeButton}
+              >
+                <IconSymbol
+                  name="xmark.circle.fill"
+                  size={24}
+                  color={colorScheme === "dark" ? "#FFFFFF" : "#000000"}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <ThemedText style={styles.modalText}>
+                Your VitalityScore is calculated based on four key areas:
+              </ThemedText>
+
+              <View style={styles.scoreSection}>
+                <ThemedText style={styles.sectionHeader}>
+                  💓 Cardiovascular Health (30 pts)
+                </ThemedText>
+                <ThemedText style={styles.sectionText}>
+                  • Resting Heart Rate{"\n"}• Heart Rate Variability{"\n"}• VO2
+                  Max estimation
+                </ThemedText>
+              </View>
+
+              <View style={styles.scoreSection}>
+                <ThemedText style={styles.sectionHeader}>
+                  😴 Recovery & Regeneration (35 pts)
+                </ThemedText>
+                <ThemedText style={styles.sectionText}>
+                  • Deep Sleep Percentage{"\n"}• REM Sleep Percentage{"\n"}•
+                  Sleep Consistency
+                </ThemedText>
+              </View>
+
+              <View style={styles.scoreSection}>
+                <ThemedText style={styles.sectionHeader}>
+                  🏃‍♂️ Activity & Training (30 pts)
+                </ThemedText>
+                <ThemedText style={styles.sectionText}>
+                  • Weekly Training Time{"\n"}• Training Intensity{"\n"}• Daily
+                  Activity (Steps)
+                </ThemedText>
+              </View>
+
+              <View style={styles.scoreSection}>
+                <ThemedText style={styles.sectionHeader}>
+                  ⭐ Bonus Points (5 pts)
+                </ThemedText>
+                <ThemedText style={styles.sectionText}>
+                  • Overall consistency across all categories
+                </ThemedText>
+              </View>
+
+              <View style={styles.updateNotice}>
+                <ThemedText style={styles.updateText}>
+                  📊 Coming Soon: Detailed breakdown showing exactly how you
+                  earned each point!
+                </ThemedText>
+              </View>
+            </ScrollView>
+          </ThemedView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -352,6 +430,24 @@ const styles = StyleSheet.create({
   detailText: {
     opacity: 0.7,
   },
+  legend: {
+    marginTop: 16,
+    gap: 8,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  legendColor: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  legendText: {
+    opacity: 0.7,
+    fontSize: 12,
+  },
   // New styles for enhanced layout
   sectionTitle: {
     marginBottom: 16,
@@ -400,30 +496,73 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
-  insightsContainer: {
-    gap: 16,
-  },
-  insightCard: {
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-  },
-  chipContainer: {
+  // Header Row Styles
+  headerRow: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 12,
-    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 10,
   },
-  chip: {
-    alignSelf: "flex-start",
+  infoButton: {
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
   },
-  insightText: {
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContainer: {
+    borderRadius: 16,
+    maxHeight: "80%",
+    width: "100%",
+    maxWidth: 400,
+    overflow: "hidden",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    paddingBottom: 10,
+  },
+  modalTitle: {
+    fontWeight: "bold",
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalContent: {},
+  modalText: {
+    marginBottom: 20,
     lineHeight: 20,
+  },
+  scoreSection: {
+    marginBottom: 16,
+  },
+  sectionHeader: {
+    fontWeight: "600",
+    marginBottom: 8,
+    fontSize: 16,
+  },
+  sectionText: {
+    lineHeight: 18,
     opacity: 0.8,
+  },
+  updateNotice: {
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: "rgba(33, 150, 243, 0.1)",
+    borderLeftWidth: 4,
+    borderLeftColor: "#2196F3",
+  },
+  updateText: {
+    fontStyle: "italic",
+    opacity: 0.9,
+    lineHeight: 18,
   },
 });

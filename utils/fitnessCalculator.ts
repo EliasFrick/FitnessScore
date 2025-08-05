@@ -3,7 +3,11 @@
  * Clean, focused implementation using modular calculators
  */
 
-import { FitnessScoreResult, HealthMetrics } from "@/types/health";
+import {
+  FitnessScoreResult,
+  HealthMetrics,
+  MonthlyAverageResult,
+} from "@/types/health";
 import {
   calculateActivityPoints,
   calculateCardiovascularPoints,
@@ -90,10 +94,18 @@ export function calculateFitnessScore(
 
 export { getZeroHealthMetrics } from "./mockData";
 
-// Legacy calculator functions with dependency injection to avoid circular imports
-export const calculateMonthlyAverage = (currentMetrics: HealthMetrics) => {
-  const {
-    calculateMonthlyAverage: legacyCalc,
-  } = require("./legacyCalculators");
-  return legacyCalc(currentMetrics, calculateFitnessScore);
-};
+export function calculateMonthlyAverage(
+  currentMetrics: HealthMetrics,
+): MonthlyAverageResult {
+  const currentResult = calculateFitnessScore(currentMetrics);
+  return {
+    totalScore: currentResult.totalScore,
+    cardiovascularPoints: currentResult.cardiovascularPoints,
+    recoveryPoints: currentResult.recoveryPoints,
+    activityPoints: currentResult.activityPoints,
+    bonusPoints: currentResult.bonusPoints,
+    fitnessLevel: currentResult.fitnessLevel,
+    dataPointsCount: 0,
+    isEstimated: true,
+  };
+}

@@ -16,12 +16,8 @@ export function usePrivacyConsent() {
       setHasConsent(consent);
 
       // Show consent modal if consent hasn't been given yet
-      if (consent === false) {
-        // Check if user has explicitly declined or just hasn't decided yet
-        const hasDeclinedBefore = await StorageService.getUserConsent();
-        if (!hasDeclinedBefore) {
-          setShowConsentModal(true);
-        }
+      if (consent === null) {
+        setShowConsentModal(true);
       }
     } catch (error) {
       setHasConsent(false);

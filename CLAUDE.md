@@ -77,11 +77,11 @@ VitalityScore is an Expo React Native app that uses file-based routing with expo
   - Overall Consistency Across Categories
 
 ### Fitness Level Classification
-- 90-100: "Topform!"
-- 70-89: "Stark & Aktiv"
-- 50-69: "Solide Fortschritte"
-- 30-49: "Auf dem Weg"
-- 0-29: "Zeit für Veränderung"
+- 90-100: "Top Form!"
+- 70-89: "Strong & Active"
+- 50-69: "Solid Progress"
+- 30-49: "On The Way"
+- 0-29: "Time For Change"
 
 ### Detailed Scoring Algorithm
 - Uses granular point allocation based on specific health metrics

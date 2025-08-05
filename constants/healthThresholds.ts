@@ -97,11 +97,11 @@ export const FITNESS_LEVEL_THRESHOLDS = {
 } as const;
 
 export const FITNESS_LEVELS = {
-  TOP_FORM: "Topform!",
-  STRONG_ACTIVE: "Stark & Aktiv",
-  SOLID_PROGRESS: "Solide Fortschritte",
-  ON_THE_WAY: "Auf dem Weg",
-  TIME_FOR_CHANGE: "Zeit für Veränderung",
+  TOP_FORM: "Top Form!",
+  STRONG_ACTIVE: "Strong & Active",
+  SOLID_PROGRESS: "Solid Progress",
+  ON_THE_WAY: "On The Way",
+  TIME_FOR_CHANGE: "Time For Change",
 } as const;
 
 export const BONUS_REQUIREMENTS = {

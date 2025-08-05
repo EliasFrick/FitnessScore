@@ -2,7 +2,6 @@ import { ScrollView, StyleSheet, Switch } from "react-native";
 import {
   Card,
   List,
-  Divider,
   Button,
   Dialog,
   Portal,
@@ -10,7 +9,6 @@ import {
 } from "react-native-paper";
 import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -174,8 +172,5 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginBottom: 8,
     fontWeight: "600",
-  },
-  divider: {
-    marginVertical: 8,
   },
 });

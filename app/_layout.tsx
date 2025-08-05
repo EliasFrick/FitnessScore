@@ -1,18 +1,24 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { PaperProvider, MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
-import 'react-native-reanimated';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { PaperProvider, MD3DarkTheme, MD3LightTheme } from "react-native-paper";
+import "react-native-reanimated";
 
-import { ThemeProvider as CustomThemeProvider, useTheme } from '@/contexts/ThemeContext';
-import { HistoryProvider } from '@/contexts/HistoryContext';
-import { Colors } from '@/constants/Colors';
+import {
+  ThemeProvider as CustomThemeProvider,
+  useTheme,
+} from "@/contexts/ThemeContext";
+import { Colors } from "@/constants/Colors";
 
 function AppContent() {
   const { colorScheme } = useTheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   if (!loaded) {
@@ -21,67 +27,40 @@ function AppContent() {
   }
 
   // Create custom Paper themes that match our color scheme
-  const paperTheme = colorScheme === 'dark' 
-    ? {
-        ...MD3DarkTheme,
-        colors: {
-          ...MD3DarkTheme.colors,
-          background: Colors.dark.background,
-          surface: Colors.dark.background,
-          surfaceVariant: '#1F2125',
-          onSurface: Colors.dark.text,
-          onSurfaceVariant: Colors.dark.text,
-          primary: Colors.dark.tint,
-          onPrimary: Colors.dark.background,
+  const paperTheme =
+    colorScheme === "dark"
+      ? {
+          ...MD3DarkTheme,
+          colors: {
+            ...MD3DarkTheme.colors,
+            background: Colors.dark.background,
+            surface: Colors.dark.background,
+            surfaceVariant: "#1F2125",
+            onSurface: Colors.dark.text,
+            onSurfaceVariant: Colors.dark.text,
+            primary: Colors.dark.tint,
+            onPrimary: Colors.dark.background,
+          },
         }
-      }
-    : {
-        ...MD3LightTheme,
-        colors: {
-          ...MD3LightTheme.colors,
-          background: Colors.light.background,
-          surface: Colors.light.background,
-          surfaceVariant: '#F5F5F5',
-          onSurface: Colors.light.text,
-          onSurfaceVariant: Colors.light.text,
-          primary: Colors.light.tint,
-          onPrimary: Colors.light.background,
-        }
-      };
+      : {
+          ...MD3LightTheme,
+          colors: {
+            ...MD3LightTheme.colors,
+            background: Colors.light.background,
+            surface: Colors.light.background,
+            surfaceVariant: "#F5F5F5",
+            onSurface: Colors.light.text,
+            onSurfaceVariant: Colors.light.text,
+            primary: Colors.light.tint,
+            onPrimary: Colors.light.background,
+          },
+        };
 
   return (
     <PaperProvider theme={paperTheme}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen 
-            name="filtered-history" 
-            options={({ route }) => {
-              const filter = (route.params as any)?.filter || '';
-              let title = '';
-              switch (filter) {
-                case 'Cardiovascular Health':
-                  title = 'Herz-Kreislauf';
-                  break;
-                case 'Recovery & Regeneration':
-                  title = 'Regeneration';
-                  break;
-                case 'Activity & Training':
-                  title = 'Aktivität';
-                  break;
-                case 'Bonus Metric':
-                  title = 'Bonus';
-                  break;
-                default:
-                  title = filter;
-              }
-              return {
-                headerShown: true,
-                title,
-                headerBackTitle: 'zurück',
-              };
-            }}
-          />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
@@ -93,9 +72,7 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <CustomThemeProvider>
-      <HistoryProvider>
-        <AppContent />
-      </HistoryProvider>
+      <AppContent />
     </CustomThemeProvider>
   );
 }

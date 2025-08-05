@@ -1,38 +1,5 @@
 {
   "hooks": {
-    "Notification": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify-attention.sh"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify-complete.sh"
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify-complete.sh"
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Bash|Write|Edit|MultiEdit",
@@ -40,6 +7,15 @@
           {
             "type": "command",
             "command": "if [ $CLAUDE_HOOK_EXIT_CODE -ne 0 ]; then echo '{\"error\": \"Tool failed\", \"toolName\": \"'$CLAUDE_HOOK_TOOL_NAME'\"}' | $CLAUDE_PROJECT_DIR/.claude/hooks/notify-error.sh; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write \"**/*.{ts,tsx,js,jsx}\" --ignore-unknown --quiet 2>/dev/null || true"
           }
         ]
       }

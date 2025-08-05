@@ -12,9 +12,9 @@ export const HEART_RATE_THRESHOLDS = {
 } as const;
 
 export const HRV_THRESHOLDS = {
-  OUTSTANDING: 50,
-  VERY_GOOD: 35,
-  GOOD: 25,
+  OUTSTANDING: 70,
+  VERY_GOOD: 40,
+  GOOD: 20,
   BELOW_AVERAGE: 15,
 } as const;
 
@@ -48,11 +48,11 @@ export const SLEEP_CONSISTENCY_THRESHOLDS = {
 
 export const DAILY_TRAINING_THRESHOLDS = {
   OUTSTANDING: 40, // ~280 min/week / 7 days
-  EXCELLENT: 35,   // ~245 min/week / 7 days
-  GOOD: 25,        // ~175 min/week / 7 days
-  MODERATE: 20,    // ~140 min/week / 7 days
+  EXCELLENT: 35, // ~245 min/week / 7 days
+  GOOD: 25, // ~175 min/week / 7 days
+  MODERATE: 20, // ~140 min/week / 7 days
   BELOW_AVERAGE: 12, // ~84 min/week / 7 days
-  LOW: 4,          // ~28 min/week / 7 days
+  LOW: 4, // ~28 min/week / 7 days
 } as const;
 
 export const TRAINING_INTENSITY_THRESHOLDS = {
@@ -76,7 +76,7 @@ export const SCORING_WEIGHTS = {
   RECOVERY_MAX: 35,
   ACTIVITY_MAX: 30,
   BONUS_MAX: 5,
-  
+
   // Individual metric weights
   RESTING_HEART_RATE_MAX: 10,
   HRV_MAX: 10,

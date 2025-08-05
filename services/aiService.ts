@@ -1,6 +1,6 @@
-import OpenAI from 'openai';
-import { HealthContext } from './healthAggregationService';
-import StorageService from './storageService';
+import OpenAI from "openai";
+import { HealthContext } from "./healthAggregationService";
+import StorageService from "./storageService";
 
 export interface AIConfig {
   apiKey: string;
@@ -32,7 +32,7 @@ export class AIService {
 
   configure(config: AIConfig): void {
     if (!config.apiKey) {
-      throw new Error('OpenAI API key is required');
+      throw new Error("OpenAI API key is required");
     }
 
     this.openai = new OpenAI({
@@ -77,7 +77,10 @@ Health Metrics Understanding:
 Always end responses with encouragement and offer to help with specific questions.`;
   }
 
-  private generateHealthPrompt(healthContext: HealthContext, userMessage: string): string {
+  private generateHealthPrompt(
+    healthContext: HealthContext,
+    userMessage: string,
+  ): string {
     return `Based on the user's current health data and their question, provide a helpful, personalized response.
 
 Health Context:
@@ -108,146 +111,185 @@ Latest Health Metrics:
 - REM Sleep: ${context.currentMetrics.remSleepPercentage}%
 - Sleep Consistency: ${context.currentMetrics.sleepConsistency}%
 - Monthly Training Time: ${context.currentMetrics.monthlyTrainingTime} minutes
-- Daily Steps: ${context.currentMetrics.dailySteps}
+- Daily Steps: ${context.currentMetrics.averageSteps}
 
 Recent Trends (past month):
 - Heart Health: ${context.recentTrends.heartHealthTrend}
 - Sleep Quality: ${context.recentTrends.sleepTrend}  
 - Activity Level: ${context.recentTrends.activityTrend}
 
-Areas for Focus: ${context.topConcerns.join(', ') || 'Maintaining current progress'}
-Key Strengths: ${context.strengths.join(', ') || 'Building healthy foundations'}
+Areas for Focus: ${context.topConcerns.join(", ") || "Maintaining current progress"}
+Key Strengths: ${context.strengths.join(", ") || "Building healthy foundations"}
 `.trim();
   }
 
   async generateResponse(
-    userMessage: string, 
+    userMessage: string,
     healthContext: HealthContext,
-    useCache: boolean = true
+    useCache: boolean = true,
   ): Promise<AIResponse> {
     if (!this.isConfigured || !this.openai) {
-      throw new Error('AI Service not configured. Please set up OpenAI API key.');
+      throw new Error(
+        "AI Service not configured. Please set up OpenAI API key.",
+      );
     }
 
     // Check cache first if enabled
     if (useCache) {
-      const cachedResponse = await this.storageService.getCachedAIResponse(userMessage, 24);
+      const cachedResponse = await this.storageService.getCachedAIResponse(
+        userMessage,
+        24,
+      );
       if (cachedResponse) {
         return {
           message: cachedResponse,
           confidence: 0.95,
-          sources: ['cached'],
+          sources: ["cached"],
         };
       }
     }
 
     try {
       const prompt = this.generateHealthPrompt(healthContext, userMessage);
-      
+
       const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini', // Cost-effective model that's good for health coaching
+        model: "gpt-4o-mini", // Cost-effective model that's good for health coaching
         messages: [
-          { role: 'system', content: this.getSystemPrompt() },
-          { role: 'user', content: prompt }
+          { role: "system", content: this.getSystemPrompt() },
+          { role: "user", content: prompt },
         ],
         max_tokens: 500,
         temperature: 0.7,
       });
 
-      const aiMessage = completion.choices[0]?.message?.content || 
+      const aiMessage =
+        completion.choices[0]?.message?.content ||
         "I'm sorry, I couldn't generate a response right now. Please try asking your question differently.";
 
       // Store response in cache
       const healthContextString = this.formatHealthContext(healthContext);
-      await this.storageService.storeAIResponse(userMessage, aiMessage, healthContextString);
+      await this.storageService.storeAIResponse(
+        userMessage,
+        aiMessage,
+        healthContextString,
+      );
 
       return {
         message: aiMessage,
         confidence: 0.9,
-        sources: ['openai-gpt4o-mini'],
+        sources: ["openai-gpt4o-mini"],
       };
-
     } catch (error: any) {
       // Fallback to rule-based response
       return this.generateFallbackResponse(userMessage, healthContext);
     }
   }
 
-  private generateFallbackResponse(userMessage: string, healthContext: HealthContext): AIResponse {
+  private generateFallbackResponse(
+    userMessage: string,
+    healthContext: HealthContext,
+  ): AIResponse {
     const input = userMessage.toLowerCase();
-    
+
     // Sleep-related questions
-    if (input.includes('sleep') || input.includes('rem') || input.includes('deep')) {
-      const sleepQuality = (healthContext.currentMetrics.deepSleepPercentage + 
-                           healthContext.currentMetrics.remSleepPercentage + 
-                           healthContext.currentMetrics.sleepConsistency) / 3;
-      
+    if (
+      input.includes("sleep") ||
+      input.includes("rem") ||
+      input.includes("deep")
+    ) {
+      const sleepQuality =
+        (healthContext.currentMetrics.deepSleepPercentage +
+          healthContext.currentMetrics.remSleepPercentage +
+          healthContext.currentMetrics.sleepConsistency) /
+        3;
+
       if (sleepQuality > 70) {
         return {
           message: `Your sleep metrics look great! With ${healthContext.currentMetrics.deepSleepPercentage}% deep sleep and ${healthContext.currentMetrics.remSleepPercentage}% REM sleep, plus ${healthContext.currentMetrics.sleepConsistency}% consistency, you're doing well. Your sleep trend is ${healthContext.recentTrends.sleepTrend}. Keep maintaining your good sleep hygiene!`,
           confidence: 0.8,
-          sources: ['fallback'],
+          sources: ["fallback"],
         };
       } else {
         return {
           message: `I see some opportunities to improve your sleep quality. Your current deep sleep is at ${healthContext.currentMetrics.deepSleepPercentage}% and REM sleep at ${healthContext.currentMetrics.remSleepPercentage}%. Try maintaining a consistent bedtime, creating a cool, dark environment, and avoiding screens before bed. Your sleep consistency score of ${healthContext.currentMetrics.sleepConsistency}% suggests working on a regular schedule could help.`,
           confidence: 0.8,
-          sources: ['fallback'],
+          sources: ["fallback"],
         };
       }
     }
 
     // Heart health questions
-    if (input.includes('heart') || input.includes('hrv') || input.includes('cardiovascular')) {
+    if (
+      input.includes("heart") ||
+      input.includes("hrv") ||
+      input.includes("cardiovascular")
+    ) {
       const rhr = healthContext.currentMetrics.restingHeartRate;
       const hrv = healthContext.currentMetrics.heartRateVariability;
-      
+
       return {
-        message: `Your cardiovascular health shows a resting heart rate of ${rhr} bpm and HRV of ${hrv} ms. ${rhr < 70 ? 'Your resting heart rate is in a good range!' : 'There\'s room to improve your resting heart rate through cardio exercise.'} ${hrv > 35 ? 'Your heart rate variability indicates good recovery capacity.' : 'Consider stress management and recovery techniques to improve HRV.'} Your heart health trend is ${healthContext.recentTrends.heartHealthTrend}.`,
+        message: `Your cardiovascular health shows a resting heart rate of ${rhr} bpm and HRV of ${hrv} ms. ${rhr < 70 ? "Your resting heart rate is in a good range!" : "There's room to improve your resting heart rate through cardio exercise."} ${hrv > 35 ? "Your heart rate variability indicates good recovery capacity." : "Consider stress management and recovery techniques to improve HRV."} Your heart health trend is ${healthContext.recentTrends.heartHealthTrend}.`,
         confidence: 0.8,
-        sources: ['fallback'],
+        sources: ["fallback"],
       };
     }
 
     // Vitality score questions
-    if (input.includes('score') || input.includes('vitality') || input.includes('fitness')) {
+    if (
+      input.includes("score") ||
+      input.includes("vitality") ||
+      input.includes("fitness")
+    ) {
       return {
-        message: `Your current vitality score is ${healthContext.vitalityScore}/100, putting you in the "${healthContext.fitnessLevel}" category. This score combines your cardiovascular health (30%), recovery & sleep (35%), activity & training (30%), and consistency (5%). ${healthContext.topConcerns.length > 0 ? `Focus areas include: ${healthContext.topConcerns.join(', ')}.` : ''} ${healthContext.strengths.length > 0 ? `Your strengths are: ${healthContext.strengths.join(', ')}.` : ''} What specific area would you like to work on?`,
+        message: `Your current vitality score is ${healthContext.vitalityScore}/100, putting you in the "${healthContext.fitnessLevel}" category. This score combines your cardiovascular health (30%), recovery & sleep (35%), activity & training (30%), and consistency (5%). ${healthContext.topConcerns.length > 0 ? `Focus areas include: ${healthContext.topConcerns.join(", ")}.` : ""} ${healthContext.strengths.length > 0 ? `Your strengths are: ${healthContext.strengths.join(", ")}.` : ""} What specific area would you like to work on?`,
         confidence: 0.8,
-        sources: ['fallback'],
+        sources: ["fallback"],
       };
     }
 
     // Activity and training questions
-    if (input.includes('training') || input.includes('exercise') || input.includes('activity') || input.includes('steps')) {
-      const steps = healthContext.currentMetrics.dailySteps;
+    if (
+      input.includes("training") ||
+      input.includes("exercise") ||
+      input.includes("activity") ||
+      input.includes("steps")
+    ) {
+      const steps = healthContext.currentMetrics.averageSteps;
       const training = healthContext.currentMetrics.monthlyTrainingTime / 4; // Convert monthly to weekly
-      
+
       return {
-        message: `Your activity levels show ${steps} daily steps and ${training} minutes of weekly training. ${steps >= 8000 ? 'Great job on your daily activity!' : 'Try to increase your daily steps toward 8,000-10,000.'} ${training >= 150 ? 'You\'re meeting the recommended exercise guidelines!' : 'Aim for 150+ minutes of exercise weekly for optimal health.'} Your activity trend is ${healthContext.recentTrends.activityTrend}. Consistency is key for long-term health benefits.`,
+        message: `Your activity levels show ${steps} daily steps and ${training} minutes of weekly training. ${steps >= 8000 ? "Great job on your daily activity!" : "Try to increase your daily steps toward 8,000-10,000."} ${training >= 150 ? "You're meeting the recommended exercise guidelines!" : "Aim for 150+ minutes of exercise weekly for optimal health."} Your activity trend is ${healthContext.recentTrends.activityTrend}. Consistency is key for long-term health benefits.`,
         confidence: 0.8,
-        sources: ['fallback'],
+        sources: ["fallback"],
       };
     }
 
     // General response
     return {
-      message: `Based on your vitality score of ${healthContext.vitalityScore}/100 (${healthContext.fitnessLevel}), I can help you understand your health data better. Your key areas for focus are: ${healthContext.topConcerns.join(', ') || 'maintaining current progress'}. What specific aspect of your health would you like to explore? I can discuss your sleep patterns, cardiovascular metrics, training data, or overall vitality score.`,
+      message: `Based on your vitality score of ${healthContext.vitalityScore}/100 (${healthContext.fitnessLevel}), I can help you understand your health data better. Your key areas for focus are: ${healthContext.topConcerns.join(", ") || "maintaining current progress"}. What specific aspect of your health would you like to explore? I can discuss your sleep patterns, cardiovascular metrics, training data, or overall vitality score.`,
       confidence: 0.7,
-      sources: ['fallback'],
+      sources: ["fallback"],
     };
   }
 
-  async generateHealthInsights(healthContext: HealthContext): Promise<AIResponse> {
+  async generateHealthInsights(
+    healthContext: HealthContext,
+  ): Promise<AIResponse> {
     const insightPrompt = `Please provide 3-4 key insights about this user's health data, focusing on their most important trends and opportunities for improvement.`;
-    
+
     return await this.generateResponse(insightPrompt, healthContext, false);
   }
 
-  async generateRecommendations(healthContext: HealthContext): Promise<AIResponse> {
+  async generateRecommendations(
+    healthContext: HealthContext,
+  ): Promise<AIResponse> {
     const recommendationPrompt = `Based on this user's health data and trends, please provide 3-4 specific, actionable recommendations for improving their vitality score.`;
-    
-    return await this.generateResponse(recommendationPrompt, healthContext, false);
+
+    return await this.generateResponse(
+      recommendationPrompt,
+      healthContext,
+      false,
+    );
   }
 
   getConfigurationStatus(): { isConfigured: boolean; hasApiKey: boolean } {

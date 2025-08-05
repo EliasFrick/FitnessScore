@@ -2,75 +2,12 @@
  * Legacy calculation functions for backward compatibility
  */
 
-import { HistoryItem } from "@/contexts/HistoryContext";
 import {
   FitnessScoreResult,
   HealthMetrics,
   MonthlyAverageResult,
 } from "@/types/health";
 import { HealthValue } from "react-native-health";
-
-// Generate sample historical data for demonstration
-export function generateSampleHistoryData(
-  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult,
-): Array<{
-  category:
-    | "Cardiovascular Health"
-    | "Recovery & Regeneration"
-    | "Activity & Training"
-    | "Bonus Metric";
-  metric: string;
-  points: number;
-  maxPoints: number;
-  reason: string;
-  timestamp: Date;
-}> {
-  const history: Array<{
-    category:
-      | "Cardiovascular Health"
-      | "Recovery & Regeneration"
-      | "Activity & Training"
-      | "Bonus Metric";
-    metric: string;
-    points: number;
-    maxPoints: number;
-    reason: string;
-    timestamp: Date;
-  }> = [];
-
-  // Generate data for the last 30 days
-  for (let i = 0; i < 30; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-
-    // Generate varying health metrics for each day
-    const mockMetrics: HealthMetrics = {
-      restingHeartRate: 65 + Math.floor(Math.random() * 20 - 10), // 55-75
-      heartRateVariability: 30 + Math.floor(Math.random() * 20 - 10), // 20-40
-      vo2Max: 40 + Math.floor(Math.random() * 10 - 5), // 35-45
-      deepSleepPercentage: 18 + Math.floor(Math.random() * 8 - 4), // 14-22
-      remSleepPercentage: 22 + Math.floor(Math.random() * 8 - 4), // 18-26
-      sleepConsistency: 75 + Math.floor(Math.random() * 20 - 10), // 65-85
-      monthlyTrainingTime: 800 + Math.floor(Math.random() * 400 - 200), // 600-1000
-      trainingIntensity: 60 + Math.floor(Math.random() * 20 - 10), // 50-70
-      dailySteps: 8500 + Math.floor(Math.random() * 3000 - 1500), // 7000-10000
-    };
-
-    const dayResult = calculateFitnessScore(mockMetrics);
-
-    // Add each metric with the historical timestamp
-    dayResult.historyItems.forEach((item) => {
-      history.push({
-        ...item,
-        timestamp: new Date(
-          date.getTime() + Math.random() * 24 * 60 * 60 * 1000,
-        ), // Random time during the day
-      });
-    });
-  }
-
-  return history;
-}
 
 // Convert historical health data to history items
 export function convertHistoricalDataToHistoryItems(
@@ -262,7 +199,18 @@ export function convertHistoricalDataToHistoryItems(
  * This maintains the old behavior for existing code
  */
 export function calculateMonthlyAverage(
-  historyItems: HistoryItem[],
+  historyItems: Array<{
+    category:
+      | "Cardiovascular Health"
+      | "Recovery & Regeneration"
+      | "Activity & Training"
+      | "Bonus Metric";
+    metric: string;
+    points: number;
+    maxPoints: number;
+    reason: string;
+    timestamp: Date;
+  }>[],
   currentMetrics: HealthMetrics,
   calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult,
 ): MonthlyAverageResult {

@@ -1,5 +1,4 @@
-import { router } from "expo-router";
-import { useEffect, useRef } from "react";
+import React from "react";
 import {
   RefreshControl,
   SafeAreaView,
@@ -14,42 +13,18 @@ import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useHistory } from "@/contexts/HistoryContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import {
-  calculateFitnessScore,
-  calculateMonthlyAverage,
-} from "@/utils/fitnessCalculator";
+import { calculateMonthlyAverage } from "@/utils/fitnessCalculator";
 
 export default function OverviewScreen() {
   const { healthMetrics, isLoading, error, isHealthKitAvailable, refreshData } =
     useHealthData();
-  const { addHistoryItem, historyItems } = useHistory();
   const { colorScheme, setThemeMode } = useTheme();
-  const fitnessResult = calculateFitnessScore(healthMetrics);
-  const monthlyAverage = calculateMonthlyAverage(historyItems, healthMetrics);
+  const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
-
-  const lastHistoryUpdateRef = useRef<string>("");
-
-  useEffect(() => {
-    const today = new Date().toDateString();
-    if (
-      lastHistoryUpdateRef.current !== today &&
-      fitnessResult.historyItems.length > 0
-    ) {
-      lastHistoryUpdateRef.current = today;
-      fitnessResult.historyItems.forEach((item) => {
-        addHistoryItem(item);
-      });
-    }
-  }, [fitnessResult.historyItems, addHistoryItem]);
-
-  const navigateToFilteredHistory = (category: string) => {
-    router.push(`/filtered-history?filter=${encodeURIComponent(category)}`);
-  };
+  console.log(healthMetrics);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -149,12 +124,7 @@ export default function OverviewScreen() {
             </ThemedText>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity
-                style={styles.metricTouchable}
-                onPress={() =>
-                  navigateToFilteredHistory("Cardiovascular Health")
-                }
-              >
+              <TouchableOpacity style={styles.metricTouchable}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -171,12 +141,7 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.metricTouchable}
-                onPress={() =>
-                  navigateToFilteredHistory("Recovery & Regeneration")
-                }
-              >
+              <TouchableOpacity style={styles.metricTouchable}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -195,10 +160,7 @@ export default function OverviewScreen() {
             </View>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity
-                style={styles.metricTouchable}
-                onPress={() => navigateToFilteredHistory("Activity & Training")}
-              >
+              <TouchableOpacity style={styles.metricTouchable}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -215,10 +177,7 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.metricTouchable}
-                onPress={() => navigateToFilteredHistory("Bonus Metric")}
-              >
+              <TouchableOpacity style={styles.metricTouchable}>
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>

@@ -17,11 +17,10 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useHistory } from "@/contexts/HistoryContext";
 
 export default function SettingsScreen() {
   const { themeMode, setThemeMode } = useTheme();
-  const { refreshHistoricalData } = useHistory();
+
   const [themeDialogVisible, setThemeDialogVisible] = useState(false);
   const backgroundColor = useThemeColor({}, "background");
   const insets = useSafeAreaInsets();
@@ -117,8 +116,8 @@ export default function SettingsScreen() {
               left={() => (
                 <IconSymbol name="arrow.clockwise" size={24} color="#FF9500" />
               )}
-              onPress={async () => {
-                await refreshHistoricalData();
+              onPress={() => {
+                // Historical data refresh functionality removed
               }}
             />
           </Card.Content>

@@ -1,4 +1,3 @@
-import { useHistory } from "@/contexts/HistoryContext";
 import HealthService from "@/services/healthService";
 import { HealthMetrics } from "@/types/health";
 import { getZeroHealthMetrics } from "@/utils/fitnessCalculator";
@@ -14,7 +13,6 @@ export function useHealthData() {
   const [isHealthKitAvailable, setIsHealthKitAvailable] = useState(
     Platform.OS === "ios",
   );
-  const { refreshHistoricalData } = useHistory();
 
   const fetchHealthData = async () => {
     if (Platform.OS !== "ios") {
@@ -30,11 +28,7 @@ export function useHealthData() {
       setError(null);
 
       const data = await HealthService.getAllHealthMetrics();
-
       setHealthMetrics(data);
-
-      // Also refresh historical data when we fetch current data
-      await refreshHistoricalData();
     } catch (err) {
       setError("No data available - please allow Apple Health access");
       // Use zero metrics when no data is available

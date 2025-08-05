@@ -13,7 +13,6 @@ import {
   ThemeProvider as CustomThemeProvider,
   useTheme,
 } from "@/contexts/ThemeContext";
-import { HistoryProvider } from "@/contexts/HistoryContext";
 import { Colors } from "@/constants/Colors";
 
 function AppContent() {
@@ -62,34 +61,6 @@ function AppContent() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="filtered-history"
-            options={({ route }) => {
-              const filter = (route.params as any)?.filter || "";
-              let title = "";
-              switch (filter) {
-                case "Cardiovascular Health":
-                  title = "Herz-Kreislauf";
-                  break;
-                case "Recovery & Regeneration":
-                  title = "Regeneration";
-                  break;
-                case "Activity & Training":
-                  title = "Aktivität";
-                  break;
-                case "Bonus Metric":
-                  title = "Bonus";
-                  break;
-                default:
-                  title = filter;
-              }
-              return {
-                headerShown: true,
-                title,
-                headerBackTitle: "zurück",
-              };
-            }}
-          />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
@@ -101,9 +72,7 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <CustomThemeProvider>
-      <HistoryProvider>
-        <AppContent />
-      </HistoryProvider>
+      <AppContent />
     </CustomThemeProvider>
   );
 }

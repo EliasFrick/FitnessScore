@@ -2,8 +2,6 @@
  * Health-related type definitions
  */
 
-import { HistoryItem } from "@/contexts/HistoryContext";
-
 export interface HealthMetrics {
   // Cardiovascular Health
   restingHeartRate: number; // RHR in bpm

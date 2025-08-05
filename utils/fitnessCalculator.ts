@@ -96,33 +96,16 @@ export function calculateFitnessScore(
   };
 }
 
-// Re-export commonly used functions for convenience
-export {
-  calculateDailyBasedMonthlyAverage,
-  calculateDailyScoresFromHistoricalData,
-  calculateMonthlyAverageFromDailyScores,
-} from "./historicalDataCalculators";
-
 export { calculateDailyFitnessScore } from "./dailyFitnessCalculator";
 
 export { getMockHealthMetrics, getZeroHealthMetrics } from "./mockData";
 
 // Legacy calculator functions with dependency injection to avoid circular imports
-export const calculateMonthlyAverage = (
-  historyItems: any[],
-  currentMetrics: HealthMetrics,
-) => {
+export const calculateMonthlyAverage = (currentMetrics: HealthMetrics) => {
   const {
     calculateMonthlyAverage: legacyCalc,
   } = require("./legacyCalculators");
-  return legacyCalc(historyItems, currentMetrics, calculateFitnessScore);
-};
-
-export const generateSampleHistoryData = () => {
-  const {
-    generateSampleHistoryData: legacyGen,
-  } = require("./legacyCalculators");
-  return legacyGen(calculateFitnessScore);
+  return legacyCalc([], currentMetrics, calculateFitnessScore);
 };
 
 export const convertHistoricalDataToHistoryItems = (

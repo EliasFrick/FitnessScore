@@ -101,7 +101,7 @@ export class HealthService {
       const initialized = await this.initialize();
       if (!initialized) {
         throw new HealthKitInitializationError(
-          "Failed to initialize HealthKit"
+          "Failed to initialize HealthKit",
         );
       }
     }
@@ -208,7 +208,7 @@ export class HealthService {
       const initialized = await this.initialize();
       if (!initialized) {
         throw new HealthKitInitializationError(
-          "Failed to initialize HealthKit"
+          "Failed to initialize HealthKit",
         );
       }
     }
@@ -293,7 +293,7 @@ export class HealthService {
       });
 
       return Object.values(dateGroups).sort(
-        (a, b) => b.date.getTime() - a.date.getTime()
+        (a, b) => b.date.getTime() - a.date.getTime(),
       );
     } catch (error) {
       throw error;
@@ -321,7 +321,7 @@ export class HealthService {
       const initialized = await this.initialize();
       if (!initialized) {
         throw new HealthKitInitializationError(
-          "Failed to initialize HealthKit"
+          "Failed to initialize HealthKit",
         );
       }
     }

@@ -96,9 +96,7 @@ export function calculateFitnessScore(
   };
 }
 
-export { calculateDailyFitnessScore } from "./dailyFitnessCalculator";
-
-export { getMockHealthMetrics, getZeroHealthMetrics } from "./mockData";
+export { getZeroHealthMetrics } from "./mockData";
 
 // Legacy calculator functions with dependency injection to avoid circular imports
 export const calculateMonthlyAverage = (currentMetrics: HealthMetrics) => {
@@ -106,17 +104,4 @@ export const calculateMonthlyAverage = (currentMetrics: HealthMetrics) => {
     calculateMonthlyAverage: legacyCalc,
   } = require("./legacyCalculators");
   return legacyCalc([], currentMetrics, calculateFitnessScore);
-};
-
-export const convertHistoricalDataToHistoryItems = (
-  historicalData: Array<{
-    date: Date;
-    stepsData: any[];
-    sleepData: any[];
-  }>,
-) => {
-  const {
-    convertHistoricalDataToHistoryItems: legacyConvert,
-  } = require("./legacyCalculators");
-  return legacyConvert(historicalData, calculateFitnessScore);
 };

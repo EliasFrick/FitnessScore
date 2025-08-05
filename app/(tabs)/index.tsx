@@ -84,7 +84,7 @@ export default function OverviewScreen() {
               </View>
             </View>
             <View style={styles.titleRow}>
-              <ThemedText type="title">VitalityScore Overview</ThemedText>
+              <ThemedText type="title">HealthScore Overview</ThemedText>
             </View>
             {!isHealthKitAvailable && (
               <Text variant="bodySmall" style={styles.statusText}>
@@ -241,7 +241,7 @@ export default function OverviewScreen() {
           <ThemedView style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <ThemedText type="subtitle" style={styles.modalTitle}>
-                How VitalityScore Works
+                How HealthScore Works
               </ThemedText>
               <TouchableOpacity
                 onPress={() => setShowInfoModal(false)}
@@ -257,7 +257,7 @@ export default function OverviewScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <ThemedText style={styles.modalText}>
-                Your VitalityScore is calculated based on four key areas:
+                Your HealthScore is calculated based on four key areas:
               </ThemedText>
 
               <View style={styles.scoreSection}>

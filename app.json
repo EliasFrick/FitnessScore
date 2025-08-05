@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Fitness Score",
-    "slug": "VitalityScore",
+    "name": "HealthScore",
+    "slug": "HealthScore",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
@@ -11,8 +11,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSHealthShareUsageDescription": "This app needs access to your health data to calculate your vitality score and provide personalized fitness insights.",
-        "NSHealthUpdateUsageDescription": "This app may update your health data to sync fitness information.",
+        "NSHealthShareUsageDescription": "HealthScore accesses your health data including heart rate, sleep patterns, activity levels, and fitness metrics to calculate your personalized vitality score. This data is processed locally on your device to provide comprehensive fitness insights, track your progress over time, and help you understand your overall health status. No health data is shared with third parties.",
+        "NSHealthUpdateUsageDescription": "HealthScore may write calculated fitness scores and workout summaries back to your Health app to maintain a complete record of your fitness journey and enable data sharing with other health apps you choose to connect.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "com.elias187.VitalityScore"

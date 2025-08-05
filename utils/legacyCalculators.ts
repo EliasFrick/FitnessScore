@@ -12,7 +12,7 @@ import { HealthValue } from "react-native-health";
 
 // Generate sample historical data for demonstration
 export function generateSampleHistoryData(
-  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
+  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult,
 ): Array<{
   category:
     | "Cardiovascular Health"
@@ -63,7 +63,7 @@ export function generateSampleHistoryData(
       history.push({
         ...item,
         timestamp: new Date(
-          date.getTime() + Math.random() * 24 * 60 * 60 * 1000
+          date.getTime() + Math.random() * 24 * 60 * 60 * 1000,
         ), // Random time during the day
       });
     });
@@ -83,7 +83,7 @@ export function convertHistoricalDataToHistoryItems(
     vo2MaxData?: HealthValue[];
     workoutData?: any[];
   }>,
-  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
+  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult,
 ): Array<{
   category:
     | "Cardiovascular Health"
@@ -116,7 +116,7 @@ export function convertHistoricalDataToHistoryItems(
     // Calculate daily steps average
     const dailySteps = dayData.stepsData.reduce(
       (sum, sample) => sum + (sample.value || 0),
-      0
+      0,
     );
 
     // Calculate sleep data (simplified)
@@ -147,7 +147,7 @@ export function convertHistoricalDataToHistoryItems(
     const restingHeartRate = dayData.heartRateData
       ? dayData.heartRateData.reduce(
           (sum, sample) => sum + (sample.value || 0),
-          0
+          0,
         ) / Math.max(dayData.heartRateData.length, 1)
       : 0;
 
@@ -264,14 +264,14 @@ export function convertHistoricalDataToHistoryItems(
 export function calculateMonthlyAverage(
   historyItems: HistoryItem[],
   currentMetrics: HealthMetrics,
-  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult
+  calculateFitnessScore: (metrics: HealthMetrics) => FitnessScoreResult,
 ): MonthlyAverageResult {
   // Filter history items from the last 30 days
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   const recentHistory = historyItems.filter(
-    (item) => item.timestamp >= thirtyDaysAgo
+    (item) => item.timestamp >= thirtyDaysAgo,
   );
 
   // If no historical data, use current metrics
@@ -312,7 +312,7 @@ export function calculateMonthlyAverage(
     categoryTotals["Cardiovascular Health"].count > 0
       ? Math.round(
           categoryTotals["Cardiovascular Health"].points /
-            categoryTotals["Cardiovascular Health"].count
+            categoryTotals["Cardiovascular Health"].count,
         )
       : Math.round(calculateFitnessScore(currentMetrics).cardiovascularPoints);
 
@@ -320,7 +320,7 @@ export function calculateMonthlyAverage(
     categoryTotals["Recovery & Regeneration"].count > 0
       ? Math.round(
           categoryTotals["Recovery & Regeneration"].points /
-            categoryTotals["Recovery & Regeneration"].count
+            categoryTotals["Recovery & Regeneration"].count,
         )
       : Math.round(calculateFitnessScore(currentMetrics).recoveryPoints);
 
@@ -328,7 +328,7 @@ export function calculateMonthlyAverage(
     categoryTotals["Activity & Training"].count > 0
       ? Math.round(
           categoryTotals["Activity & Training"].points /
-            categoryTotals["Activity & Training"].count
+            categoryTotals["Activity & Training"].count,
         )
       : Math.round(calculateFitnessScore(currentMetrics).activityPoints);
 
@@ -336,7 +336,7 @@ export function calculateMonthlyAverage(
     categoryTotals["Bonus Metric"].count > 0
       ? Math.round(
           categoryTotals["Bonus Metric"].points /
-            categoryTotals["Bonus Metric"].count
+            categoryTotals["Bonus Metric"].count,
         )
       : Math.round(calculateFitnessScore(currentMetrics).bonusPoints);
 

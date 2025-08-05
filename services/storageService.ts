@@ -1,6 +1,6 @@
-import * as SQLite from 'expo-sqlite';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HealthMetrics } from '@/types/health';
+import * as SQLite from "expo-sqlite";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { HealthMetrics } from "@/types/health";
 
 interface StoredHealthData {
   id: string;
@@ -28,9 +28,9 @@ interface StoredHealthData {
     avgTrainingIntensity: number;
     avgDailySteps: number;
     trends: {
-      heartHealthTrend: 'improving' | 'stable' | 'declining';
-      sleepTrend: 'improving' | 'stable' | 'declining';
-      activityTrend: 'improving' | 'stable' | 'declining';
+      heartHealthTrend: "improving" | "stable" | "declining";
+      sleepTrend: "improving" | "stable" | "declining";
+      activityTrend: "improving" | "stable" | "declining";
     };
   };
 }
@@ -58,8 +58,8 @@ export class StorageService {
 
   async initialize(): Promise<void> {
     try {
-      this.db = await SQLite.openDatabaseAsync('vitality_data.db');
-      
+      this.db = await SQLite.openDatabaseAsync("vitality_data.db");
+
       await this.db.execAsync(`
         CREATE TABLE IF NOT EXISTS health_data (
           id TEXT PRIMARY KEY,
@@ -87,7 +87,6 @@ export class StorageService {
       await this.db.execAsync(`
         CREATE INDEX IF NOT EXISTS idx_ai_timestamp ON ai_responses(timestamp);
       `);
-
     } catch (error) {
       throw error;
     }
@@ -104,20 +103,19 @@ export class StorageService {
     try {
       // Store the raw health data
       await this.db!.runAsync(
-        'INSERT INTO health_data (id, data, timestamp) VALUES (?, ?, ?)',
-        [id, JSON.stringify(data), timestamp]
+        "INSERT INTO health_data (id, data, timestamp) VALUES (?, ?, ?)",
+        [id, JSON.stringify(data), timestamp],
       );
 
       // Calculate and store aggregated data
       await this.updateAggregatedData();
 
       // Keep only last 30 days of raw data for privacy
-      const thirtyDaysAgo = timestamp - (30 * 24 * 60 * 60 * 1000);
+      const thirtyDaysAgo = timestamp - 30 * 24 * 60 * 60 * 1000;
       await this.db!.runAsync(
-        'DELETE FROM health_data WHERE timestamp < ? AND aggregated_weekly IS NULL',
-        [thirtyDaysAgo]
+        "DELETE FROM health_data WHERE timestamp < ? AND aggregated_weekly IS NULL",
+        [thirtyDaysAgo],
       );
-
     } catch (error) {
       throw error;
     }
@@ -127,44 +125,48 @@ export class StorageService {
     if (!this.db) return;
 
     const now = Date.now();
-    const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
-    const oneMonthAgo = now - (30 * 24 * 60 * 60 * 1000);
+    const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
+    const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
 
     try {
       // Get last 7 days of data for weekly aggregation
-      const weeklyData = await this.db.getAllAsync(
-        'SELECT data FROM health_data WHERE timestamp >= ? ORDER BY timestamp DESC',
-        [oneWeekAgo]
-      ) as { data: string }[];
+      const weeklyData = (await this.db.getAllAsync(
+        "SELECT data FROM health_data WHERE timestamp >= ? ORDER BY timestamp DESC",
+        [oneWeekAgo],
+      )) as { data: string }[];
 
       if (weeklyData.length > 0) {
-        const parsedData = weeklyData.map(row => JSON.parse(row.data) as HealthMetrics);
+        const parsedData = weeklyData.map(
+          (row) => JSON.parse(row.data) as HealthMetrics,
+        );
         const weeklyAgg = this.calculateAggregates(parsedData);
 
         // Store weekly aggregate
         const weeklyId = `weekly_${Math.floor(now / (7 * 24 * 60 * 60 * 1000))}`;
         await this.db.runAsync(
-          'INSERT OR REPLACE INTO health_data (id, data, timestamp, aggregated_weekly) VALUES (?, ?, ?, ?)',
-          [weeklyId, '{}', now, JSON.stringify(weeklyAgg)]
+          "INSERT OR REPLACE INTO health_data (id, data, timestamp, aggregated_weekly) VALUES (?, ?, ?, ?)",
+          [weeklyId, "{}", now, JSON.stringify(weeklyAgg)],
         );
       }
 
       // Get last 30 days for monthly aggregation
-      const monthlyData = await this.db.getAllAsync(
-        'SELECT data FROM health_data WHERE timestamp >= ? ORDER BY timestamp DESC',
-        [oneMonthAgo]
-      ) as { data: string }[];
+      const monthlyData = (await this.db.getAllAsync(
+        "SELECT data FROM health_data WHERE timestamp >= ? ORDER BY timestamp DESC",
+        [oneMonthAgo],
+      )) as { data: string }[];
 
       if (monthlyData.length > 0) {
-        const parsedData = monthlyData.map(row => JSON.parse(row.data) as HealthMetrics);
+        const parsedData = monthlyData.map(
+          (row) => JSON.parse(row.data) as HealthMetrics,
+        );
         const monthlyAgg = this.calculateAggregates(parsedData);
         const trends = this.calculateTrends(parsedData);
 
         // Store monthly aggregate with trends
         const monthlyId = `monthly_${Math.floor(now / (30 * 24 * 60 * 60 * 1000))}`;
         await this.db.runAsync(
-          'INSERT OR REPLACE INTO health_data (id, data, timestamp, aggregated_monthly) VALUES (?, ?, ?, ?)',
-          [monthlyId, '{}', now, JSON.stringify({ ...monthlyAgg, trends })]
+          "INSERT OR REPLACE INTO health_data (id, data, timestamp, aggregated_monthly) VALUES (?, ?, ?, ?)",
+          [monthlyId, "{}", now, JSON.stringify({ ...monthlyAgg, trends })],
         );
       }
     } catch (error) {
@@ -176,7 +178,8 @@ export class StorageService {
     const sum = data.reduce(
       (acc, curr) => ({
         restingHeartRate: acc.restingHeartRate + curr.restingHeartRate,
-        heartRateVariability: acc.heartRateVariability + curr.heartRateVariability,
+        heartRateVariability:
+          acc.heartRateVariability + curr.heartRateVariability,
         vo2Max: acc.vo2Max + curr.vo2Max,
         deepSleepPercentage: acc.deepSleepPercentage + curr.deepSleepPercentage,
         remSleepPercentage: acc.remSleepPercentage + curr.remSleepPercentage,
@@ -195,7 +198,7 @@ export class StorageService {
         monthlyTrainingTime: 0,
         trainingIntensity: 0,
         dailySteps: 0,
-      }
+      },
     );
 
     const count = data.length;
@@ -203,8 +206,10 @@ export class StorageService {
       avgRestingHeartRate: Math.round(sum.restingHeartRate / count),
       avgHeartRateVariability: Math.round(sum.heartRateVariability / count),
       avgVO2Max: Math.round((sum.vo2Max / count) * 10) / 10,
-      avgDeepSleepPercentage: Math.round((sum.deepSleepPercentage / count) * 10) / 10,
-      avgRemSleepPercentage: Math.round((sum.remSleepPercentage / count) * 10) / 10,
+      avgDeepSleepPercentage:
+        Math.round((sum.deepSleepPercentage / count) * 10) / 10,
+      avgRemSleepPercentage:
+        Math.round((sum.remSleepPercentage / count) * 10) / 10,
       avgSleepConsistency: Math.round(sum.sleepConsistency / count),
       totalTrainingTime: Math.round(sum.monthlyTrainingTime / count),
       avgTrainingIntensity: Math.round(sum.trainingIntensity / count),
@@ -215,9 +220,9 @@ export class StorageService {
   private calculateTrends(data: HealthMetrics[]) {
     if (data.length < 14) {
       return {
-        heartHealthTrend: 'stable' as const,
-        sleepTrend: 'stable' as const,
-        activityTrend: 'stable' as const,
+        heartHealthTrend: "stable" as const,
+        sleepTrend: "stable" as const,
+        activityTrend: "stable" as const,
       };
     }
 
@@ -229,38 +234,55 @@ export class StorageService {
 
     const getTrend = (oldVal: number, newVal: number, threshold = 5) => {
       const change = ((newVal - oldVal) / oldVal) * 100;
-      if (change > threshold) return 'improving';
-      if (change < -threshold) return 'declining';
-      return 'stable';
+      if (change > threshold) return "improving";
+      if (change < -threshold) return "declining";
+      return "stable";
     };
 
     // Heart health trend (lower RHR and higher HRV is better)
     const heartTrend = (() => {
-      const rhrTrend = getTrend(firstHalfAvg.avgRestingHeartRate, secondHalfAvg.avgRestingHeartRate);
-      const hrvTrend = getTrend(firstHalfAvg.avgHeartRateVariability, secondHalfAvg.avgHeartRateVariability);
-      
-      if ((rhrTrend === 'declining' && hrvTrend === 'improving') || 
-          (rhrTrend === 'stable' && hrvTrend === 'improving') ||
-          (rhrTrend === 'declining' && hrvTrend === 'stable')) {
-        return 'improving';
+      const rhrTrend = getTrend(
+        firstHalfAvg.avgRestingHeartRate,
+        secondHalfAvg.avgRestingHeartRate,
+      );
+      const hrvTrend = getTrend(
+        firstHalfAvg.avgHeartRateVariability,
+        secondHalfAvg.avgHeartRateVariability,
+      );
+
+      if (
+        (rhrTrend === "declining" && hrvTrend === "improving") ||
+        (rhrTrend === "stable" && hrvTrend === "improving") ||
+        (rhrTrend === "declining" && hrvTrend === "stable")
+      ) {
+        return "improving";
       }
-      if ((rhrTrend === 'improving' && hrvTrend === 'declining') || 
-          (rhrTrend === 'stable' && hrvTrend === 'declining') ||
-          (rhrTrend === 'improving' && hrvTrend === 'stable')) {
-        return 'declining';
+      if (
+        (rhrTrend === "improving" && hrvTrend === "declining") ||
+        (rhrTrend === "stable" && hrvTrend === "declining") ||
+        (rhrTrend === "improving" && hrvTrend === "stable")
+      ) {
+        return "declining";
       }
-      return 'stable';
+      return "stable";
     })();
 
     return {
       heartHealthTrend: heartTrend,
       sleepTrend: getTrend(
-        (firstHalfAvg.avgDeepSleepPercentage + firstHalfAvg.avgRemSleepPercentage + firstHalfAvg.avgSleepConsistency) / 3,
-        (secondHalfAvg.avgDeepSleepPercentage + secondHalfAvg.avgRemSleepPercentage + secondHalfAvg.avgSleepConsistency) / 3
+        (firstHalfAvg.avgDeepSleepPercentage +
+          firstHalfAvg.avgRemSleepPercentage +
+          firstHalfAvg.avgSleepConsistency) /
+          3,
+        (secondHalfAvg.avgDeepSleepPercentage +
+          secondHalfAvg.avgRemSleepPercentage +
+          secondHalfAvg.avgSleepConsistency) /
+          3,
       ),
       activityTrend: getTrend(
         (firstHalfAvg.totalTrainingTime + firstHalfAvg.avgDailySteps / 100) / 2,
-        (secondHalfAvg.totalTrainingTime + secondHalfAvg.avgDailySteps / 100) / 2
+        (secondHalfAvg.totalTrainingTime + secondHalfAvg.avgDailySteps / 100) /
+          2,
       ),
     };
   }
@@ -271,17 +293,21 @@ export class StorageService {
     }
 
     try {
-      const result = await this.db!.getFirstAsync(
-        'SELECT * FROM health_data WHERE aggregated_monthly IS NOT NULL ORDER BY timestamp DESC LIMIT 1'
-      ) as any;
+      const result = (await this.db!.getFirstAsync(
+        "SELECT * FROM health_data WHERE aggregated_monthly IS NOT NULL ORDER BY timestamp DESC LIMIT 1",
+      )) as any;
 
       if (result) {
         return {
           id: result.id,
-          data: JSON.parse(result.data || '{}'),
+          data: JSON.parse(result.data || "{}"),
           timestamp: result.timestamp,
-          aggregatedWeekly: result.aggregated_weekly ? JSON.parse(result.aggregated_weekly) : undefined,
-          aggregatedMonthly: result.aggregated_monthly ? JSON.parse(result.aggregated_monthly) : undefined,
+          aggregatedWeekly: result.aggregated_weekly
+            ? JSON.parse(result.aggregated_weekly)
+            : undefined,
+          aggregatedMonthly: result.aggregated_monthly
+            ? JSON.parse(result.aggregated_monthly)
+            : undefined,
         };
       }
 
@@ -291,7 +317,11 @@ export class StorageService {
     }
   }
 
-  async storeAIResponse(userMessage: string, aiResponse: string, healthContext: string): Promise<void> {
+  async storeAIResponse(
+    userMessage: string,
+    aiResponse: string,
+    healthContext: string,
+  ): Promise<void> {
     if (!this.db) {
       await this.initialize();
     }
@@ -301,37 +331,41 @@ export class StorageService {
 
     try {
       await this.db!.runAsync(
-        'INSERT INTO ai_responses (id, user_message, ai_response, timestamp, context) VALUES (?, ?, ?, ?, ?)',
-        [id, userMessage, aiResponse, timestamp, healthContext]
+        "INSERT INTO ai_responses (id, user_message, ai_response, timestamp, context) VALUES (?, ?, ?, ?, ?)",
+        [id, userMessage, aiResponse, timestamp, healthContext],
       );
 
       // Keep only last 100 AI responses for privacy
-      const responses = await this.db!.getAllAsync(
-        'SELECT id FROM ai_responses ORDER BY timestamp DESC LIMIT -1 OFFSET 100'
-      ) as { id: string }[];
+      const responses = (await this.db!.getAllAsync(
+        "SELECT id FROM ai_responses ORDER BY timestamp DESC LIMIT -1 OFFSET 100",
+      )) as { id: string }[];
 
       if (responses.length > 0) {
-        const idsToDelete = responses.map(r => `'${r.id}'`).join(',');
-        await this.db!.runAsync(`DELETE FROM ai_responses WHERE id IN (${idsToDelete})`);
+        const idsToDelete = responses.map((r) => `'${r.id}'`).join(",");
+        await this.db!.runAsync(
+          `DELETE FROM ai_responses WHERE id IN (${idsToDelete})`,
+        );
       }
-
     } catch (error) {
       throw error;
     }
   }
 
-  async getCachedAIResponse(userMessage: string, maxAgeHours = 24): Promise<string | null> {
+  async getCachedAIResponse(
+    userMessage: string,
+    maxAgeHours = 24,
+  ): Promise<string | null> {
     if (!this.db) {
       await this.initialize();
     }
 
-    const maxAge = Date.now() - (maxAgeHours * 60 * 60 * 1000);
+    const maxAge = Date.now() - maxAgeHours * 60 * 60 * 1000;
 
     try {
-      const result = await this.db!.getFirstAsync(
-        'SELECT ai_response FROM ai_responses WHERE user_message = ? AND timestamp > ? ORDER BY timestamp DESC LIMIT 1',
-        [userMessage, maxAge]
-      ) as { ai_response: string } | null;
+      const result = (await this.db!.getFirstAsync(
+        "SELECT ai_response FROM ai_responses WHERE user_message = ? AND timestamp > ? ORDER BY timestamp DESC LIMIT 1",
+        [userMessage, maxAge],
+      )) as { ai_response: string } | null;
 
       return result?.ai_response || null;
     } catch (error) {
@@ -341,8 +375,8 @@ export class StorageService {
 
   async getUserConsent(): Promise<boolean> {
     try {
-      const consent = await AsyncStorage.getItem('health_data_consent');
-      return consent === 'true';
+      const consent = await AsyncStorage.getItem("health_data_consent");
+      return consent === "true";
     } catch (error) {
       return false;
     }
@@ -350,7 +384,7 @@ export class StorageService {
 
   async setUserConsent(consent: boolean): Promise<void> {
     try {
-      await AsyncStorage.setItem('health_data_consent', consent.toString());
+      await AsyncStorage.setItem("health_data_consent", consent.toString());
     } catch (error) {
       throw error;
     }
@@ -362,9 +396,9 @@ export class StorageService {
     }
 
     try {
-      await this.db!.runAsync('DELETE FROM health_data');
-      await this.db!.runAsync('DELETE FROM ai_responses');
-      await AsyncStorage.removeItem('health_data_consent');
+      await this.db!.runAsync("DELETE FROM health_data");
+      await this.db!.runAsync("DELETE FROM ai_responses");
+      await AsyncStorage.removeItem("health_data_consent");
     } catch (error) {
       throw error;
     }

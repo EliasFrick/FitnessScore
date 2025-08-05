@@ -25,7 +25,7 @@ import {
 export function calculateCardiovascularPoints(
   restingHeartRate: number,
   heartRateVariability: number,
-  vo2Max: number
+  vo2Max: number,
 ): CategoryScoringResult {
   const items: HistoryItem[] = [];
 
@@ -37,8 +37,8 @@ export function calculateCardiovascularPoints(
       "Resting Heart Rate",
       rhrResult.points,
       10,
-      rhrResult.reason
-    )
+      rhrResult.reason,
+    ),
   );
 
   // Heart Rate Variability (10 points max)
@@ -49,8 +49,8 @@ export function calculateCardiovascularPoints(
       "Heart Rate Variability",
       hrvResult.points,
       10,
-      hrvResult.reason
-    )
+      hrvResult.reason,
+    ),
   );
 
   // VO2 Max (10 points max)
@@ -61,8 +61,8 @@ export function calculateCardiovascularPoints(
       "VO2 Max",
       vo2Result.points,
       10,
-      vo2Result.reason
-    )
+      vo2Result.reason,
+    ),
   );
 
   const total = rhrResult.points + hrvResult.points + vo2Result.points;
@@ -76,7 +76,7 @@ export function calculateCardiovascularPoints(
 export function calculateRecoveryPoints(
   deepSleepPercentage: number,
   remSleepPercentage: number,
-  sleepConsistency: number
+  sleepConsistency: number,
 ): CategoryScoringResult {
   const items: HistoryItem[] = [];
 
@@ -88,8 +88,8 @@ export function calculateRecoveryPoints(
       "Deep Sleep",
       deepSleepResult.points,
       15,
-      deepSleepResult.reason
-    )
+      deepSleepResult.reason,
+    ),
   );
 
   // REM Sleep (12 points max)
@@ -100,8 +100,8 @@ export function calculateRecoveryPoints(
       "REM Sleep",
       remSleepResult.points,
       12,
-      remSleepResult.reason
-    )
+      remSleepResult.reason,
+    ),
   );
 
   // Sleep Consistency (8 points max)
@@ -113,8 +113,8 @@ export function calculateRecoveryPoints(
       "Sleep Consistency",
       sleepConsistencyResult.points,
       8,
-      sleepConsistencyResult.reason
-    )
+      sleepConsistencyResult.reason,
+    ),
   );
 
   const total =
@@ -131,7 +131,7 @@ export function calculateRecoveryPoints(
 export function calculateActivityPoints(
   dailyTrainingTime: number,
   trainingIntensity: number,
-  dailySteps: number
+  dailySteps: number,
 ): CategoryScoringResult {
   const items: HistoryItem[] = [];
 
@@ -145,8 +145,8 @@ export function calculateActivityPoints(
       "Daily Training Time",
       trainingTimeResult.points,
       12,
-      trainingTimeResult.reason
-    )
+      trainingTimeResult.reason,
+    ),
   );
 
   // Training Intensity (12 points max)
@@ -157,8 +157,8 @@ export function calculateActivityPoints(
       "Training Intensity",
       intensityResult.points,
       12,
-      intensityResult.reason
-    )
+      intensityResult.reason,
+    ),
   );
 
   // Daily Steps (6 points max)
@@ -169,8 +169,8 @@ export function calculateActivityPoints(
       "Daily Steps",
       stepsResult.points,
       6,
-      stepsResult.reason
-    )
+      stepsResult.reason,
+    ),
   );
 
   const total =
@@ -185,12 +185,12 @@ export function calculateActivityPoints(
 export function createBonusHistoryItem(
   cardiovascularPoints: number,
   recoveryPoints: number,
-  activityPoints: number
+  activityPoints: number,
 ): HistoryItem {
   const bonusResult = calculateBonusPoints(
     cardiovascularPoints,
     recoveryPoints,
-    activityPoints
+    activityPoints,
   );
 
   return createHistoryItem(
@@ -198,6 +198,6 @@ export function createBonusHistoryItem(
     "Overall Consistency",
     bonusResult.points,
     5,
-    bonusResult.reason + " | " + bonusResult.detailedExplanation
+    bonusResult.reason + " | " + bonusResult.detailedExplanation,
   );
 }

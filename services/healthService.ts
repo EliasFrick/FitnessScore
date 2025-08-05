@@ -122,7 +122,6 @@ export class HealthService {
         getTodaysStepCount(),
         getMonthlyWorkoutData(),
       ]);
-      console.log(await getHeartRateVariabilityData());
       return {
         restingHeartRate,
         heartRateVariability,

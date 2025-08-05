@@ -110,7 +110,7 @@ export async function getMonthlyWorkoutData(): Promise<{
             trainingIntensity,
           });
         }
-      }
+      },
     );
   });
 }
@@ -212,7 +212,7 @@ export async function getTodaysWorkoutData(): Promise<{
             trainingIntensity,
           });
         }
-      }
+      },
     );
   });
 }

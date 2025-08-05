@@ -42,14 +42,14 @@ export async function getRestingHeartRateData(): Promise<number> {
 }
 
 /**
- * Get heart rate variability data from the last 7 days
+ * Get heart rate variability data from the last 30 days
  */
 export async function getHeartRateVariabilityData(): Promise<number> {
   if (Platform.OS !== "ios") return 0;
 
   return new Promise((resolve) => {
     const options: HealthInputOptions = {
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
       limit: 7,
@@ -67,6 +67,7 @@ export async function getHeartRateVariabilityData(): Promise<number> {
               ? results.reduce((sum, sample) => sum + sample.value, 0) /
                 results.length
               : 0;
+          console.log(averageHeartRateVariability);
           resolve(Math.round(averageHeartRateVariability * 1000));
         }
       }

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import StorageService from '@/services/storageService';
+import { useState, useEffect } from "react";
+import StorageService from "@/services/storageService";
 
 export function usePrivacyConsent() {
   const [hasConsent, setHasConsent] = useState<boolean | null>(null);
@@ -14,7 +14,7 @@ export function usePrivacyConsent() {
     try {
       const consent = await StorageService.getUserConsent();
       setHasConsent(consent);
-      
+
       // Show consent modal if consent hasn't been given yet
       if (consent === false) {
         // Check if user has explicitly declined or just hasn't decided yet

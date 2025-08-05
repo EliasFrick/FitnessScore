@@ -2,7 +2,7 @@
  * Mock data generators for testing and demonstration
  */
 
-import { HealthMetrics, DailyHealthMetrics } from '@/types/health';
+import { HealthMetrics, DailyHealthMetrics } from "@/types/health";
 
 // Example/mock data for demonstration
 export function getMockHealthMetrics(): HealthMetrics {

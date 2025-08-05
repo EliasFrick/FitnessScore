@@ -6,12 +6,12 @@ import { Platform } from "react-native";
 
 export function useHealthData() {
   const [healthMetrics, setHealthMetrics] = useState<HealthMetrics>(
-    getZeroHealthMetrics(),
+    getZeroHealthMetrics()
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isHealthKitAvailable, setIsHealthKitAvailable] = useState(
-    Platform.OS === "ios",
+    Platform.OS === "ios"
   );
 
   const fetchHealthData = async () => {
@@ -28,6 +28,7 @@ export function useHealthData() {
       setError(null);
 
       const data = await HealthService.getAllHealthMetrics();
+      console.log(data);
       setHealthMetrics(data);
     } catch (err) {
       setError("No data available - please allow Apple Health access");

@@ -200,7 +200,8 @@ export async function getTodaysStepCount(): Promise<number> {
 
   return new Promise((resolve) => {
     const options: HealthInputOptions = {
-      date: new Date().toISOString(),
+      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      endDate: new Date().toISOString(),
     };
 
     AppleHealthKit.getStepCount(
@@ -209,6 +210,7 @@ export async function getTodaysStepCount(): Promise<number> {
         if (callbackError) {
           resolve(0);
         } else {
+          console.log("Result: ", results);
           resolve(results.value || 0);
         }
       }

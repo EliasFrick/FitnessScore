@@ -8,7 +8,6 @@ import {
   calculateActivityPoints,
   calculateCardiovascularPoints,
   calculateRecoveryPoints,
-  createBonusHistoryItem,
 } from "./categoryCalculators";
 import { calculateBonusPoints, determineFitnessLevel } from "./scoringUtils";
 
@@ -28,7 +27,6 @@ export function calculateFitnessScore(
   metrics: HealthMetrics
 ): FitnessScoreResult {
   // Calculate each category using focused calculators
-  console.log(metrics.restingHeartRate);
   const cardiovascularResult = calculateCardiovascularPoints(
     metrics.restingHeartRate,
     metrics.heartRateVariability,
@@ -53,7 +51,6 @@ export function calculateFitnessScore(
     recoveryResult.total,
     activityResult.total
   );
-
 
   // Combine all results
   const totalScore =

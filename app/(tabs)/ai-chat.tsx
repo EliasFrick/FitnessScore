@@ -6,13 +6,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   View,
-  Alert,
 } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useHealthData } from "@/hooks/useHealthData";
@@ -136,7 +134,7 @@ export default function AIChatScreen() {
 
       // Store health data for future analysis
       await HealthAggregationService.storeAndAggregate(healthMetrics);
-    } catch (error) {
+    } catch (_error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: "I apologize, but I encountered an error processing your request. Please check your AI settings and try again. In the meantime, I can still help with basic questions about your health data.",

@@ -59,7 +59,6 @@ export async function getHeartRateVariabilityData(): Promise<number> {
       options,
       (callbackError: string, results: HealthValue[]) => {
         if (callbackError) {
-          console.error("grr");
           resolve(0);
         } else {
           const averageHeartRateVariability =
@@ -212,7 +211,6 @@ export async function getAverageStepCount(): Promise<number> {
 
     return averageSteps;
   } catch (error) {
-    console.error("Error fetching average step count:", error);
     return 0;
   }
 }

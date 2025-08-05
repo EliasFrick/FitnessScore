@@ -60,7 +60,7 @@ export default function AISettingsScreen() {
       }
 
       setHasConsent(consent);
-    } catch (error) {}
+    } catch (_error) {}
   };
 
   const saveApiKey = async () => {
@@ -86,7 +86,7 @@ export default function AISettingsScreen() {
         "Success",
         "API key saved successfully! You can now use AI features.",
       );
-    } catch (error) {
+    } catch (_error) {
       Alert.alert("Error", "Failed to save API key. Please try again.");
     } finally {
       setIsLoading(false);
@@ -108,7 +108,7 @@ export default function AISettingsScreen() {
               setApiKey("");
               setIsConfigured(false);
               Alert.alert("Success", "API key removed successfully.");
-            } catch (error) {
+            } catch (_error) {
               Alert.alert("Error", "Failed to remove API key.");
             }
           },
@@ -134,7 +134,7 @@ export default function AISettingsScreen() {
           "Data processing disabled. AI features will use only basic health summaries.",
         );
       }
-    } catch (error) {
+    } catch (_error) {
       Alert.alert("Error", "Failed to update privacy settings.");
     }
   };
@@ -153,7 +153,7 @@ export default function AISettingsScreen() {
               await StorageService.clearAllData();
               setHasConsent(false);
               Alert.alert("Success", "All data cleared successfully.");
-            } catch (error) {
+            } catch (_error) {
               Alert.alert("Error", "Failed to clear data.");
             }
           },

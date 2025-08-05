@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
+    padding: 16,
     gap: 20,
     paddingBottom: 20,
   },
@@ -337,9 +337,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   switchContainer: {
-    width: "100%",
     alignItems: "flex-end",
-    marginBottom: 10,
   },
   customSwitch: {
     width: 60,

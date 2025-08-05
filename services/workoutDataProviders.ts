@@ -3,10 +3,8 @@
  * Methods for fetching and processing workout data
  */
 
-import { NativeModules, Platform } from "react-native";
-import AppleHealthKit, {
-  HealthInputOptions,
-} from "react-native-health";
+import { Platform } from "react-native";
+import AppleHealthKit from "react-native-health";
 
 /**
  * Get monthly workout data (last 30 days)
@@ -37,7 +35,7 @@ export async function getMonthlyWorkoutData(): Promise<{
           let highIntensityWorkouts = 0;
 
           const workouts = results.data || results || [];
-          
+
           if (!Array.isArray(workouts) || workouts.length === 0) {
             resolve({ monthlyTrainingTime: 0, trainingIntensity: 0 });
             return;
@@ -49,14 +47,15 @@ export async function getMonthlyWorkoutData(): Promise<{
             }
 
             const duration = workout.duration / 60; // Convert seconds to minutes
-            
+
             if (duration > 0 && !isNaN(duration)) {
               totalDuration += duration;
               totalCalories += workout.calories || 0;
               workoutCount++;
 
               // Consider high intensity based on workout type and calories per minute
-              const caloriesPerMinute = (workout.calories || 0) / Math.max(duration, 1);
+              const caloriesPerMinute =
+                (workout.calories || 0) / Math.max(duration, 1);
               const activityName = workout.activityName || "";
 
               if (
@@ -89,13 +88,18 @@ export async function getMonthlyWorkoutData(): Promise<{
             workoutCount > 0 ? highIntensityWorkouts / workoutCount : 0;
           const frequencyBonus = Math.min(workoutCount * 5, 20);
 
-          const safeAvgCaloriesPerMinute = isNaN(averageCaloriesPerMinute) ? 0 : averageCaloriesPerMinute;
-          const safeHighIntensityRatio = isNaN(highIntensityRatio) ? 0 : highIntensityRatio;
+          const safeAvgCaloriesPerMinute = isNaN(averageCaloriesPerMinute)
+            ? 0
+            : averageCaloriesPerMinute;
+          const safeHighIntensityRatio = isNaN(highIntensityRatio)
+            ? 0
+            : highIntensityRatio;
           const safeFrequencyBonus = isNaN(frequencyBonus) ? 0 : frequencyBonus;
 
           const baseIntensity = safeAvgCaloriesPerMinute * 5;
           const intensityBonus = safeHighIntensityRatio * 30;
-          const rawIntensityScore = baseIntensity + intensityBonus + safeFrequencyBonus;
+          const rawIntensityScore =
+            baseIntensity + intensityBonus + safeFrequencyBonus;
 
           const trainingIntensity = isNaN(rawIntensityScore)
             ? 0
@@ -140,7 +144,7 @@ export async function getTodaysWorkoutData(): Promise<{
           resolve({ dailyTrainingTime: 0, trainingIntensity: 0 });
         } else {
           const workouts = results.data || results || [];
-          
+
           if (!Array.isArray(workouts) || workouts.length === 0) {
             resolve({ dailyTrainingTime: 0, trainingIntensity: 0 });
             return;
@@ -157,20 +161,21 @@ export async function getTodaysWorkoutData(): Promise<{
             }
 
             const duration = workout.duration / 60; // Convert seconds to minutes
-            
+
             if (duration > 0 && !isNaN(duration)) {
               totalDuration += duration;
               totalCalories += workout.calories || 0;
               workoutCount++;
 
-              const caloriesPerMinute = (workout.calories || 0) / Math.max(duration, 1);
+              const caloriesPerMinute =
+                (workout.calories || 0) / Math.max(duration, 1);
               const activityName = workout.activityName || "";
 
               if (
                 caloriesPerMinute > 8 ||
                 [
                   "Running",
-                  "Cycling", 
+                  "Cycling",
                   "Swimming",
                   "HIIT",
                   "CrossTraining",
@@ -185,15 +190,18 @@ export async function getTodaysWorkoutData(): Promise<{
           const dailyTrainingTime = Math.round(totalDuration);
 
           // Calculate intensity for today's workouts
-          const averageCaloriesPerMinute = workoutCount > 0 && totalDuration > 0
-            ? totalCalories / totalDuration
-            : 0;
-          const highIntensityRatio = workoutCount > 0 ? highIntensityWorkouts / workoutCount : 0;
+          const averageCaloriesPerMinute =
+            workoutCount > 0 && totalDuration > 0
+              ? totalCalories / totalDuration
+              : 0;
+          const highIntensityRatio =
+            workoutCount > 0 ? highIntensityWorkouts / workoutCount : 0;
           const frequencyBonus = Math.min(workoutCount * 10, 20); // Bonus for having workouts today
 
           const baseIntensity = averageCaloriesPerMinute * 5;
           const intensityBonus = highIntensityRatio * 30;
-          const rawIntensityScore = baseIntensity + intensityBonus + frequencyBonus;
+          const rawIntensityScore =
+            baseIntensity + intensityBonus + frequencyBonus;
 
           const trainingIntensity = isNaN(rawIntensityScore)
             ? 0

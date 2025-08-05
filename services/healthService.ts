@@ -3,31 +3,31 @@
  * Main service for accessing health data from HealthKit
  */
 
+import { HealthKitInitializationError } from "@/types/errors";
+import { HealthMetrics } from "@/types/health";
 import { NativeModules, Platform } from "react-native";
 import AppleHealthKit, {
   HealthKitPermissions,
   HealthValue,
 } from "react-native-health";
-import { HealthMetrics } from '@/types/health';
-import { HealthKitInitializationError } from '@/types/errors';
 import {
-  getRestingHeartRateData,
   getHeartRateVariabilityData,
-  getVO2MaxData,
+  getRestingHeartRateData,
   getSleepAnalysisData,
   getTodaysStepCount,
-} from './healthDataProviders';
+  getVO2MaxData,
+} from "./healthDataProviders";
 import {
-  getMonthlyWorkoutData,
-  getTodaysWorkoutData,
-} from './workoutDataProviders';
-import {
-  getHistoricalStepsData,
   getHistoricalHeartRateData,
   getHistoricalHRVData,
   getHistoricalSleepData,
+  getHistoricalStepsData,
   getHistoricalWorkoutData,
-} from './historicalDataProviders';
+} from "./historicalDataProviders";
+import {
+  getMonthlyWorkoutData,
+  getTodaysWorkoutData,
+} from "./workoutDataProviders";
 
 // Workaround for react-native-health missing functions
 if (Platform.OS === "ios" && NativeModules.AppleHealthKit) {
@@ -100,7 +100,9 @@ export class HealthService {
     if (!this.isHealthKitInitialized) {
       const initialized = await this.initialize();
       if (!initialized) {
-        throw new HealthKitInitializationError("Failed to initialize HealthKit");
+        throw new HealthKitInitializationError(
+          "Failed to initialize HealthKit"
+        );
       }
     }
 
@@ -120,7 +122,7 @@ export class HealthService {
         getTodaysStepCount(),
         getMonthlyWorkoutData(),
       ]);
-
+      console.log(await getHeartRateVariabilityData());
       return {
         restingHeartRate,
         heartRateVariability,
@@ -206,7 +208,9 @@ export class HealthService {
     if (!this.isHealthKitInitialized) {
       const initialized = await this.initialize();
       if (!initialized) {
-        throw new HealthKitInitializationError("Failed to initialize HealthKit");
+        throw new HealthKitInitializationError(
+          "Failed to initialize HealthKit"
+        );
       }
     }
 
@@ -317,7 +321,9 @@ export class HealthService {
     if (!this.isHealthKitInitialized) {
       const initialized = await this.initialize();
       if (!initialized) {
-        throw new HealthKitInitializationError("Failed to initialize HealthKit");
+        throw new HealthKitInitializationError(
+          "Failed to initialize HealthKit"
+        );
       }
     }
 

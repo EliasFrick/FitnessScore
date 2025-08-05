@@ -36,8 +36,7 @@ export default function OverviewScreen() {
 
   useEffect(() => {
     const today = new Date().toDateString();
-    /*     console.log("Result: ", monthlyAverage);
-     */ if (
+     if (
       lastHistoryUpdateRef.current !== today &&
       fitnessResult.historyItems.length > 0
     ) {

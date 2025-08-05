@@ -3,12 +3,11 @@
  * Individual data fetching methods for specific health metrics
  */
 
-import { NativeModules, Platform } from "react-native";
+import { Platform } from "react-native";
 import AppleHealthKit, {
   HealthInputOptions,
   HealthValue,
 } from "react-native-health";
-import { HealthKitError, HealthKitDataError } from '@/types/errors';
 
 /**
  * Get resting heart rate data from the last 7 days
@@ -60,6 +59,7 @@ export async function getHeartRateVariabilityData(): Promise<number> {
       options,
       (callbackError: string, results: HealthValue[]) => {
         if (callbackError) {
+          console.error("grr");
           resolve(0);
         } else {
           const averageHeartRateVariability =
@@ -67,7 +67,7 @@ export async function getHeartRateVariabilityData(): Promise<number> {
               ? results.reduce((sum, sample) => sum + sample.value, 0) /
                 results.length
               : 0;
-          resolve(Math.round(averageHeartRateVariability));
+          resolve(Math.round(averageHeartRateVariability * 1000));
         }
       }
     );

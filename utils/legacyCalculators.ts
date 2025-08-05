@@ -167,7 +167,6 @@ export function convertHistoricalDataToHistoryItems(
     let workoutCount = 0;
 
     if (dayData.workoutData) {
-      console.log("hama");
       dayData.workoutData.forEach((workout) => {
         const duration = workout.duration || 0; // Duration in minutes
         const intensity = workout.intensity || 0; // Intensity percentage
@@ -306,8 +305,6 @@ export function calculateMonthlyAverage(
       categoryTotals[item.category].count += 1;
     }
   });
-
-  console.log(categoryTotals["Activity & Training"]);
 
   // Calculate averages for each category based on actual average points achieved
   // Only calculate if we have data, otherwise use current metrics as fallback

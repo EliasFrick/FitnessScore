@@ -54,11 +54,6 @@ export function calculateFitnessScore(
     activityResult.total
   );
 
-  const bonusHistoryItem = createBonusHistoryItem(
-    cardiovascularResult.total,
-    recoveryResult.total,
-    activityResult.total
-  );
 
   // Combine all results
   const totalScore =
@@ -72,7 +67,6 @@ export function calculateFitnessScore(
     ...cardiovascularResult.items,
     ...recoveryResult.items,
     ...activityResult.items,
-    bonusHistoryItem,
   ];
 
   return {

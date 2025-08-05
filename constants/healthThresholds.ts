@@ -12,9 +12,9 @@ export const HEART_RATE_THRESHOLDS = {
 } as const;
 
 export const HRV_THRESHOLDS = {
-  OUTSTANDING: 50,
-  VERY_GOOD: 35,
-  GOOD: 25,
+  OUTSTANDING: 70,
+  VERY_GOOD: 40,
+  GOOD: 20,
   BELOW_AVERAGE: 15,
 } as const;
 

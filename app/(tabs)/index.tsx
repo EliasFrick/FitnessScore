@@ -24,7 +24,6 @@ export default function OverviewScreen() {
   const { colorScheme, setThemeMode } = useTheme();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
-  console.log(healthMetrics);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>

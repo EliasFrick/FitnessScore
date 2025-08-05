@@ -25,38 +25,39 @@ import { calculateBonusPoints, determineFitnessLevel } from "./scoringUtils";
  * @returns Detailed fitness score with breakdown and explanations
  */
 export function calculateFitnessScore(
-  metrics: HealthMetrics,
+  metrics: HealthMetrics
 ): FitnessScoreResult {
   // Calculate each category using focused calculators
+  console.log(metrics.restingHeartRate);
   const cardiovascularResult = calculateCardiovascularPoints(
     metrics.restingHeartRate,
     metrics.heartRateVariability,
-    metrics.vo2Max,
+    metrics.vo2Max
   );
 
   const recoveryResult = calculateRecoveryPoints(
     metrics.deepSleepPercentage,
     metrics.remSleepPercentage,
-    metrics.sleepConsistency,
+    metrics.sleepConsistency
   );
 
   const activityResult = calculateActivityPoints(
     metrics.monthlyTrainingTime / 30, // Convert monthly to daily average
     metrics.trainingIntensity,
-    metrics.dailySteps,
+    metrics.dailySteps
   );
 
   // Calculate bonus points
   const bonusResult = calculateBonusPoints(
     cardiovascularResult.total,
     recoveryResult.total,
-    activityResult.total,
+    activityResult.total
   );
 
   const bonusHistoryItem = createBonusHistoryItem(
     cardiovascularResult.total,
     recoveryResult.total,
-    activityResult.total,
+    activityResult.total
   );
 
   // Combine all results
@@ -83,7 +84,7 @@ export function calculateFitnessScore(
     fitnessLevel,
     bonusBreakdown: {
       cardiovascularPercent: Math.round(
-        (cardiovascularResult.total / 30) * 100,
+        (cardiovascularResult.total / 30) * 100
       ),
       recoveryPercent: Math.round((recoveryResult.total / 35) * 100),
       activityPercent: Math.round((activityResult.total / 30) * 100),
@@ -103,5 +104,5 @@ export const calculateMonthlyAverage = (currentMetrics: HealthMetrics) => {
   const {
     calculateMonthlyAverage: legacyCalc,
   } = require("./legacyCalculators");
-  return legacyCalc([], currentMetrics, calculateFitnessScore);
+  return legacyCalc(currentMetrics, calculateFitnessScore);
 };

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "HealthScore",
-    "slug": "HealthScore",
+    "slug": "VitalityScore",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
@@ -11,11 +11,11 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSHealthShareUsageDescription": "HealthScore accesses your health data including heart rate, sleep patterns, activity levels, and fitness metrics to calculate your personalized vitality score. This data is processed locally on your device to provide comprehensive fitness insights, track your progress over time, and help you understand your overall health status. No health data is shared with third parties.",
+        "NSHealthShareUsageDescription": "HealthScore accesses your health data including heart rate, sleep patterns, activity levels, and fitness metrics to calculate your personalized health score. This data is processed locally on your device to provide comprehensive fitness insights, track your progress over time, and help you understand your overall health status. No health data is shared with third parties.",
         "NSHealthUpdateUsageDescription": "HealthScore may write calculated fitness scores and workout summaries back to your Health app to maintain a complete record of your fitness journey and enable data sharing with other health apps you choose to connect.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.yourcompany.VitalityScore"
+      "bundleIdentifier": "com.elias187.HealthScore"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.yourcompany.VitalityScore"
+      "package": "com.elias187.HealthScore"
     },
     "web": {
       "bundler": "metro",

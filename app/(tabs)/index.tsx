@@ -20,8 +20,14 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { calculateMonthlyAverage } from "@/utils/fitnessCalculator";
 
 export default function OverviewScreen() {
-  const { healthMetrics, isLoading, error, isHealthKitAvailable, refreshData } =
-    useHealthData();
+  const {
+    healthMetrics,
+    isLoading,
+    error,
+    isHealthKitAvailable,
+    hasPermissions,
+    refreshData,
+  } = useHealthData();
   const { colorScheme, setThemeMode } = useTheme();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
@@ -91,17 +97,18 @@ export default function OverviewScreen() {
                 📱 Apple Health not available on this platform
               </Text>
             )}
-            {isHealthKitAvailable && !error && (
+            {isHealthKitAvailable && hasPermissions && (
               <Text variant="bodySmall" style={styles.statusText}>
-                📊 Connected to Apple Health
+                📊 Apple Health is connected
               </Text>
             )}
-            {error && (
+            {isHealthKitAvailable && !hasPermissions && (
               <Text
                 variant="bodySmall"
                 style={[styles.statusText, styles.errorText]}
               >
-                ⚠️ {error}
+                ⚠️ Please allow Apple Health permissions in Settings to use the
+                app
               </Text>
             )}
           </ThemedView>
@@ -255,55 +262,63 @@ export default function OverviewScreen() {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <ThemedText style={styles.modalText}>
-                Your HealthScore is calculated based on four key areas:
-              </ThemedText>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={styles.modalScrollView}
+            >
+              <View style={styles.modalContent}>
+                <ThemedText style={styles.modalText}>
+                  Your HealthScore is calculated based on four key areas:
+                </ThemedText>
 
-              <View style={styles.scoreSection}>
-                <ThemedText style={styles.sectionHeader}>
-                  💓 Cardiovascular Health (30 pts)
-                </ThemedText>
-                <ThemedText style={styles.sectionText}>
-                  • Resting Heart Rate{"\n"}• Heart Rate Variability{"\n"}• VO2
-                  Max estimation
-                </ThemedText>
-              </View>
+                <View style={styles.scoreSection}>
+                  <ThemedText style={styles.sectionHeader}>
+                    💓 Cardiovascular Health (30 pts)
+                  </ThemedText>
+                  <ThemedText style={styles.sectionText}>
+                    • Resting Heart Rate (up to 10 pts){"\n"}• Heart Rate
+                    Variability (up to 10 pts){"\n"}• VO2 Max estimation (up to
+                    10 pts)
+                  </ThemedText>
+                </View>
 
-              <View style={styles.scoreSection}>
-                <ThemedText style={styles.sectionHeader}>
-                  😴 Recovery & Regeneration (35 pts)
-                </ThemedText>
-                <ThemedText style={styles.sectionText}>
-                  • Deep Sleep Percentage{"\n"}• REM Sleep Percentage{"\n"}•
-                  Sleep Consistency
-                </ThemedText>
-              </View>
+                <View style={styles.scoreSection}>
+                  <ThemedText style={styles.sectionHeader}>
+                    😴 Recovery & Regeneration (35 pts)
+                  </ThemedText>
+                  <ThemedText style={styles.sectionText}>
+                    • Deep Sleep Percentage (up to 12 pts){"\n"}• REM Sleep
+                    Percentage (up to 12 pts){"\n"}• Sleep Consistency (up to 11
+                    pts)
+                  </ThemedText>
+                </View>
 
-              <View style={styles.scoreSection}>
-                <ThemedText style={styles.sectionHeader}>
-                  🏃‍♂️ Activity & Training (30 pts)
-                </ThemedText>
-                <ThemedText style={styles.sectionText}>
-                  • Weekly Training Time{"\n"}• Training Intensity{"\n"}• Daily
-                  Activity (Steps)
-                </ThemedText>
-              </View>
+                <View style={styles.scoreSection}>
+                  <ThemedText style={styles.sectionHeader}>
+                    🏃‍♂️ Activity & Training (30 pts)
+                  </ThemedText>
+                  <ThemedText style={styles.sectionText}>
+                    • Weekly Training Time (up to 12 pts){"\n"}• Training
+                    Intensity/Consistency (up to 10 pts){"\n"}• Daily Activity
+                    Steps (up to 8 pts)
+                  </ThemedText>
+                </View>
 
-              <View style={styles.scoreSection}>
-                <ThemedText style={styles.sectionHeader}>
-                  ⭐ Bonus Points (5 pts)
-                </ThemedText>
-                <ThemedText style={styles.sectionText}>
-                  • Overall consistency across all categories
-                </ThemedText>
-              </View>
+                <View style={styles.scoreSection}>
+                  <ThemedText style={styles.sectionHeader}>
+                    ⭐ Bonus Points (5 pts)
+                  </ThemedText>
+                  <ThemedText style={styles.sectionText}>
+                    • Overall consistency across all categories (up to 5 pts)
+                  </ThemedText>
+                </View>
 
-              <View style={styles.updateNotice}>
-                <ThemedText style={styles.updateText}>
-                  📊 Coming Soon: Detailed breakdown showing exactly how you
-                  earned each point!
-                </ThemedText>
+                <View style={styles.updateNotice}>
+                  <ThemedText style={styles.updateText}>
+                    📊 Coming Soon: Detailed breakdown showing exactly how you
+                    earned each point!
+                  </ThemedText>
+                </View>
               </View>
             </ScrollView>
           </ThemedView>
@@ -508,7 +523,7 @@ const styles = StyleSheet.create({
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
@@ -533,7 +548,12 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
-  modalContent: {},
+  modalScrollView: {
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    paddingBottom: 20,
+  },
   modalText: {
     marginBottom: 20,
     lineHeight: 20,

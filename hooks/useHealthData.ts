@@ -13,10 +13,12 @@ export function useHealthData() {
   const [isHealthKitAvailable, setIsHealthKitAvailable] = useState(
     Platform.OS === "ios",
   );
+  const [hasPermissions, setHasPermissions] = useState<boolean>(false);
 
   const fetchHealthData = async () => {
     if (Platform.OS !== "ios") {
       setIsHealthKitAvailable(false);
+      setHasPermissions(false);
       setError("No data available - please allow Apple Health access");
       setHealthMetrics(getZeroHealthMetrics());
       setIsLoading(false);
@@ -30,7 +32,9 @@ export function useHealthData() {
       const data = await HealthService.getAllHealthMetrics();
 
       setHealthMetrics(data);
+      setHasPermissions(true);
     } catch (err) {
+      setHasPermissions(false);
       setError("No data available - please allow Apple Health access");
       // Use zero metrics when no data is available
       setHealthMetrics(getZeroHealthMetrics());
@@ -48,6 +52,7 @@ export function useHealthData() {
     isLoading,
     error,
     isHealthKitAvailable,
+    hasPermissions,
     refreshData: fetchHealthData,
   };
 }

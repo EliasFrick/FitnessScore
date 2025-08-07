@@ -46,7 +46,6 @@ export default function OverviewScreen() {
           <ThemedView style={styles.titleContainer}>
             <View style={styles.headerRow}>
               <TouchableOpacity
-                style={styles.infoButton}
                 onPress={() => setShowInfoModal(true)}
                 activeOpacity={0.7}
               >
@@ -54,6 +53,7 @@ export default function OverviewScreen() {
                   name="info.circle"
                   size={24}
                   color={colorScheme === "dark" ? "#FFFFFF" : "#000000"}
+                  style={{ backgroundColor: "transparent" }}
                 />
               </TouchableOpacity>
 
@@ -516,9 +516,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     marginBottom: 10,
-  },
-  infoButton: {
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
   },
   // Modal Styles
   modalOverlay: {

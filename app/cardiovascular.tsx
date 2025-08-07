@@ -1,10 +1,10 @@
 import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
-import { Stack } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { HeaderBackText } from "@/components/ui/HeaderBackText";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { calculateMonthlyAverage } from "@/utils/fitnessCalculator";
@@ -16,12 +16,7 @@ export default function CardiovascularScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-      <Stack.Screen
-        options={{
-          title: "Cardiovascular",
-          headerShown: true,
-        }}
-      />
+      <HeaderBackText title="Cardiovascular" backTitle="Home" />
       <ScrollView
         style={[styles.container, { backgroundColor }]}
         showsVerticalScrollIndicator={false}

@@ -17,13 +17,3 @@ export class HealthKitInitializationError extends HealthKitError {
     super(message, "HEALTHKIT_INIT_FAILED");
   }
 }
-
-export class AIServiceError extends Error {
-  constructor(
-    message: string,
-    public readonly code: string,
-  ) {
-    super(message);
-    this.name = "AIServiceError";
-  }
-}

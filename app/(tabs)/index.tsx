@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
+import { router } from "expo-router";
 
 import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
@@ -164,7 +165,11 @@ export default function OverviewScreen() {
             </ThemedText>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity style={styles.metricTouchable}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() => router.push("/cardiovascular")}
+                activeOpacity={0.7}
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -181,7 +186,11 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.metricTouchable}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() => router.push("/recovery")}
+                activeOpacity={0.7}
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -200,7 +209,11 @@ export default function OverviewScreen() {
             </View>
 
             <View style={styles.metricsGrid}>
-              <TouchableOpacity style={styles.metricTouchable}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() => router.push("/activity")}
+                activeOpacity={0.7}
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>
@@ -217,7 +230,11 @@ export default function OverviewScreen() {
                 </Card>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.metricTouchable}>
+              <TouchableOpacity
+                style={styles.metricTouchable}
+                onPress={() => router.push("/bonus")}
+                activeOpacity={0.7}
+              >
                 <Card style={styles.metricCard}>
                   <Card.Content style={styles.metricContent}>
                     <Text variant="labelMedium" style={styles.metricLabel}>

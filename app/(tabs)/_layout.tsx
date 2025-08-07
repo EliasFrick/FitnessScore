@@ -38,18 +38,6 @@ export default function TabLayout() {
           href: null,
         }}
       />
-      <Tabs.Screen
-        name="ai-chat"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="ai-settings"
-        options={{
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }

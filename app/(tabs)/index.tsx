@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Modal,
@@ -9,7 +10,6 @@ import {
   View,
 } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
-import { router } from "expo-router";
 
 import { FitnessRings } from "@/components/FitnessRings";
 import { ThemedText } from "@/components/ThemedText";
@@ -24,7 +24,6 @@ export default function OverviewScreen() {
   const {
     healthMetrics,
     isLoading,
-    error,
     isHealthKitAvailable,
     hasPermissions,
     refreshData,
@@ -33,6 +32,7 @@ export default function OverviewScreen() {
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
   const [showInfoModal, setShowInfoModal] = useState(false);
+
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>

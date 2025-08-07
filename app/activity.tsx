@@ -5,14 +5,38 @@ import { Card, ProgressBar, Text } from "react-native-paper";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
+import {
+  DAILY_STEPS_THRESHOLDS,
+  DAILY_TRAINING_THRESHOLDS,
+  TRAINING_INTENSITY_THRESHOLDS,
+} from "@/constants/healthThresholds";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { calculateMonthlyAverage } from "@/utils/fitnessCalculator";
+import {
+  calculateFitnessScore,
+  calculateMonthlyAverage,
+} from "@/utils/fitnessCalculator";
 
 export default function ActivityScreen() {
   const { healthMetrics } = useHealthData();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+  const currentResult = calculateFitnessScore(healthMetrics);
+
+  const findCategoryIndex = (
+    dataArray: any,
+    categoryToFind: string
+  ): number => {
+    return dataArray.findIndex((item) => item.category === categoryToFind);
+  };
+
+  console.log(currentResult.historyItems);
+
+  console.log(
+    currentResult.historyItems[
+      findCategoryIndex(currentResult.historyItems, "Activity & Training")
+    ].points
+  );
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -50,14 +74,18 @@ export default function ActivityScreen() {
             <Card.Content style={styles.metricContent}>
               <View style={styles.metricHeader}>
                 <Text variant="titleMedium" style={styles.metricName}>
-                  🏋️ Weekly Training Time
+                  🏋️ Training Time
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
                   {Math.round((monthlyAverage.activityPoints / 30) * 12)}/12
                 </Text>
               </View>
               <ProgressBar
-                progress={(monthlyAverage.activityPoints / 30) * (12 / 30)}
+                progress={
+                  healthMetrics.monthlyTrainingTime /
+                  30 /
+                  DAILY_TRAINING_THRESHOLDS.OUTSTANDING
+                }
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -78,7 +106,10 @@ export default function ActivityScreen() {
                 </Text>
               </View>
               <ProgressBar
-                progress={(monthlyAverage.activityPoints / 30) * (10 / 30)}
+                progress={
+                  healthMetrics.trainingIntensity /
+                  TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL
+                }
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -99,7 +130,10 @@ export default function ActivityScreen() {
                 </Text>
               </View>
               <ProgressBar
-                progress={(monthlyAverage.activityPoints / 30) * (8 / 30)}
+                progress={
+                  healthMetrics.averageSteps /
+                  DAILY_STEPS_THRESHOLDS.OUTSTANDING
+                }
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>

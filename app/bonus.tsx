@@ -198,7 +198,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.15,
     shadowRadius: 2,
-    backgroundColor: "#FFF3E0",
   },
   tipsCard: {
     elevation: 2,

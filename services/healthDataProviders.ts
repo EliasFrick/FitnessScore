@@ -20,7 +20,6 @@ export async function getRestingHeartRateData(): Promise<number> {
       startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
-      limit: 7,
     };
 
     AppleHealthKit.getRestingHeartRateSamples(
@@ -36,7 +35,7 @@ export async function getRestingHeartRateData(): Promise<number> {
               : 0;
           resolve(Math.round(averageRestingHeartRate));
         }
-      },
+      }
     );
   });
 }
@@ -52,7 +51,6 @@ export async function getHeartRateVariabilityData(): Promise<number> {
       startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
-      limit: 7,
     };
 
     AppleHealthKit.getHeartRateVariabilitySamples(
@@ -66,9 +64,10 @@ export async function getHeartRateVariabilityData(): Promise<number> {
               ? results.reduce((sum, sample) => sum + sample.value, 0) /
                 results.length
               : 0;
+
           resolve(Math.round(averageHeartRateVariability * 1000));
         }
-      },
+      }
     );
   });
 }
@@ -84,7 +83,6 @@ export async function getVO2MaxData(): Promise<number> {
       startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
-      limit: 5,
     };
 
     AppleHealthKit.getVo2MaxSamples(
@@ -100,7 +98,7 @@ export async function getVO2MaxData(): Promise<number> {
               : 0;
           resolve(Math.round(averageVO2Max * 10) / 10);
         }
-      },
+      }
     );
   });
 }
@@ -174,7 +172,7 @@ export async function getSleepAnalysisData(): Promise<{
             sleepDurations.length > 0
               ? sleepDurations.reduce(
                   (sum, duration) => sum + Math.pow(duration - averageSleep, 2),
-                  0,
+                  0
                 ) / sleepDurations.length
               : 0;
           const standardDeviation = Math.sqrt(variance);
@@ -186,7 +184,7 @@ export async function getSleepAnalysisData(): Promise<{
             sleepConsistency: Math.round(sleepConsistency),
           });
         }
-      },
+      }
     );
   });
 }

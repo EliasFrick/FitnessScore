@@ -4,12 +4,15 @@
     "slug": "VitalityScore",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/app-icon.png",
+    "icon": "./assets/images/ios-light.png",
     "scheme": "fitnessscore",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "icon": "./assets/images/ios-light.png",
+      "darkModeIcon": "./assets/images/ios-dark.png",
+      "tintedIcon": "./assets/images/ios-tinted.png",
       "infoPlist": {
         "NSHealthShareUsageDescription": "HealthScore accesses your health data including heart rate, sleep patterns, activity levels, and fitness metrics to calculate your personalized health score. This data is processed locally on your device to provide comprehensive fitness insights, track your progress over time, and help you understand your overall health status. No health data is shared with third parties.",
         "NSHealthUpdateUsageDescription": "HealthScore may write calculated fitness scores and workout summaries back to your Health app to maintain a complete record of your fitness journey and enable data sharing with other health apps you choose to connect.",
@@ -36,7 +39,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-screen.png",
+          "image": "./assets/images/splash-icon-light.png",
+          "dark": {
+            "image": "./assets/images/splash-icon-dark.png"
+          },
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

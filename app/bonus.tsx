@@ -85,29 +85,28 @@ export default function BonusScreen() {
               <ThemedText type="subtitle" style={styles.infoTitle}>
                 🎯 How It Works
               </ThemedText>
-              <View style={styles.infoGrid}>
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoEmoji}>⚖️</Text>
-                  <Text variant="bodySmall" style={styles.infoLabel}>
-                    Balanced across all areas
+              <Text variant="bodyMedium" style={styles.infoDescription}>
+                Earn bonus points by achieving ≥75% performance in each health
+                category:
+              </Text>
+              <View style={styles.bonusRules}>
+                <View style={styles.bonusRule}>
+                  <Text style={styles.bonusPoints}>1 point</Text>
+                  <Text variant="bodySmall" style={styles.bonusRuleText}>
+                    One category ≥75% (≥22.5 cardio pts, ≥26.25 recovery pts, or
+                    ≥22.5 activity pts)
                   </Text>
                 </View>
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoEmoji}>📈</Text>
-                  <Text variant="bodySmall" style={styles.infoLabel}>
-                    Consistent over time
+                <View style={styles.bonusRule}>
+                  <Text style={styles.bonusPoints}>3 points</Text>
+                  <Text variant="bodySmall" style={styles.bonusRuleText}>
+                    Two categories ≥75% - great consistency!
                   </Text>
                 </View>
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoEmoji}>🏆</Text>
-                  <Text variant="bodySmall" style={styles.infoLabel}>
-                    Holistic health reward
-                  </Text>
-                </View>
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoEmoji}>⬆️</Text>
-                  <Text variant="bodySmall" style={styles.infoLabel}>
-                    Boosts fitness level
+                <View style={styles.bonusRule}>
+                  <Text style={styles.bonusPoints}>5 points</Text>
+                  <Text variant="bodySmall" style={styles.bonusRuleText}>
+                    All three categories ≥75% - maximum bonus achieved!
                   </Text>
                 </View>
               </View>
@@ -315,5 +314,31 @@ const styles = StyleSheet.create({
     fontSize: 10,
     opacity: 0.8,
     lineHeight: 12,
+  },
+  infoDescription: {
+    opacity: 0.8,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  bonusRules: {
+    gap: 12,
+  },
+  bonusRule: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    paddingVertical: 8,
+  },
+  bonusPoints: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#9C27B0",
+    minWidth: 60,
+    textAlign: "center",
+  },
+  bonusRuleText: {
+    flex: 1,
+    opacity: 0.8,
+    lineHeight: 16,
   },
 });

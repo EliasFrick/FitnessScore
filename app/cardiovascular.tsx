@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
@@ -7,12 +7,57 @@ import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { calculateMonthlyAverage } from "@/utils/fitnessCalculator";
+import {
+  calculateFitnessScore,
+  calculateMonthlyAverage,
+} from "@/utils/fitnessCalculator";
 
 export default function CardiovascularScreen() {
   const { healthMetrics } = useHealthData();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+  const currentResult = calculateFitnessScore(healthMetrics);
+  const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
+    return dataArray.findIndex((item: any) => item.metric === metricToFind);
+  };
+
+  const cardiovascularMetrics = useMemo(() => {
+    const restingHeartRateIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "Resting Heart Rate"
+    );
+    const heartRateVariabilityIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "Heart Rate Variability"
+    );
+    const vo2MaxIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "VO2 Max"
+    );
+
+    return {
+      restingHeartRate: {
+        percentage:
+          currentResult.historyItems[restingHeartRateIndex].points /
+          currentResult.historyItems[restingHeartRateIndex].maxPoints,
+        points: currentResult.historyItems[restingHeartRateIndex].points,
+      },
+      heartRateVariability: {
+        percentage:
+          currentResult.historyItems[heartRateVariabilityIndex].points /
+          currentResult.historyItems[heartRateVariabilityIndex].maxPoints,
+        points: currentResult.historyItems[heartRateVariabilityIndex].points,
+      },
+      vo2Max: {
+        percentage:
+          currentResult.historyItems[vo2MaxIndex].points /
+          currentResult.historyItems[vo2MaxIndex].maxPoints,
+        points: currentResult.historyItems[vo2MaxIndex].points,
+      },
+    };
+  }, [currentResult.historyItems]);
+
+  console.log(cardiovascularMetrics.vo2Max.points);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -54,14 +99,11 @@ export default function CardiovascularScreen() {
                   💓 Resting Heart Rate
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.cardiovascularPoints / 30) * 10)}
-                  /10
+                  {cardiovascularMetrics.restingHeartRate.points}/10
                 </Text>
               </View>
               <ProgressBar
-                progress={
-                  (monthlyAverage.cardiovascularPoints / 30) * (10 / 30)
-                }
+                progress={cardiovascularMetrics.restingHeartRate.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -78,14 +120,11 @@ export default function CardiovascularScreen() {
                   📊 Heart Rate Variability
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.cardiovascularPoints / 30) * 10)}
-                  /10
+                  {cardiovascularMetrics.heartRateVariability.points}/10
                 </Text>
               </View>
               <ProgressBar
-                progress={
-                  (monthlyAverage.cardiovascularPoints / 30) * (10 / 30)
-                }
+                progress={cardiovascularMetrics.heartRateVariability.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -101,14 +140,11 @@ export default function CardiovascularScreen() {
                   🫁 VO2 Max Estimation
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.cardiovascularPoints / 30) * 10)}
-                  /10
+                  {cardiovascularMetrics.vo2Max.points}/10
                 </Text>
               </View>
               <ProgressBar
-                progress={
-                  (monthlyAverage.cardiovascularPoints / 30) * (10 / 30)
-                }
+                progress={cardiovascularMetrics.vo2Max.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>

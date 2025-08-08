@@ -17,7 +17,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-          cache: bun
+          # Remove this line: cache: bun
+
+      - name: 🏗 Setup Bun
+        uses: oven-sh/setup-bun@v1 # Add this step
+        with:
+          bun-version: latest
 
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8

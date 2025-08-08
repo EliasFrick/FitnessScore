@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
@@ -17,57 +17,47 @@ export default function ActivityScreen() {
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
   const currentResult = calculateFitnessScore(healthMetrics);
-  const [trainingTimePercent, setTrainingTimePercent] = useState<number>();
-  const [trainingIntensityPercent, setTrainingIntensityPercent] =
-    useState<number>();
-  const [dailyStepsPercent, setDailyStepsPercent] = useState<number>();
-
   const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
     return dataArray.findIndex((item: any) => item.metric === metricToFind);
   };
 
-  useEffect(() => {
-    setDailyStepsPercent(
-      currentResult.historyItems[
-        findCategoryIndex(currentResult.historyItems, "Daily Steps")
-      ].points /
-        currentResult.historyItems[
-          findCategoryIndex(currentResult.historyItems, "Daily Steps")
-        ].maxPoints
+  const activityMetrics = useMemo(() => {
+    const dailyStepsIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "Daily Steps"
+    );
+    const trainingIntensityIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "Training Intensity"
+    );
+    const trainingTimeIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "Daily Training Time"
     );
 
-    setTrainingIntensityPercent(
-      currentResult.historyItems[
-        findCategoryIndex(currentResult.historyItems, "Training Intensity")
-      ].points /
-        currentResult.historyItems[
-          findCategoryIndex(currentResult.historyItems, "Training Intensity")
-        ].maxPoints
-    );
+    return {
+      dailySteps: {
+        percentage:
+          currentResult.historyItems[dailyStepsIndex].points /
+          currentResult.historyItems[dailyStepsIndex].maxPoints,
+        points: currentResult.historyItems[dailyStepsIndex].points,
+      },
+      trainingIntensity: {
+        percentage:
+          currentResult.historyItems[trainingIntensityIndex].points /
+          currentResult.historyItems[trainingIntensityIndex].maxPoints,
+        points: currentResult.historyItems[trainingIntensityIndex].points,
+      },
+      trainingTime: {
+        percentage:
+          currentResult.historyItems[trainingTimeIndex].points /
+          currentResult.historyItems[trainingTimeIndex].maxPoints,
+        points: currentResult.historyItems[trainingTimeIndex].points,
+      },
+    };
+  }, [currentResult.historyItems]);
 
-    setTrainingTimePercent(
-      currentResult.historyItems[
-        findCategoryIndex(currentResult.historyItems, "Daily Training Time")
-      ].points /
-        currentResult.historyItems[
-          findCategoryIndex(currentResult.historyItems, "Daily Training Time")
-        ].maxPoints
-    );
-  });
-
-  console.log(currentResult.historyItems);
-
-  /*   console.log(currentResult.historyItems[8]);
-  console.log(findCategoryIndex(currentResult.historyItems, "Daily Steps"));
- */
-  console.log(
-    currentResult.historyItems[
-      findCategoryIndex(currentResult.historyItems, "Daily Training Time")
-    ].points,
-    currentResult.historyItems[
-      findCategoryIndex(currentResult.historyItems, "Daily Training Time")
-    ].maxPoints
-  );
+  console.log(activityMetrics.trainingIntensity.points);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -108,11 +98,11 @@ export default function ActivityScreen() {
                   🏋️ Training Time
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.activityPoints / 30) * 12)}/12
+                  {activityMetrics.trainingTime.points}/12
                 </Text>
               </View>
               <ProgressBar
-                progress={trainingTimePercent}
+                progress={activityMetrics.trainingTime.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -129,11 +119,11 @@ export default function ActivityScreen() {
                   🎯 Training Intensity & Consistency
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.activityPoints / 30) * 10)}/10
+                  {activityMetrics.trainingIntensity.points}/10
                 </Text>
               </View>
               <ProgressBar
-                progress={trainingIntensityPercent}
+                progress={activityMetrics.trainingIntensity.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -150,11 +140,11 @@ export default function ActivityScreen() {
                   👟 Daily Activity (Steps)
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.activityPoints / 30) * 8)}/8
+                  {activityMetrics.dailySteps.points}/8
                 </Text>
               </View>
               <ProgressBar
-                progress={dailyStepsPercent}
+                progress={activityMetrics.dailySteps.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>

@@ -24,15 +24,15 @@ export default function ActivityScreen() {
   const activityMetrics = useMemo(() => {
     const dailyStepsIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Daily Steps"
+      "Daily Steps",
     );
     const trainingIntensityIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Training Intensity"
+      "Training Intensity",
     );
     const trainingTimeIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Daily Training Time"
+      "Daily Training Time",
     );
 
     return {

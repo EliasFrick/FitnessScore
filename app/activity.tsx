@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
@@ -6,7 +6,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
 import {
-  DAILY_STEPS_THRESHOLDS,
   DAILY_TRAINING_THRESHOLDS,
   TRAINING_INTENSITY_THRESHOLDS,
 } from "@/constants/healthThresholds";
@@ -22,19 +21,32 @@ export default function ActivityScreen() {
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
   const currentResult = calculateFitnessScore(healthMetrics);
+  const [trainingTimePercent, setTrainingTimePercent] = useState<number>();
+  const [trainingIntensityPercent, setTrainingIntensityPercent] =
+    useState<number>();
+  const [dailyStepsPercent, setDailyStepsPercent] = useState<number>();
 
-  const findCategoryIndex = (
-    dataArray: any,
-    categoryToFind: string
-  ): number => {
-    return dataArray.findIndex((item) => item.category === categoryToFind);
+  const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
+    return dataArray.findIndex((item) => item.metric === metricToFind);
   };
 
-  console.log(currentResult.historyItems);
+  useEffect(() => {
+    setDailyStepsPercent(
+      currentResult.historyItems[
+        findCategoryIndex(currentResult.historyItems, "Daily Steps")
+      ].points /
+        currentResult.historyItems[
+          findCategoryIndex(currentResult.historyItems, "Daily Steps")
+        ].maxPoints
+    );
+  });
 
+  /*   console.log(currentResult.historyItems[8]);
+  console.log(findCategoryIndex(currentResult.historyItems, "Daily Steps"));
+ */
   console.log(
     currentResult.historyItems[
-      findCategoryIndex(currentResult.historyItems, "Activity & Training")
+      findCategoryIndex(currentResult.historyItems, "Daily Steps")
     ].points
   );
 
@@ -130,10 +142,7 @@ export default function ActivityScreen() {
                 </Text>
               </View>
               <ProgressBar
-                progress={
-                  healthMetrics.averageSteps /
-                  DAILY_STEPS_THRESHOLDS.OUTSTANDING
-                }
+                progress={dailyStepsPercent}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>

@@ -98,6 +98,7 @@ export function calculateMonthlyAverage(
   currentMetrics: HealthMetrics,
 ): MonthlyAverageResult {
   const currentResult = calculateFitnessScore(currentMetrics);
+
   return {
     totalScore: currentResult.totalScore,
     cardiovascularPoints: currentResult.cardiovascularPoints,

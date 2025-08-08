@@ -4,19 +4,19 @@
  */
 
 import {
-  HEART_RATE_THRESHOLDS,
-  HRV_THRESHOLDS,
-  VO2_MAX_THRESHOLDS,
-  DEEP_SLEEP_THRESHOLDS,
-  REM_SLEEP_THRESHOLDS,
-  SLEEP_CONSISTENCY_THRESHOLDS,
-  DAILY_TRAINING_THRESHOLDS,
-  TRAINING_INTENSITY_THRESHOLDS,
+  BONUS_REQUIREMENTS,
   DAILY_STEPS_THRESHOLDS,
-  SCORING_WEIGHTS,
+  DAILY_TRAINING_THRESHOLDS,
+  DEEP_SLEEP_THRESHOLDS,
   FITNESS_LEVEL_THRESHOLDS,
   FITNESS_LEVELS,
-  BONUS_REQUIREMENTS,
+  HEART_RATE_THRESHOLDS,
+  HRV_THRESHOLDS,
+  REM_SLEEP_THRESHOLDS,
+  SCORING_WEIGHTS,
+  SLEEP_CONSISTENCY_THRESHOLDS,
+  TRAINING_INTENSITY_THRESHOLDS,
+  VO2_MAX_THRESHOLDS,
 } from "@/constants/healthThresholds";
 
 export interface ScoringResult {
@@ -328,37 +328,51 @@ export function calculateDailyTrainingTimePoints(
   if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.OUTSTANDING) {
     return createScoringResult(
       12,
-      `Outstanding training volume (${Math.round(dailyTrainingTime)} min/day) - exceptional fitness commitment`,
+      `Outstanding training volume (${Math.round(
+        dailyTrainingTime,
+      )} min/day) - exceptional fitness commitment`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
       10,
-      `Excellent training volume (${Math.round(dailyTrainingTime)} min/day) - great commitment to fitness`,
+      `Excellent training volume (${Math.round(
+        dailyTrainingTime,
+      )} min/day) - great commitment to fitness`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.GOOD) {
     return createScoringResult(
       8,
-      `Good training volume (${Math.round(dailyTrainingTime)} min/day) - solid fitness routine`,
+      `Good training volume (${Math.round(
+        dailyTrainingTime,
+      )} min/day) - solid fitness routine`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.MODERATE) {
     return createScoringResult(
       6,
-      `Moderate training volume (${Math.round(dailyTrainingTime)} min/day) - meets WHO minimum`,
+      `Moderate training volume (${Math.round(
+        dailyTrainingTime,
+      )} min/day) - meets WHO minimum`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE) {
     return createScoringResult(
       4,
-      `Below recommended volume (${Math.round(dailyTrainingTime)} min/day) - increase frequency`,
+      `Below recommended volume (${Math.round(
+        dailyTrainingTime,
+      )} min/day) - increase frequency`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.LOW) {
     return createScoringResult(
       2,
-      `Low training volume (${Math.round(dailyTrainingTime)} min/day) - aim for more consistent training`,
+      `Low training volume (${Math.round(
+        dailyTrainingTime,
+      )} min/day) - aim for more consistent training`,
     );
   } else if (dailyTrainingTime > 0) {
     return createScoringResult(
       1,
-      `Very low training volume (${Math.round(dailyTrainingTime)} min/day) - start building routine`,
+      `Very low training volume (${Math.round(
+        dailyTrainingTime,
+      )} min/day) - start building routine`,
     );
   } else {
     return createScoringResult(0, "No training data available");
@@ -407,22 +421,22 @@ export function calculateTrainingIntensityPoints(
 export function calculateDailyStepsPoints(dailySteps: number): ScoringResult {
   if (dailySteps >= DAILY_STEPS_THRESHOLDS.OUTSTANDING) {
     return createScoringResult(
-      6,
+      8,
       `Outstanding daily activity (${dailySteps.toLocaleString()} steps) - exceptional health benefits`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
-      5,
+      6,
       `Excellent daily activity (${dailySteps.toLocaleString()} steps) - optimal WHO range for health`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.VERY_GOOD) {
     return createScoringResult(
-      4,
+      5,
       `Very good daily activity (${dailySteps.toLocaleString()} steps) - significant health benefits`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.GOOD) {
     return createScoringResult(
-      3,
+      4,
       `Good daily activity (${dailySteps.toLocaleString()} steps) - moderate health benefits`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.MODERATE) {
@@ -491,7 +505,9 @@ export function calculateBonusPoints(
     );
     return {
       points: BONUS_REQUIREMENTS.TWO_CATEGORIES_BONUS,
-      reason: `Excellent performance in ${excellentCategories.join(" & ")} (${categoryPercentages.join(", ")}) - strong consistency!`,
+      reason: `Excellent performance in ${excellentCategories.join(
+        " & ",
+      )} (${categoryPercentages.join(", ")}) - strong consistency!`,
       detailedExplanation:
         "Achieved ≥75% in two health categories - great progress toward full consistency!",
     };

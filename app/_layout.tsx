@@ -72,6 +72,10 @@ function AppContent() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
+          <Stack.Screen name="recovery" options={{ headerShown: true }} />
+          <Stack.Screen name="cardiovascular" options={{ headerShown: true }} />
+          <Stack.Screen name="activity" options={{ headerShown: true }} />
+          <Stack.Screen name="bonus" options={{ headerShown: true }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

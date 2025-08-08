@@ -161,14 +161,14 @@ export function calculateActivityPoints(
     ),
   );
 
-  // Daily Steps (6 points max)
+  // Daily Steps (8 points max)
   const stepsResult = calculateDailyStepsPoints(dailySteps);
   items.push(
     createHistoryItem(
       "Activity & Training",
       "Daily Steps",
       stepsResult.points,
-      6,
+      8,
       stepsResult.reason,
     ),
   );

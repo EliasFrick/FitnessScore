@@ -11,6 +11,11 @@ import {
   calculateFitnessScore,
   calculateMonthlyAverage,
 } from "@/utils/fitnessCalculator";
+import {
+  HEART_RATE_THRESHOLDS,
+  HRV_THRESHOLDS,
+  VO2_MAX_THRESHOLDS,
+} from "@/constants/healthThresholds";
 
 export default function CardiovascularScreen() {
   const { healthMetrics } = useHealthData();
@@ -19,6 +24,47 @@ export default function CardiovascularScreen() {
   const currentResult = calculateFitnessScore(healthMetrics);
   const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
     return dataArray.findIndex((item: any) => item.metric === metricToFind);
+  };
+
+  const getNextTarget = (
+    currentValue: number,
+    currentPoints: number,
+    maxPoints: number,
+    type: "rhr" | "hrv" | "vo2max",
+  ) => {
+    if (currentPoints >= maxPoints) return null;
+
+    if (type === "rhr") {
+      if (currentValue > HEART_RATE_THRESHOLDS.ELEVATED)
+        return `Get below ${HEART_RATE_THRESHOLDS.ELEVATED} bpm for +1 point`;
+      if (currentValue > HEART_RATE_THRESHOLDS.AVERAGE)
+        return `Get below ${HEART_RATE_THRESHOLDS.AVERAGE} bpm for +2 more points`;
+      if (currentValue > HEART_RATE_THRESHOLDS.GOOD)
+        return `Get below ${HEART_RATE_THRESHOLDS.GOOD} bpm for +2 more points`;
+      if (currentValue > HEART_RATE_THRESHOLDS.VERY_GOOD)
+        return `Get below ${HEART_RATE_THRESHOLDS.VERY_GOOD} bpm for +2 more points`;
+      if (currentValue > HEART_RATE_THRESHOLDS.EXCELLENT)
+        return `Get below ${HEART_RATE_THRESHOLDS.EXCELLENT} bpm for +2 more points`;
+    } else if (type === "hrv") {
+      if (currentValue < HRV_THRESHOLDS.BELOW_AVERAGE)
+        return `Get above ${HRV_THRESHOLDS.BELOW_AVERAGE} ms for +2 more points`;
+      if (currentValue < HRV_THRESHOLDS.GOOD)
+        return `Get above ${HRV_THRESHOLDS.GOOD} ms for +2 more points`;
+      if (currentValue < HRV_THRESHOLDS.VERY_GOOD)
+        return `Get above ${HRV_THRESHOLDS.VERY_GOOD} ms for +2 more points`;
+      if (currentValue < HRV_THRESHOLDS.OUTSTANDING)
+        return `Get above ${HRV_THRESHOLDS.OUTSTANDING} ms for +2 more points`;
+    } else if (type === "vo2max") {
+      if (currentValue < VO2_MAX_THRESHOLDS.AVERAGE)
+        return `Get above ${VO2_MAX_THRESHOLDS.AVERAGE} ml/kg/min for +2 more points`;
+      if (currentValue < VO2_MAX_THRESHOLDS.GOOD)
+        return `Get above ${VO2_MAX_THRESHOLDS.GOOD} ml/kg/min for +2 more points`;
+      if (currentValue < VO2_MAX_THRESHOLDS.EXCELLENT)
+        return `Get above ${VO2_MAX_THRESHOLDS.EXCELLENT} ml/kg/min for +2 more points`;
+      if (currentValue < VO2_MAX_THRESHOLDS.OUTSTANDING)
+        return `Get above ${VO2_MAX_THRESHOLDS.OUTSTANDING} ml/kg/min for +2 more points`;
+    }
+    return null;
   };
 
   const cardiovascularMetrics = useMemo(() => {
@@ -41,21 +87,45 @@ export default function CardiovascularScreen() {
           currentResult.historyItems[restingHeartRateIndex].points /
           currentResult.historyItems[restingHeartRateIndex].maxPoints,
         points: currentResult.historyItems[restingHeartRateIndex].points,
+        currentValue: healthMetrics.restingHeartRate,
+        unit: "bpm",
+        nextTarget: getNextTarget(
+          healthMetrics.restingHeartRate,
+          currentResult.historyItems[restingHeartRateIndex].points,
+          10,
+          "rhr",
+        ),
       },
       heartRateVariability: {
         percentage:
           currentResult.historyItems[heartRateVariabilityIndex].points /
           currentResult.historyItems[heartRateVariabilityIndex].maxPoints,
         points: currentResult.historyItems[heartRateVariabilityIndex].points,
+        currentValue: healthMetrics.heartRateVariability,
+        unit: "ms",
+        nextTarget: getNextTarget(
+          healthMetrics.heartRateVariability,
+          currentResult.historyItems[heartRateVariabilityIndex].points,
+          10,
+          "hrv",
+        ),
       },
       vo2Max: {
         percentage:
           currentResult.historyItems[vo2MaxIndex].points /
           currentResult.historyItems[vo2MaxIndex].maxPoints,
         points: currentResult.historyItems[vo2MaxIndex].points,
+        currentValue: healthMetrics.vo2Max,
+        unit: "ml/kg/min",
+        nextTarget: getNextTarget(
+          healthMetrics.vo2Max,
+          currentResult.historyItems[vo2MaxIndex].points,
+          10,
+          "vo2max",
+        ),
       },
     };
-  }, [currentResult.historyItems]);
+  }, [currentResult.historyItems, healthMetrics]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -103,9 +173,20 @@ export default function CardiovascularScreen() {
                 progress={cardiovascularMetrics.restingHeartRate.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Lower = better fitness
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current: {cardiovascularMetrics.restingHeartRate.currentValue}{" "}
+                  {cardiovascularMetrics.restingHeartRate.unit}
+                </Text>
+                <Text variant="bodySmall" style={styles.metricDescription}>
+                  Lower = better fitness
+                </Text>
+              </View>
+              {cardiovascularMetrics.restingHeartRate.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  🎯 {cardiovascularMetrics.restingHeartRate.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
@@ -123,9 +204,21 @@ export default function CardiovascularScreen() {
                 progress={cardiovascularMetrics.heartRateVariability.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Higher = better recovery
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current:{" "}
+                  {cardiovascularMetrics.heartRateVariability.currentValue}{" "}
+                  {cardiovascularMetrics.heartRateVariability.unit}
+                </Text>
+                <Text variant="bodySmall" style={styles.metricDescription}>
+                  Higher = better recovery
+                </Text>
+              </View>
+              {cardiovascularMetrics.heartRateVariability.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  🎯 {cardiovascularMetrics.heartRateVariability.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
@@ -143,9 +236,20 @@ export default function CardiovascularScreen() {
                 progress={cardiovascularMetrics.vo2Max.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Maximum oxygen uptake
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current: {cardiovascularMetrics.vo2Max.currentValue}{" "}
+                  {cardiovascularMetrics.vo2Max.unit}
+                </Text>
+                <Text variant="bodySmall" style={styles.metricDescription}>
+                  Maximum oxygen uptake
+                </Text>
+              </View>
+              {cardiovascularMetrics.vo2Max.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  🎯 {cardiovascularMetrics.vo2Max.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
@@ -280,9 +384,24 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 8,
   },
+  metricInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  currentValue: {
+    fontWeight: "500",
+    opacity: 0.9,
+  },
   metricDescription: {
     opacity: 0.7,
     lineHeight: 16,
+  },
+  nextTarget: {
+    marginTop: 4,
+    fontSize: 11,
+    color: "#FF6B35",
+    fontWeight: "500",
   },
   tipsTitle: {
     marginBottom: 16,

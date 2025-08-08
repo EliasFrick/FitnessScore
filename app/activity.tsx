@@ -57,7 +57,6 @@ export default function ActivityScreen() {
     };
   }, [currentResult.historyItems]);
 
-  console.log(activityMetrics.trainingIntensity.points);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>

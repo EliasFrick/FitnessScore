@@ -30,7 +30,7 @@ export default function ActivityScreen() {
     currentValue: number,
     currentPoints: number,
     maxPoints: number,
-    type: "training" | "intensity" | "steps",
+    type: "training" | "intensity" | "steps"
   ) => {
     if (currentPoints >= maxPoints) return null;
     if (type === "training") {
@@ -77,15 +77,15 @@ export default function ActivityScreen() {
   const activityMetrics = useMemo(() => {
     const dailyStepsIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Daily Steps",
+      "Daily Steps"
     );
     const trainingIntensityIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Training Intensity",
+      "Training Intensity"
     );
     const trainingTimeIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Daily Training Time",
+      "Daily Training Time"
     );
     return {
       dailySteps: {
@@ -99,7 +99,7 @@ export default function ActivityScreen() {
           healthMetrics.averageSteps,
           currentResult.historyItems[dailyStepsIndex].points,
           8,
-          "steps",
+          "steps"
         ),
       },
       trainingIntensity: {
@@ -113,7 +113,7 @@ export default function ActivityScreen() {
           healthMetrics.trainingIntensity,
           currentResult.historyItems[trainingIntensityIndex].points,
           10,
-          "intensity",
+          "intensity"
         ),
       },
       trainingTime: {
@@ -127,7 +127,7 @@ export default function ActivityScreen() {
           Math.round(healthMetrics.monthlyTrainingTime / 30),
           currentResult.historyItems[trainingTimeIndex].points,
           12,
-          "training",
+          "training"
         ),
       },
     };
@@ -187,7 +187,7 @@ export default function ActivityScreen() {
               </View>
               {activityMetrics.trainingTime.nextTarget && (
                 <Text variant="bodySmall" style={styles.nextTarget}>
-                  🎯 {activityMetrics.trainingTime.nextTarget}
+                  {activityMetrics.trainingTime.nextTarget}
                 </Text>
               )}
             </Card.Content>
@@ -215,7 +215,7 @@ export default function ActivityScreen() {
               </View>
               {activityMetrics.trainingIntensity.nextTarget && (
                 <Text variant="bodySmall" style={styles.nextTarget}>
-                  🎯 {activityMetrics.trainingIntensity.nextTarget}
+                  {activityMetrics.trainingIntensity.nextTarget}
                 </Text>
               )}
             </Card.Content>
@@ -243,7 +243,7 @@ export default function ActivityScreen() {
               </View>
               {activityMetrics.dailySteps.nextTarget && (
                 <Text variant="bodySmall" style={styles.nextTarget}>
-                  🎯 {activityMetrics.dailySteps.nextTarget}
+                  {activityMetrics.dailySteps.nextTarget}
                 </Text>
               )}
             </Card.Content>
@@ -269,7 +269,7 @@ export default function ActivityScreen() {
                   </Text>
                 </View>
                 <View style={styles.tipItem}>
-                  <Text style={styles.tipEmoji}>🚂</Text>
+                  <Text style={styles.tipEmoji}>👣</Text>
                   <Text variant="bodySmall" style={styles.tipLabel}>
                     Take stairs daily
                   </Text>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
@@ -7,12 +7,25 @@ import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { calculateMonthlyAverage } from "@/utils/fitnessCalculator";
+import {
+  calculateFitnessScore,
+  calculateMonthlyAverage,
+} from "@/utils/fitnessCalculator";
 
 export default function BonusScreen() {
   const { healthMetrics } = useHealthData();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+  const currentResult = calculateFitnessScore(healthMetrics);
+
+  const bonusMetrics = useMemo(() => {
+    return {
+      overallConsistency: {
+        percentage: currentResult.bonusPoints / 5,
+        points: currentResult.bonusPoints,
+      },
+    };
+  }, [currentResult.bonusPoints]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -54,11 +67,11 @@ export default function BonusScreen() {
                   ⭐ Overall Consistency
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {monthlyAverage.bonusPoints}/5
+                  {bonusMetrics.overallConsistency.points}/5
                 </Text>
               </View>
               <ProgressBar
-                progress={monthlyAverage.bonusPoints / 5}
+                progress={bonusMetrics.overallConsistency.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>

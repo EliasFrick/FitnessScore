@@ -24,15 +24,15 @@ export default function CardiovascularScreen() {
   const cardiovascularMetrics = useMemo(() => {
     const restingHeartRateIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Resting Heart Rate"
+      "Resting Heart Rate",
     );
     const heartRateVariabilityIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Heart Rate Variability"
+      "Heart Rate Variability",
     );
     const vo2MaxIndex = findCategoryIndex(
       currentResult.historyItems,
-      "VO2 Max"
+      "VO2 Max",
     );
 
     return {
@@ -57,7 +57,7 @@ export default function CardiovascularScreen() {
     };
   }, [currentResult.historyItems]);
 
-  console.log(cardiovascularMetrics.vo2Max.points);
+  console.log(currentResult);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>

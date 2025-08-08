@@ -5,17 +5,17 @@ import { Card, ProgressBar, Text } from "react-native-paper";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
+import {
+  HEART_RATE_THRESHOLDS,
+  HRV_THRESHOLDS,
+  VO2_MAX_THRESHOLDS,
+} from "@/constants/healthThresholds";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
   calculateFitnessScore,
   calculateMonthlyAverage,
 } from "@/utils/fitnessCalculator";
-import {
-  HEART_RATE_THRESHOLDS,
-  HRV_THRESHOLDS,
-  VO2_MAX_THRESHOLDS,
-} from "@/constants/healthThresholds";
 
 export default function CardiovascularScreen() {
   const { healthMetrics } = useHealthData();
@@ -178,9 +178,6 @@ export default function CardiovascularScreen() {
                   Current: {cardiovascularMetrics.restingHeartRate.currentValue}{" "}
                   {cardiovascularMetrics.restingHeartRate.unit}
                 </Text>
-                <Text variant="bodySmall" style={styles.metricDescription}>
-                  Lower = better fitness
-                </Text>
               </View>
               {cardiovascularMetrics.restingHeartRate.nextTarget && (
                 <Text variant="bodySmall" style={styles.nextTarget}>
@@ -210,9 +207,6 @@ export default function CardiovascularScreen() {
                   {cardiovascularMetrics.heartRateVariability.currentValue}{" "}
                   {cardiovascularMetrics.heartRateVariability.unit}
                 </Text>
-                <Text variant="bodySmall" style={styles.metricDescription}>
-                  Higher = better recovery
-                </Text>
               </View>
               {cardiovascularMetrics.heartRateVariability.nextTarget && (
                 <Text variant="bodySmall" style={styles.nextTarget}>
@@ -240,9 +234,6 @@ export default function CardiovascularScreen() {
                 <Text variant="bodySmall" style={styles.currentValue}>
                   Current: {cardiovascularMetrics.vo2Max.currentValue}{" "}
                   {cardiovascularMetrics.vo2Max.unit}
-                </Text>
-                <Text variant="bodySmall" style={styles.metricDescription}>
-                  Maximum oxygen uptake
                 </Text>
               </View>
               {cardiovascularMetrics.vo2Max.nextTarget && (

@@ -385,33 +385,33 @@ export function calculateDailyTrainingTimePoints(
 export function calculateTrainingIntensityPoints(
   trainingIntensity: number,
 ): ScoringResult {
-  if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL) {
+  if (trainingIntensity > TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL) {
     return createScoringResult(
-      12,
-      `Exceptional training intensity (${trainingIntensity}%) - outstanding workout quality and effort`,
+      10,
+      `Exceptional high-intensity training (${Math.round(trainingIntensity)} minutes) - more than 40 minutes of intense workouts`,
     );
   } else if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.HIGH) {
     return createScoringResult(
-      10,
-      `High training intensity (${trainingIntensity}%) - excellent workout quality and effort`,
+      8,
+      `High-intensity training (${Math.round(trainingIntensity)} minutes) - 30-40 minutes of intense workouts`,
     );
   } else if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.GOOD) {
     return createScoringResult(
       7,
-      `Good training intensity (${trainingIntensity}%) - effective workout sessions`,
+      `Good high-intensity training (${Math.round(trainingIntensity)} minutes) - 20-30 minutes of intense workouts`,
     );
   } else if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.MODERATE) {
     return createScoringResult(
       4,
-      `Moderate training intensity (${trainingIntensity}%) - push yourself harder during workouts`,
+      `Moderate high-intensity training (${Math.round(trainingIntensity)} minutes) - 10-20 minutes of intense workouts`,
     );
-  } else if (trainingIntensity > 0) {
+  } else if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.LOW) {
     return createScoringResult(
       2,
-      `Low training intensity (${trainingIntensity}%) - focus on challenging yourself more`,
+      `Low high-intensity training (${Math.round(trainingIntensity)} minutes) - 1-10 minutes of intense workouts`,
     );
   } else {
-    return createScoringResult(0, "No training intensity data available");
+    return createScoringResult(0, "No high-intensity training data available");
   }
 }
 

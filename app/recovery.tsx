@@ -29,7 +29,7 @@ export default function RecoveryScreen() {
     currentValue: number,
     currentPoints: number,
     maxPoints: number,
-    type: "deep" | "rem" | "consistency"
+    type: "deep" | "rem" | "consistency",
   ) => {
     if (currentPoints >= maxPoints) return null;
 
@@ -64,15 +64,15 @@ export default function RecoveryScreen() {
   const recoveryMetrics = useMemo(() => {
     const deepSleepIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Deep Sleep"
+      "Deep Sleep",
     );
     const remSleepIndex = findCategoryIndex(
       currentResult.historyItems,
-      "REM Sleep"
+      "REM Sleep",
     );
     const sleepConsistencyIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Sleep Consistency"
+      "Sleep Consistency",
     );
 
     return {
@@ -87,7 +87,7 @@ export default function RecoveryScreen() {
           healthMetrics.deepSleepPercentage,
           currentResult.historyItems[deepSleepIndex].points,
           15,
-          "deep"
+          "deep",
         ),
       },
       remSleep: {
@@ -101,7 +101,7 @@ export default function RecoveryScreen() {
           healthMetrics.remSleepPercentage,
           currentResult.historyItems[remSleepIndex].points,
           12,
-          "rem"
+          "rem",
         ),
       },
       sleepConsistency: {
@@ -115,7 +115,7 @@ export default function RecoveryScreen() {
           healthMetrics.sleepConsistency,
           currentResult.historyItems[sleepConsistencyIndex].points,
           8,
-          "consistency"
+          "consistency",
         ),
       },
     };
@@ -172,9 +172,6 @@ export default function RecoveryScreen() {
                   Current: {recoveryMetrics.deepSleep.currentValue}
                   {recoveryMetrics.deepSleep.unit}
                 </Text>
-                <Text variant="bodySmall" style={styles.metricDescription}>
-                  Physical recovery & immune function
-                </Text>
               </View>
               {recoveryMetrics.deepSleep.nextTarget && (
                 <Text variant="bodySmall" style={styles.nextTarget}>
@@ -202,9 +199,6 @@ export default function RecoveryScreen() {
                 <Text variant="bodySmall" style={styles.currentValue}>
                   Current: {recoveryMetrics.remSleep.currentValue}
                   {recoveryMetrics.remSleep.unit}
-                </Text>
-                <Text variant="bodySmall" style={styles.metricDescription}>
-                  Cognitive & emotional health
                 </Text>
               </View>
               {recoveryMetrics.remSleep.nextTarget && (

@@ -24,10 +24,7 @@ import {
   getHistoricalStepsData,
   getHistoricalWorkoutData,
 } from "./historicalDataProviders";
-import {
-  getMonthlyWorkoutData,
-  getTodaysWorkoutData,
-} from "./workoutDataProviders";
+import { getMonthlyWorkoutData } from "./workoutDataProviders";
 
 // Workaround for react-native-health missing functions
 if (Platform.OS === "ios" && NativeModules.AppleHealthKit) {
@@ -135,60 +132,6 @@ export class HealthService {
       };
     } catch (error) {
       throw error;
-    }
-  }
-
-  /**
-   * Get current day's health metrics optimized for widget display
-   */
-  async getTodaysHealthMetrics(): Promise<{
-    averageSteps: number;
-    dailyTrainingTime: number;
-    trainingIntensity: number;
-    restingHeartRate: number;
-    heartRateVariability: number;
-  }> {
-    if (!this.isHealthKitInitialized) {
-      const initialized = await this.initialize();
-      if (!initialized) {
-        return {
-          averageSteps: 0,
-          dailyTrainingTime: 0,
-          trainingIntensity: 0,
-          restingHeartRate: 0,
-          heartRateVariability: 0,
-        };
-      }
-    }
-
-    try {
-      const [
-        averageSteps,
-        todaysTraining,
-        restingHeartRate,
-        heartRateVariability,
-      ] = await Promise.all([
-        getAverageStepCount(),
-        getTodaysWorkoutData(),
-        getRestingHeartRateData(),
-        getHeartRateVariabilityData(),
-      ]);
-
-      return {
-        averageSteps,
-        dailyTrainingTime: todaysTraining.dailyTrainingTime,
-        trainingIntensity: todaysTraining.trainingIntensity,
-        restingHeartRate,
-        heartRateVariability,
-      };
-    } catch (error) {
-      return {
-        averageSteps: 0,
-        dailyTrainingTime: 0,
-        trainingIntensity: 0,
-        restingHeartRate: 0,
-        heartRateVariability: 0,
-      };
     }
   }
 

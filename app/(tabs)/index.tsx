@@ -257,23 +257,38 @@ export default function OverviewScreen() {
       <Modal
         visible={showInfoModal}
         transparent={true}
-        animationType="fade"
+        animationType="slide"
+        presentationStyle="overFullScreen"
         onRequestClose={() => setShowInfoModal(false)}
       >
         <View style={styles.modalOverlay}>
+          <View style={styles.modalBackdrop} />
           <ThemedView style={styles.modalContainer}>
+            <View style={styles.modalHandle} />
+            
             <View style={styles.modalHeader}>
-              <ThemedText type="subtitle" style={styles.modalTitle}>
-                How HealthScore Works
-              </ThemedText>
+              <View style={styles.modalTitleContainer}>
+                <View style={styles.modalIcon}>
+                  <IconSymbol
+                    name="info.circle.fill"
+                    size={28}
+                    color="#2196F3"
+                  />
+                </View>
+                <ThemedText type="title" style={styles.modalTitle}>
+                  How HealthScore Works
+                </ThemedText>
+              </View>
+              
               <TouchableOpacity
                 onPress={() => setShowInfoModal(false)}
                 style={styles.closeButton}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <IconSymbol
-                  name="xmark.circle.fill"
-                  size={24}
-                  color={colorScheme === "dark" ? "#FFFFFF" : "#000000"}
+                  name="xmark"
+                  size={20}
+                  color={colorScheme === "dark" ? "#FFFFFF" : "#666666"}
                 />
               </TouchableOpacity>
             </View>
@@ -281,52 +296,117 @@ export default function OverviewScreen() {
             <ScrollView
               showsVerticalScrollIndicator={false}
               style={styles.modalScrollView}
+              bounces={false}
             >
               <View style={styles.modalContent}>
-                <ThemedText style={styles.modalText}>
-                  Your HealthScore is calculated based on four key areas:
-                </ThemedText>
-
-                <View style={styles.scoreSection}>
-                  <ThemedText style={styles.sectionHeader}>
-                    💓 Cardiovascular Health (30 pts)
-                  </ThemedText>
-                  <ThemedText style={styles.sectionText}>
-                    • Resting Heart Rate (up to 10 pts){"\n"}• Heart Rate
-                    Variability (up to 10 pts){"\n"}• VO2 Max estimation (up to
-                    10 pts)
+                <View style={styles.introSection}>
+                  <ThemedText style={styles.modalIntroText}>
+                    Your HealthScore is calculated based on four key areas that provide a comprehensive view of your fitness and wellness:
                   </ThemedText>
                 </View>
 
                 <View style={styles.scoreSection}>
-                  <ThemedText style={styles.sectionHeader}>
-                    😴 Recovery & Regeneration (35 pts)
-                  </ThemedText>
-                  <ThemedText style={styles.sectionText}>
-                    • Deep Sleep Percentage (up to 15 pts){"\n"}• REM Sleep
-                    Percentage (up to 12 pts){"\n"}• Sleep Consistency (up to 8
-                    pts)
-                  </ThemedText>
+                  <View style={styles.sectionIconHeader}>
+                    <View style={[styles.sectionIconContainer, { backgroundColor: "#FF6B6B20" }]}>
+                      <ThemedText style={[styles.sectionIcon, { color: "#FF6B6B" }]}>💓</ThemedText>
+                    </View>
+                    <View style={styles.sectionTitleContainer}>
+                      <ThemedText style={styles.sectionHeader}>
+                        Cardiovascular Health
+                      </ThemedText>
+                      <ThemedText style={styles.sectionPoints}>30 points</ThemedText>
+                    </View>
+                  </View>
+                  <View style={styles.sectionMetrics}>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Resting Heart Rate (up to 10 pts)</ThemedText>
+                    </View>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Heart Rate Variability (up to 10 pts)</ThemedText>
+                    </View>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>VO2 Max estimation (up to 10 pts)</ThemedText>
+                    </View>
+                  </View>
                 </View>
 
                 <View style={styles.scoreSection}>
-                  <ThemedText style={styles.sectionHeader}>
-                    🏃‍♂️ Activity & Training (30 pts)
-                  </ThemedText>
-                  <ThemedText style={styles.sectionText}>
-                    • Weekly Training Time (up to 12 pts){"\n"}• Training
-                    Intensity/Consistency (up to 10 pts){"\n"}• Daily Activity
-                    Steps (up to 8 pts)
-                  </ThemedText>
+                  <View style={styles.sectionIconHeader}>
+                    <View style={[styles.sectionIconContainer, { backgroundColor: "#4CAF5020" }]}>
+                      <ThemedText style={[styles.sectionIcon, { color: "#4CAF50" }]}>😴</ThemedText>
+                    </View>
+                    <View style={styles.sectionTitleContainer}>
+                      <ThemedText style={styles.sectionHeader}>
+                        Recovery & Regeneration
+                      </ThemedText>
+                      <ThemedText style={styles.sectionPoints}>35 points</ThemedText>
+                    </View>
+                  </View>
+                  <View style={styles.sectionMetrics}>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Deep Sleep Percentage (up to 15 pts)</ThemedText>
+                    </View>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>REM Sleep Percentage (up to 12 pts)</ThemedText>
+                    </View>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Sleep Consistency (up to 8 pts)</ThemedText>
+                    </View>
+                  </View>
                 </View>
 
                 <View style={styles.scoreSection}>
-                  <ThemedText style={styles.sectionHeader}>
-                    ⭐ Bonus Points (5 pts)
-                  </ThemedText>
-                  <ThemedText style={styles.sectionText}>
-                    • Overall consistency across all categories (up to 5 pts)
-                  </ThemedText>
+                  <View style={styles.sectionIconHeader}>
+                    <View style={[styles.sectionIconContainer, { backgroundColor: "#FF980020" }]}>
+                      <ThemedText style={[styles.sectionIcon, { color: "#FF9800" }]}>🏃‍♂️</ThemedText>
+                    </View>
+                    <View style={styles.sectionTitleContainer}>
+                      <ThemedText style={styles.sectionHeader}>
+                        Activity & Training
+                      </ThemedText>
+                      <ThemedText style={styles.sectionPoints}>30 points</ThemedText>
+                    </View>
+                  </View>
+                  <View style={styles.sectionMetrics}>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Weekly Training Time (up to 12 pts)</ThemedText>
+                    </View>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Training Intensity/Consistency (up to 10 pts)</ThemedText>
+                    </View>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Daily Activity Steps (up to 8 pts)</ThemedText>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.scoreSection}>
+                  <View style={styles.sectionIconHeader}>
+                    <View style={[styles.sectionIconContainer, { backgroundColor: "#9C27B020" }]}>
+                      <ThemedText style={[styles.sectionIcon, { color: "#9C27B0" }]}>⭐</ThemedText>
+                    </View>
+                    <View style={styles.sectionTitleContainer}>
+                      <ThemedText style={styles.sectionHeader}>
+                        Bonus Points
+                      </ThemedText>
+                      <ThemedText style={styles.sectionPoints}>5 points</ThemedText>
+                    </View>
+                  </View>
+                  <View style={styles.sectionMetrics}>
+                    <View style={styles.metricItem}>
+                      <View style={styles.metricDot} />
+                      <ThemedText style={styles.sectionText}>Overall consistency across all categories</ThemedText>
+                    </View>
+                  </View>
                 </View>
               </View>
             </ScrollView>
@@ -528,52 +608,153 @@ const styles = StyleSheet.create({
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.75)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
+    justifyContent: "flex-end",
+    paddingHorizontal: 0,
+  },
+  modalBackdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   modalContainer: {
-    borderRadius: 16,
-    maxHeight: "80%",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: "85%",
+    minHeight: "50%",
     width: "100%",
-    maxWidth: 400,
-    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#CCCCCC",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginTop: 12,
+    marginBottom: 8,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    paddingBottom: 10,
-  },
-  modalTitle: {
-    fontWeight: "bold",
-  },
-  closeButton: {
-    padding: 4,
-  },
-  modalScrollView: {
-    paddingHorizontal: 20,
-  },
-  modalContent: {
+    alignItems: "flex-start",
+    paddingHorizontal: 24,
+    paddingTop: 16,
     paddingBottom: 20,
   },
-  modalText: {
-    marginBottom: 20,
-    lineHeight: 20,
+  modalTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 12,
+  },
+  modalIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#2196F320",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalTitle: {
+    fontWeight: "700",
+    fontSize: 20,
+    flex: 1,
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(128, 128, 128, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+  modalScrollView: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  modalContent: {
+    paddingBottom: 32,
+  },
+  introSection: {
+    marginBottom: 28,
+    paddingHorizontal: 4,
+  },
+  modalIntroText: {
+    fontSize: 16,
+    lineHeight: 24,
+    opacity: 0.85,
+    textAlign: "left",
   },
   scoreSection: {
+    marginBottom: 24,
+    backgroundColor: "rgba(128, 128, 128, 0.05)",
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "rgba(128, 128, 128, 0.1)",
+  },
+  sectionIconHeader: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
+    gap: 16,
+  },
+  sectionIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionIcon: {
+    fontSize: 24,
+  },
+  sectionTitleContainer: {
+    flex: 1,
   },
   sectionHeader: {
-    fontWeight: "600",
-    marginBottom: 8,
-    fontSize: 16,
+    fontWeight: "700",
+    fontSize: 18,
+    marginBottom: 2,
+    lineHeight: 22,
+  },
+  sectionPoints: {
+    fontSize: 14,
+    opacity: 0.7,
+    fontWeight: "500",
+  },
+  sectionMetrics: {
+    gap: 12,
+    marginLeft: 12,
+  },
+  metricItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  metricDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#2196F3",
+    opacity: 0.6,
   },
   sectionText: {
-    lineHeight: 18,
-    opacity: 0.8,
+    fontSize: 15,
+    lineHeight: 20,
+    opacity: 0.85,
+    flex: 1,
   },
   updateNotice: {
     marginTop: 12,

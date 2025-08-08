@@ -24,15 +24,15 @@ export default function CardiovascularScreen() {
   const cardiovascularMetrics = useMemo(() => {
     const restingHeartRateIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Resting Heart Rate"
+      "Resting Heart Rate",
     );
     const heartRateVariabilityIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Heart Rate Variability"
+      "Heart Rate Variability",
     );
     const vo2MaxIndex = findCategoryIndex(
       currentResult.historyItems,
-      "VO2 Max"
+      "VO2 Max",
     );
 
     return {
@@ -79,8 +79,7 @@ export default function CardiovascularScreen() {
                 style={styles.totalProgressBar}
               />
               <Text variant="bodyMedium" style={styles.description}>
-                Your heart health metrics indicate cardiovascular fitness and
-                efficiency.
+                Heart health & fitness metrics
               </Text>
             </Card.Content>
           </Card>
@@ -105,8 +104,7 @@ export default function CardiovascularScreen() {
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
-                Lower resting heart rate typically indicates better
-                cardiovascular fitness.
+                Lower = better fitness
               </Text>
             </Card.Content>
           </Card>
@@ -126,7 +124,7 @@ export default function CardiovascularScreen() {
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
-                Higher HRV suggests better recovery and stress adaptation.
+                Higher = better recovery
               </Text>
             </Card.Content>
           </Card>
@@ -146,35 +144,42 @@ export default function CardiovascularScreen() {
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
-                VO2 Max measures your body's maximum oxygen uptake during
-                exercise.
+                Maximum oxygen uptake
               </Text>
             </Card.Content>
           </Card>
 
-          {/* Tips Section */}
+          {/* Quick Tips */}
           <Card style={styles.tipsCard}>
-            <Card.Content style={styles.cardContent}>
+            <Card.Content style={styles.quickTipsContent}>
               <ThemedText type="subtitle" style={styles.tipsTitle}>
-                💡 Improvement Tips
+                💡 Quick Tips
               </ThemedText>
-              <View style={styles.tipsList}>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Engage in regular aerobic exercise (150+ minutes per week)
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Include interval training to improve cardiovascular
-                  efficiency
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Monitor stress levels and practice relaxation techniques
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Maintain a heart-healthy diet rich in omega-3 fatty acids
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Stay hydrated and avoid excessive alcohol and smoking
-                </Text>
+              <View style={styles.tipsGrid}>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🏃</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Cardio 150min/week
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>⚡</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Interval training
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🧘</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Manage stress
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🐟</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Omega-3 rich diet
+                  </Text>
+                </View>
               </View>
             </Card.Content>
           </Card>
@@ -283,11 +288,28 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontWeight: "600",
   },
-  tipsList: {
-    gap: 8,
+  quickTipsContent: {
+    paddingVertical: 16,
   },
-  tipText: {
-    lineHeight: 20,
+  tipsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  tipItem: {
+    alignItems: "center",
+    width: "22%",
+    minWidth: 70,
+  },
+  tipEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  tipLabel: {
+    textAlign: "center",
+    fontSize: 10,
     opacity: 0.8,
+    lineHeight: 12,
   },
 });

@@ -49,8 +49,7 @@ export default function BonusScreen() {
                 style={styles.totalProgressBar}
               />
               <Text variant="bodyMedium" style={styles.description}>
-                Extra points for consistency and balanced performance across all
-                categories.
+                Consistency & balanced performance bonus
               </Text>
             </Card.Content>
           </Card>
@@ -75,69 +74,77 @@ export default function BonusScreen() {
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
-                Bonus points awarded for consistent performance across all
-                health categories.
+                Balanced health category performance
               </Text>
             </Card.Content>
           </Card>
 
-          {/* How Bonus Points Work */}
+          {/* How It Works */}
           <Card style={styles.infoCard}>
-            <Card.Content style={styles.cardContent}>
+            <Card.Content style={styles.infoContent}>
               <ThemedText type="subtitle" style={styles.infoTitle}>
-                🎯 How Bonus Points Work
+                🎯 How It Works
               </ThemedText>
-              <View style={styles.infoList}>
-                <Text variant="bodyMedium" style={styles.infoText}>
-                  • <Text style={styles.boldText}>Consistency Reward:</Text>{" "}
-                  Points are awarded when you maintain balanced performance
-                  across cardiovascular health, recovery, and activity metrics.
-                </Text>
-                <Text variant="bodyMedium" style={styles.infoText}>
-                  • <Text style={styles.boldText}>Balanced Approach:</Text>{" "}
-                  Rather than excelling in just one area, maintaining good
-                  scores in all categories earns bonus points.
-                </Text>
-                <Text variant="bodyMedium" style={styles.infoText}>
-                  • <Text style={styles.boldText}>Long-term Success:</Text>{" "}
-                  Consistent performance over time demonstrates sustainable
-                  healthy habits.
-                </Text>
-                <Text variant="bodyMedium" style={styles.infoText}>
-                  • <Text style={styles.boldText}>Maximum Impact:</Text> These
-                  bonus points can be the difference between fitness levels,
-                  rewarding holistic health.
-                </Text>
+              <View style={styles.infoGrid}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoEmoji}>⚖️</Text>
+                  <Text variant="bodySmall" style={styles.infoLabel}>
+                    Balanced across all areas
+                  </Text>
+                </View>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoEmoji}>📈</Text>
+                  <Text variant="bodySmall" style={styles.infoLabel}>
+                    Consistent over time
+                  </Text>
+                </View>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoEmoji}>🏆</Text>
+                  <Text variant="bodySmall" style={styles.infoLabel}>
+                    Holistic health reward
+                  </Text>
+                </View>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoEmoji}>⬆️</Text>
+                  <Text variant="bodySmall" style={styles.infoLabel}>
+                    Boosts fitness level
+                  </Text>
+                </View>
               </View>
             </Card.Content>
           </Card>
 
-          {/* Tips Section */}
+          {/* Quick Tips */}
           <Card style={styles.tipsCard}>
-            <Card.Content style={styles.cardContent}>
+            <Card.Content style={styles.quickTipsContent}>
               <ThemedText type="subtitle" style={styles.tipsTitle}>
-                💡 Maximizing Bonus Points
+                💡 Maximize Points
               </ThemedText>
-              <View style={styles.tipsList}>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Focus on improving your weakest health category first
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Maintain consistent daily habits rather than sporadic
-                  intense efforts
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Balance cardiovascular exercise with strength training and
-                  recovery
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Track your metrics regularly to identify patterns and
-                  improvements
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Remember that small, consistent improvements compound over
-                  time
-                </Text>
+              <View style={styles.tipsGrid}>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🔄</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Improve weakest area
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>📊</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Daily consistency
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>⚖️</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Balance all areas
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>📝</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Track regularly
+                  </Text>
+                </View>
               </View>
             </Card.Content>
           </Card>
@@ -256,25 +263,57 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontWeight: "600",
   },
-  infoList: {
+  infoContent: {
+    paddingVertical: 16,
+  },
+  infoGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     gap: 12,
   },
-  infoText: {
-    lineHeight: 20,
-    opacity: 0.8,
+  infoItem: {
+    alignItems: "center",
+    width: "45%",
+    minWidth: 140,
+    marginBottom: 8,
   },
-  boldText: {
-    fontWeight: "bold",
+  infoEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  infoLabel: {
+    textAlign: "center",
+    fontSize: 11,
+    opacity: 0.8,
+    lineHeight: 14,
   },
   tipsTitle: {
     marginBottom: 16,
     fontWeight: "600",
   },
-  tipsList: {
-    gap: 8,
+  quickTipsContent: {
+    paddingVertical: 16,
   },
-  tipText: {
-    lineHeight: 20,
+  tipsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  tipItem: {
+    alignItems: "center",
+    width: "22%",
+    minWidth: 70,
+  },
+  tipEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  tipLabel: {
+    textAlign: "center",
+    fontSize: 10,
     opacity: 0.8,
+    lineHeight: 12,
   },
 });

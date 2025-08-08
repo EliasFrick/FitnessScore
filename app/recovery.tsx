@@ -79,8 +79,7 @@ export default function RecoveryScreen() {
                 style={styles.totalProgressBar}
               />
               <Text variant="bodyMedium" style={styles.description}>
-                Your recovery metrics are essential for optimal performance and
-                health.
+                Recovery & sleep quality metrics
               </Text>
             </Card.Content>
           </Card>
@@ -105,7 +104,7 @@ export default function RecoveryScreen() {
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
-                Deep sleep is crucial for physical recovery and immune function.
+                Physical recovery & immune function
               </Text>
             </Card.Content>
           </Card>
@@ -125,7 +124,7 @@ export default function RecoveryScreen() {
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
-                REM sleep supports cognitive function and emotional regulation.
+                Cognitive & emotional health
               </Text>
             </Card.Content>
           </Card>
@@ -145,30 +144,42 @@ export default function RecoveryScreen() {
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
-                Consistent sleep patterns optimize your circadian rhythm.
+                Optimizes circadian rhythm
               </Text>
             </Card.Content>
           </Card>
 
-          {/* Tips Section */}
+          {/* Quick Tips */}
           <Card style={styles.tipsCard}>
-            <Card.Content style={styles.cardContent}>
+            <Card.Content style={styles.quickTipsContent}>
               <ThemedText type="subtitle" style={styles.tipsTitle}>
-                💡 Improvement Tips
+                💡 Quick Tips
               </ThemedText>
-              <View style={styles.tipsList}>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Maintain a consistent sleep schedule, even on weekends
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Create a relaxing bedtime routine 1-2 hours before sleep
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Keep your bedroom cool, dark, and quiet
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Limit screen time and caffeine before bedtime
-                </Text>
+              <View style={styles.tipsGrid}>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>⏰</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Consistent schedule
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🛐</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Bedtime routine
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🌙</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Cool, dark room
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>📵</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Limit screens
+                  </Text>
+                </View>
               </View>
             </Card.Content>
           </Card>
@@ -277,11 +288,28 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontWeight: "600",
   },
-  tipsList: {
-    gap: 8,
+  quickTipsContent: {
+    paddingVertical: 16,
   },
-  tipText: {
-    lineHeight: 20,
+  tipsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  tipItem: {
+    alignItems: "center",
+    width: "22%",
+    minWidth: 70,
+  },
+  tipEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  tipLabel: {
+    textAlign: "center",
+    fontSize: 10,
     opacity: 0.8,
+    lineHeight: 12,
   },
 });

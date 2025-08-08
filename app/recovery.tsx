@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
@@ -7,12 +7,55 @@ import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { calculateMonthlyAverage } from "@/utils/fitnessCalculator";
+import {
+  calculateFitnessScore,
+  calculateMonthlyAverage,
+} from "@/utils/fitnessCalculator";
 
 export default function RecoveryScreen() {
   const { healthMetrics } = useHealthData();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+  const currentResult = calculateFitnessScore(healthMetrics);
+  const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
+    return dataArray.findIndex((item: any) => item.metric === metricToFind);
+  };
+
+  const recoveryMetrics = useMemo(() => {
+    const deepSleepIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "Deep Sleep",
+    );
+    const remSleepIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "REM Sleep",
+    );
+    const sleepConsistencyIndex = findCategoryIndex(
+      currentResult.historyItems,
+      "Sleep Consistency",
+    );
+
+    return {
+      deepSleep: {
+        percentage:
+          currentResult.historyItems[deepSleepIndex].points /
+          currentResult.historyItems[deepSleepIndex].maxPoints,
+        points: currentResult.historyItems[deepSleepIndex].points,
+      },
+      remSleep: {
+        percentage:
+          currentResult.historyItems[remSleepIndex].points /
+          currentResult.historyItems[remSleepIndex].maxPoints,
+        points: currentResult.historyItems[remSleepIndex].points,
+      },
+      sleepConsistency: {
+        percentage:
+          currentResult.historyItems[sleepConsistencyIndex].points /
+          currentResult.historyItems[sleepConsistencyIndex].maxPoints,
+        points: currentResult.historyItems[sleepConsistencyIndex].points,
+      },
+    };
+  }, [currentResult.historyItems]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -54,11 +97,11 @@ export default function RecoveryScreen() {
                   😴 Deep Sleep Percentage
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.recoveryPoints / 35) * 12)}/12
+                  {recoveryMetrics.deepSleep.points}/15
                 </Text>
               </View>
               <ProgressBar
-                progress={(monthlyAverage.recoveryPoints / 35) * (12 / 35)}
+                progress={recoveryMetrics.deepSleep.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -74,11 +117,11 @@ export default function RecoveryScreen() {
                   🌙 REM Sleep Percentage
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.recoveryPoints / 35) * 12)}/12
+                  {recoveryMetrics.remSleep.points}/12
                 </Text>
               </View>
               <ProgressBar
-                progress={(monthlyAverage.recoveryPoints / 35) * (12 / 35)}
+                progress={recoveryMetrics.remSleep.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -94,11 +137,11 @@ export default function RecoveryScreen() {
                   ⏰ Sleep Consistency
                 </Text>
                 <Text variant="titleLarge" style={styles.metricScore}>
-                  {Math.round((monthlyAverage.recoveryPoints / 35) * 11)}/11
+                  {recoveryMetrics.sleepConsistency.points}/8
                 </Text>
               </View>
               <ProgressBar
-                progress={(monthlyAverage.recoveryPoints / 35) * (11 / 35)}
+                progress={recoveryMetrics.sleepConsistency.percentage}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>

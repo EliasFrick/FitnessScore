@@ -56,10 +56,11 @@ export const DAILY_TRAINING_THRESHOLDS = {
 } as const;
 
 export const TRAINING_INTENSITY_THRESHOLDS = {
-  EXCEPTIONAL: 85,
-  HIGH: 70,
-  GOOD: 55,
-  MODERATE: 40,
+  EXCEPTIONAL: 40, // More than 40 minutes high-intensity training
+  HIGH: 30, // 30-40 minutes high-intensity training
+  GOOD: 20, // 20-30 minutes high-intensity training
+  MODERATE: 10, // 10-20 minutes high-intensity training
+  LOW: 1, // 1-10 minutes high-intensity training
 } as const;
 
 export const DAILY_STEPS_THRESHOLDS = {
@@ -85,7 +86,7 @@ export const SCORING_WEIGHTS = {
   REM_SLEEP_MAX: 12,
   SLEEP_CONSISTENCY_MAX: 8,
   DAILY_TRAINING_MAX: 12,
-  TRAINING_INTENSITY_MAX: 12,
+  TRAINING_INTENSITY_MAX: 10,
   DAILY_STEPS_MAX: 8,
 } as const;
 

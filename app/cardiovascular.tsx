@@ -5,6 +5,11 @@ import { Card, ProgressBar, Text } from "react-native-paper";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
+import {
+  HEART_RATE_THRESHOLDS,
+  HRV_THRESHOLDS,
+  VO2_MAX_THRESHOLDS,
+} from "@/constants/healthThresholds";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
@@ -19,6 +24,47 @@ export default function CardiovascularScreen() {
   const currentResult = calculateFitnessScore(healthMetrics);
   const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
     return dataArray.findIndex((item: any) => item.metric === metricToFind);
+  };
+
+  const getNextTarget = (
+    currentValue: number,
+    currentPoints: number,
+    maxPoints: number,
+    type: "rhr" | "hrv" | "vo2max",
+  ) => {
+    if (currentPoints >= maxPoints) return null;
+
+    if (type === "rhr") {
+      if (currentValue > HEART_RATE_THRESHOLDS.ELEVATED)
+        return `Get below ${HEART_RATE_THRESHOLDS.ELEVATED} bpm for +1 point`;
+      if (currentValue > HEART_RATE_THRESHOLDS.AVERAGE)
+        return `Get below ${HEART_RATE_THRESHOLDS.AVERAGE} bpm for +2 more points`;
+      if (currentValue > HEART_RATE_THRESHOLDS.GOOD)
+        return `Get below ${HEART_RATE_THRESHOLDS.GOOD} bpm for +2 more points`;
+      if (currentValue > HEART_RATE_THRESHOLDS.VERY_GOOD)
+        return `Get below ${HEART_RATE_THRESHOLDS.VERY_GOOD} bpm for +2 more points`;
+      if (currentValue > HEART_RATE_THRESHOLDS.EXCELLENT)
+        return `Get below ${HEART_RATE_THRESHOLDS.EXCELLENT} bpm for +2 more points`;
+    } else if (type === "hrv") {
+      if (currentValue < HRV_THRESHOLDS.BELOW_AVERAGE)
+        return `Get above ${HRV_THRESHOLDS.BELOW_AVERAGE} ms for +2 more points`;
+      if (currentValue < HRV_THRESHOLDS.GOOD)
+        return `Get above ${HRV_THRESHOLDS.GOOD} ms for +2 more points`;
+      if (currentValue < HRV_THRESHOLDS.VERY_GOOD)
+        return `Get above ${HRV_THRESHOLDS.VERY_GOOD} ms for +2 more points`;
+      if (currentValue < HRV_THRESHOLDS.OUTSTANDING)
+        return `Get above ${HRV_THRESHOLDS.OUTSTANDING} ms for +2 more points`;
+    } else if (type === "vo2max") {
+      if (currentValue < VO2_MAX_THRESHOLDS.AVERAGE)
+        return `Get above ${VO2_MAX_THRESHOLDS.AVERAGE} ml/kg/min for +2 more points`;
+      if (currentValue < VO2_MAX_THRESHOLDS.GOOD)
+        return `Get above ${VO2_MAX_THRESHOLDS.GOOD} ml/kg/min for +2 more points`;
+      if (currentValue < VO2_MAX_THRESHOLDS.EXCELLENT)
+        return `Get above ${VO2_MAX_THRESHOLDS.EXCELLENT} ml/kg/min for +2 more points`;
+      if (currentValue < VO2_MAX_THRESHOLDS.OUTSTANDING)
+        return `Get above ${VO2_MAX_THRESHOLDS.OUTSTANDING} ml/kg/min for +2 more points`;
+    }
+    return null;
   };
 
   const cardiovascularMetrics = useMemo(() => {
@@ -41,23 +87,45 @@ export default function CardiovascularScreen() {
           currentResult.historyItems[restingHeartRateIndex].points /
           currentResult.historyItems[restingHeartRateIndex].maxPoints,
         points: currentResult.historyItems[restingHeartRateIndex].points,
+        currentValue: healthMetrics.restingHeartRate,
+        unit: "bpm",
+        nextTarget: getNextTarget(
+          healthMetrics.restingHeartRate,
+          currentResult.historyItems[restingHeartRateIndex].points,
+          10,
+          "rhr",
+        ),
       },
       heartRateVariability: {
         percentage:
           currentResult.historyItems[heartRateVariabilityIndex].points /
           currentResult.historyItems[heartRateVariabilityIndex].maxPoints,
         points: currentResult.historyItems[heartRateVariabilityIndex].points,
+        currentValue: healthMetrics.heartRateVariability,
+        unit: "ms",
+        nextTarget: getNextTarget(
+          healthMetrics.heartRateVariability,
+          currentResult.historyItems[heartRateVariabilityIndex].points,
+          10,
+          "hrv",
+        ),
       },
       vo2Max: {
         percentage:
           currentResult.historyItems[vo2MaxIndex].points /
           currentResult.historyItems[vo2MaxIndex].maxPoints,
         points: currentResult.historyItems[vo2MaxIndex].points,
+        currentValue: healthMetrics.vo2Max,
+        unit: "ml/kg/min",
+        nextTarget: getNextTarget(
+          healthMetrics.vo2Max,
+          currentResult.historyItems[vo2MaxIndex].points,
+          10,
+          "vo2max",
+        ),
       },
     };
-  }, [currentResult.historyItems]);
-
-  console.log(currentResult);
+  }, [currentResult.historyItems, healthMetrics]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -81,8 +149,7 @@ export default function CardiovascularScreen() {
                 style={styles.totalProgressBar}
               />
               <Text variant="bodyMedium" style={styles.description}>
-                Your heart health metrics indicate cardiovascular fitness and
-                efficiency.
+                Heart health & fitness metrics
               </Text>
             </Card.Content>
           </Card>
@@ -106,10 +173,17 @@ export default function CardiovascularScreen() {
                 progress={cardiovascularMetrics.restingHeartRate.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Lower resting heart rate typically indicates better
-                cardiovascular fitness.
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current: {cardiovascularMetrics.restingHeartRate.currentValue}{" "}
+                  {cardiovascularMetrics.restingHeartRate.unit}
+                </Text>
+              </View>
+              {cardiovascularMetrics.restingHeartRate.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  🎯 {cardiovascularMetrics.restingHeartRate.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
@@ -127,9 +201,18 @@ export default function CardiovascularScreen() {
                 progress={cardiovascularMetrics.heartRateVariability.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Higher HRV suggests better recovery and stress adaptation.
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current:{" "}
+                  {cardiovascularMetrics.heartRateVariability.currentValue}{" "}
+                  {cardiovascularMetrics.heartRateVariability.unit}
+                </Text>
+              </View>
+              {cardiovascularMetrics.heartRateVariability.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  🎯 {cardiovascularMetrics.heartRateVariability.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
@@ -147,36 +230,51 @@ export default function CardiovascularScreen() {
                 progress={cardiovascularMetrics.vo2Max.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                VO2 Max measures your body's maximum oxygen uptake during
-                exercise.
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current: {cardiovascularMetrics.vo2Max.currentValue}{" "}
+                  {cardiovascularMetrics.vo2Max.unit}
+                </Text>
+              </View>
+              {cardiovascularMetrics.vo2Max.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  🎯 {cardiovascularMetrics.vo2Max.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
-          {/* Tips Section */}
+          {/* Quick Tips */}
           <Card style={styles.tipsCard}>
-            <Card.Content style={styles.cardContent}>
+            <Card.Content style={styles.quickTipsContent}>
               <ThemedText type="subtitle" style={styles.tipsTitle}>
-                💡 Improvement Tips
+                💡 Quick Tips
               </ThemedText>
-              <View style={styles.tipsList}>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Engage in regular aerobic exercise (150+ minutes per week)
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Include interval training to improve cardiovascular
-                  efficiency
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Monitor stress levels and practice relaxation techniques
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Maintain a heart-healthy diet rich in omega-3 fatty acids
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Stay hydrated and avoid excessive alcohol and smoking
-                </Text>
+              <View style={styles.tipsGrid}>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🏃</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Cardio 150min/week
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>⚡</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Interval training
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🧘</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Manage stress
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🐟</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Omega-3 rich diet
+                  </Text>
+                </View>
               </View>
             </Card.Content>
           </Card>
@@ -277,19 +375,51 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 8,
   },
+  metricInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  currentValue: {
+    fontWeight: "500",
+    opacity: 0.9,
+  },
   metricDescription: {
     opacity: 0.7,
     lineHeight: 16,
+  },
+  nextTarget: {
+    marginTop: 4,
+    fontSize: 11,
+    color: "#FF6B35",
+    fontWeight: "500",
   },
   tipsTitle: {
     marginBottom: 16,
     fontWeight: "600",
   },
-  tipsList: {
-    gap: 8,
+  quickTipsContent: {
+    paddingVertical: 16,
   },
-  tipText: {
-    lineHeight: 20,
+  tipsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  tipItem: {
+    alignItems: "center",
+    width: "22%",
+    minWidth: 70,
+  },
+  tipEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  tipLabel: {
+    textAlign: "center",
+    fontSize: 10,
     opacity: 0.8,
+    lineHeight: 12,
   },
 });

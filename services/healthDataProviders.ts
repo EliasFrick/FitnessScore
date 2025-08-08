@@ -10,17 +10,16 @@ import AppleHealthKit, {
 } from "react-native-health";
 
 /**
- * Get resting heart rate data from the last 7 days
+ * Get resting heart rate data from the last 30 days
  */
 export async function getRestingHeartRateData(): Promise<number> {
   if (Platform.OS !== "ios") return 0;
 
   return new Promise((resolve) => {
     const options: HealthInputOptions = {
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
-      limit: 7,
     };
 
     AppleHealthKit.getRestingHeartRateSamples(
@@ -52,7 +51,6 @@ export async function getHeartRateVariabilityData(): Promise<number> {
       startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
-      limit: 7,
     };
 
     AppleHealthKit.getHeartRateVariabilitySamples(
@@ -66,6 +64,7 @@ export async function getHeartRateVariabilityData(): Promise<number> {
               ? results.reduce((sum, sample) => sum + sample.value, 0) /
                 results.length
               : 0;
+
           resolve(Math.round(averageHeartRateVariability * 1000));
         }
       },
@@ -84,7 +83,6 @@ export async function getVO2MaxData(): Promise<number> {
       startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
-      limit: 5,
     };
 
     AppleHealthKit.getVo2MaxSamples(
@@ -93,6 +91,7 @@ export async function getVO2MaxData(): Promise<number> {
         if (callbackError) {
           resolve(0);
         } else {
+          console.log(results);
           const averageVO2Max =
             results.length > 0
               ? results.reduce((sum, sample) => sum + sample.value, 0) /
@@ -106,7 +105,7 @@ export async function getVO2MaxData(): Promise<number> {
 }
 
 /**
- * Get sleep analysis data from the last 7 days
+ * Get sleep analysis data from the last 30 days
  */
 export async function getSleepAnalysisData(): Promise<{
   deepSleepPercentage: number;
@@ -123,7 +122,7 @@ export async function getSleepAnalysisData(): Promise<{
 
   return new Promise((resolve) => {
     const options: HealthInputOptions = {
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       endDate: new Date().toISOString(),
     };
 

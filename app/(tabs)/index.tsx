@@ -303,8 +303,8 @@ export default function OverviewScreen() {
                     😴 Recovery & Regeneration (35 pts)
                   </ThemedText>
                   <ThemedText style={styles.sectionText}>
-                    • Deep Sleep Percentage (up to 12 pts){"\n"}• REM Sleep
-                    Percentage (up to 12 pts){"\n"}• Sleep Consistency (up to 11
+                    • Deep Sleep Percentage (up to 15 pts){"\n"}• REM Sleep
+                    Percentage (up to 12 pts){"\n"}• Sleep Consistency (up to 8
                     pts)
                   </ThemedText>
                 </View>
@@ -326,13 +326,6 @@ export default function OverviewScreen() {
                   </ThemedText>
                   <ThemedText style={styles.sectionText}>
                     • Overall consistency across all categories (up to 5 pts)
-                  </ThemedText>
-                </View>
-
-                <View style={styles.updateNotice}>
-                  <ThemedText style={styles.updateText}>
-                    📊 Coming Soon: Detailed breakdown showing exactly how you
-                    earned each point!
                   </ThemedText>
                 </View>
               </View>
@@ -477,7 +470,6 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     fontSize: 12,
   },
-  // New styles for enhanced layout
   sectionTitle: {
     marginBottom: 16,
     fontWeight: "600",
@@ -531,7 +523,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    marginBottom: 10,
+    marginBottom: 30,
   },
   // Modal Styles
   modalOverlay: {

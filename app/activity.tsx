@@ -5,6 +5,11 @@ import { Card, ProgressBar, Text } from "react-native-paper";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
+import {
+  DAILY_STEPS_THRESHOLDS,
+  DAILY_TRAINING_THRESHOLDS,
+  TRAINING_INTENSITY_THRESHOLDS,
+} from "@/constants/healthThresholds";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
@@ -21,6 +26,54 @@ export default function ActivityScreen() {
     return dataArray.findIndex((item: any) => item.metric === metricToFind);
   };
 
+  const getNextTarget = (
+    currentValue: number,
+    currentPoints: number,
+    maxPoints: number,
+    type: "training" | "intensity" | "steps",
+  ) => {
+    if (currentPoints >= maxPoints) return null;
+    if (type === "training") {
+      if (currentValue < DAILY_TRAINING_THRESHOLDS.LOW)
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.LOW} min/day for +2 more points`;
+      if (currentValue < DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE)
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE} min/day for +2 more points`;
+      if (currentValue < DAILY_TRAINING_THRESHOLDS.MODERATE)
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.MODERATE} min/day for +2 more points`;
+      if (currentValue < DAILY_TRAINING_THRESHOLDS.GOOD)
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.GOOD} min/day for +2 more points`;
+      if (currentValue < DAILY_TRAINING_THRESHOLDS.EXCELLENT)
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.EXCELLENT} min/day for +2 more points`;
+      if (currentValue < DAILY_TRAINING_THRESHOLDS.OUTSTANDING)
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.OUTSTANDING} min/day for +2 more points`;
+    } else if (type === "intensity") {
+      if (currentValue < TRAINING_INTENSITY_THRESHOLDS.LOW)
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.LOW} min/week of high-intensity training for +2 more points`;
+      if (currentValue < TRAINING_INTENSITY_THRESHOLDS.MODERATE)
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.MODERATE} min/week of high-intensity training for +2 more points`;
+      if (currentValue < TRAINING_INTENSITY_THRESHOLDS.GOOD)
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.GOOD} min/week of high-intensity training for +3 more points`;
+      if (currentValue < TRAINING_INTENSITY_THRESHOLDS.HIGH)
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.HIGH} min/week of high-intensity training for +1 more point`;
+      if (currentValue <= TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL)
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL} min/week of high-intensity training for +2 more points`;
+    } else if (type === "steps") {
+      if (currentValue < DAILY_STEPS_THRESHOLDS.LOW)
+        return `Get above ${DAILY_STEPS_THRESHOLDS.LOW} steps for +1 more point`;
+      if (currentValue < DAILY_STEPS_THRESHOLDS.MODERATE)
+        return `Get above ${DAILY_STEPS_THRESHOLDS.MODERATE} steps for +1 more point`;
+      if (currentValue < DAILY_STEPS_THRESHOLDS.GOOD)
+        return `Get above ${DAILY_STEPS_THRESHOLDS.GOOD} steps for +2 more points`;
+      if (currentValue < DAILY_STEPS_THRESHOLDS.VERY_GOOD)
+        return `Get above ${DAILY_STEPS_THRESHOLDS.VERY_GOOD} steps for +1 more point`;
+      if (currentValue < DAILY_STEPS_THRESHOLDS.EXCELLENT)
+        return `Get above ${DAILY_STEPS_THRESHOLDS.EXCELLENT} steps for +1 more point`;
+      if (currentValue < DAILY_STEPS_THRESHOLDS.OUTSTANDING)
+        return `Get above ${DAILY_STEPS_THRESHOLDS.OUTSTANDING} steps for +2 more points`;
+    }
+    return null;
+  };
+
   const activityMetrics = useMemo(() => {
     const dailyStepsIndex = findCategoryIndex(
       currentResult.historyItems,
@@ -34,30 +87,51 @@ export default function ActivityScreen() {
       currentResult.historyItems,
       "Daily Training Time",
     );
-
     return {
       dailySteps: {
         percentage:
           currentResult.historyItems[dailyStepsIndex].points /
           currentResult.historyItems[dailyStepsIndex].maxPoints,
         points: currentResult.historyItems[dailyStepsIndex].points,
+        currentValue: healthMetrics.averageSteps,
+        unit: " steps",
+        nextTarget: getNextTarget(
+          healthMetrics.averageSteps,
+          currentResult.historyItems[dailyStepsIndex].points,
+          8,
+          "steps",
+        ),
       },
       trainingIntensity: {
         percentage:
           currentResult.historyItems[trainingIntensityIndex].points /
           currentResult.historyItems[trainingIntensityIndex].maxPoints,
         points: currentResult.historyItems[trainingIntensityIndex].points,
+        currentValue: healthMetrics.trainingIntensity,
+        unit: " min/week",
+        nextTarget: getNextTarget(
+          healthMetrics.trainingIntensity,
+          currentResult.historyItems[trainingIntensityIndex].points,
+          10,
+          "intensity",
+        ),
       },
       trainingTime: {
         percentage:
           currentResult.historyItems[trainingTimeIndex].points /
           currentResult.historyItems[trainingTimeIndex].maxPoints,
         points: currentResult.historyItems[trainingTimeIndex].points,
+        currentValue: Math.round(healthMetrics.monthlyTrainingTime / 30),
+        unit: " min/day",
+        nextTarget: getNextTarget(
+          Math.round(healthMetrics.monthlyTrainingTime / 30),
+          currentResult.historyItems[trainingTimeIndex].points,
+          12,
+          "training",
+        ),
       },
     };
-  }, [currentResult.historyItems]);
-
-  console.log(activityMetrics.trainingIntensity.points);
+  }, [currentResult.historyItems, healthMetrics]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -81,7 +155,7 @@ export default function ActivityScreen() {
                 style={styles.totalProgressBar}
               />
               <Text variant="bodyMedium" style={styles.description}>
-                Your physical activity and training metrics for overall fitness.
+                Physical activity & training metrics
               </Text>
             </Card.Content>
           </Card>
@@ -105,10 +179,17 @@ export default function ActivityScreen() {
                 progress={activityMetrics.trainingTime.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Regular training sessions improve strength, endurance, and
-                overall fitness.
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current: {activityMetrics.trainingTime.currentValue}
+                  {activityMetrics.trainingTime.unit}
+                </Text>
+              </View>
+              {activityMetrics.trainingTime.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  {activityMetrics.trainingTime.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
@@ -126,10 +207,17 @@ export default function ActivityScreen() {
                 progress={activityMetrics.trainingIntensity.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Consistent training with appropriate intensity yields optimal
-                results.
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current: {activityMetrics.trainingIntensity.currentValue}
+                  {activityMetrics.trainingIntensity.unit}
+                </Text>
+              </View>
+              {activityMetrics.trainingIntensity.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  {activityMetrics.trainingIntensity.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
@@ -147,36 +235,51 @@ export default function ActivityScreen() {
                 progress={activityMetrics.dailySteps.percentage}
                 style={styles.progressBar}
               />
-              <Text variant="bodySmall" style={styles.metricDescription}>
-                Daily movement and step count contribute to overall health and
-                vitality.
-              </Text>
+              <View style={styles.metricInfo}>
+                <Text variant="bodySmall" style={styles.currentValue}>
+                  Current: {activityMetrics.dailySteps.currentValue}
+                  {activityMetrics.dailySteps.unit}
+                </Text>
+              </View>
+              {activityMetrics.dailySteps.nextTarget && (
+                <Text variant="bodySmall" style={styles.nextTarget}>
+                  {activityMetrics.dailySteps.nextTarget}
+                </Text>
+              )}
             </Card.Content>
           </Card>
 
-          {/* Tips Section */}
+          {/* Quick Tips */}
           <Card style={styles.tipsCard}>
-            <Card.Content style={styles.cardContent}>
+            <Card.Content style={styles.quickTipsContent}>
               <ThemedText type="subtitle" style={styles.tipsTitle}>
-                💡 Improvement Tips
+                💡 Quick Tips
               </ThemedText>
-              <View style={styles.tipsList}>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Aim for at least 150 minutes of moderate exercise per week
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Include both cardiovascular and strength training exercises
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Take the stairs and walk more throughout your day
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Set daily step goals (aim for 8,000-10,000 steps)
-                </Text>
-                <Text variant="bodyMedium" style={styles.tipText}>
-                  • Mix up your activities to prevent boredom and overuse
-                  injuries
-                </Text>
+              <View style={styles.tipsGrid}>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🗓️</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    150min/week
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>🏋️</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Mix cardio & strength
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>👣</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    Take stairs daily
+                  </Text>
+                </View>
+                <View style={styles.tipItem}>
+                  <Text style={styles.tipEmoji}>📊</Text>
+                  <Text variant="bodySmall" style={styles.tipLabel}>
+                    8-10k steps goal
+                  </Text>
+                </View>
               </View>
             </Card.Content>
           </Card>
@@ -277,19 +380,51 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 8,
   },
+  metricInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  currentValue: {
+    fontWeight: "500",
+    opacity: 0.9,
+  },
   metricDescription: {
     opacity: 0.7,
     lineHeight: 16,
+  },
+  nextTarget: {
+    marginTop: 4,
+    fontSize: 11,
+    color: "#FF6B35",
+    fontWeight: "500",
   },
   tipsTitle: {
     marginBottom: 16,
     fontWeight: "600",
   },
-  tipsList: {
-    gap: 8,
+  quickTipsContent: {
+    paddingVertical: 16,
   },
-  tipText: {
-    lineHeight: 20,
+  tipsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  tipItem: {
+    alignItems: "center",
+    width: "22%",
+    minWidth: 70,
+  },
+  tipEmoji: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  tipLabel: {
+    textAlign: "center",
+    fontSize: 10,
     opacity: 0.8,
+    lineHeight: 12,
   },
 });

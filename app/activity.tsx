@@ -5,10 +5,6 @@ import { Card, ProgressBar, Text } from "react-native-paper";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
-import {
-  DAILY_TRAINING_THRESHOLDS,
-  TRAINING_INTENSITY_THRESHOLDS,
-} from "@/constants/healthThresholds";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
@@ -27,7 +23,7 @@ export default function ActivityScreen() {
   const [dailyStepsPercent, setDailyStepsPercent] = useState<number>();
 
   const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
-    return dataArray.findIndex((item) => item.metric === metricToFind);
+    return dataArray.findIndex((item: any) => item.metric === metricToFind);
   };
 
   useEffect(() => {
@@ -39,15 +35,38 @@ export default function ActivityScreen() {
           findCategoryIndex(currentResult.historyItems, "Daily Steps")
         ].maxPoints
     );
+
+    setTrainingIntensityPercent(
+      currentResult.historyItems[
+        findCategoryIndex(currentResult.historyItems, "Training Intensity")
+      ].points /
+        currentResult.historyItems[
+          findCategoryIndex(currentResult.historyItems, "Training Intensity")
+        ].maxPoints
+    );
+
+    setTrainingTimePercent(
+      currentResult.historyItems[
+        findCategoryIndex(currentResult.historyItems, "Daily Training Time")
+      ].points /
+        currentResult.historyItems[
+          findCategoryIndex(currentResult.historyItems, "Daily Training Time")
+        ].maxPoints
+    );
   });
+
+  console.log(currentResult.historyItems);
 
   /*   console.log(currentResult.historyItems[8]);
   console.log(findCategoryIndex(currentResult.historyItems, "Daily Steps"));
  */
   console.log(
     currentResult.historyItems[
-      findCategoryIndex(currentResult.historyItems, "Daily Steps")
-    ].points
+      findCategoryIndex(currentResult.historyItems, "Daily Training Time")
+    ].points,
+    currentResult.historyItems[
+      findCategoryIndex(currentResult.historyItems, "Daily Training Time")
+    ].maxPoints
   );
 
   return (
@@ -93,11 +112,7 @@ export default function ActivityScreen() {
                 </Text>
               </View>
               <ProgressBar
-                progress={
-                  healthMetrics.monthlyTrainingTime /
-                  30 /
-                  DAILY_TRAINING_THRESHOLDS.OUTSTANDING
-                }
+                progress={trainingTimePercent}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>
@@ -118,10 +133,7 @@ export default function ActivityScreen() {
                 </Text>
               </View>
               <ProgressBar
-                progress={
-                  healthMetrics.trainingIntensity /
-                  TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL
-                }
+                progress={trainingIntensityPercent}
                 style={styles.progressBar}
               />
               <Text variant="bodySmall" style={styles.metricDescription}>

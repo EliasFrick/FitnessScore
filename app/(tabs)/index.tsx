@@ -33,7 +33,6 @@ export default function OverviewScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const [showInfoModal, setShowInfoModal] = useState(false);
 
-
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <ScrollView

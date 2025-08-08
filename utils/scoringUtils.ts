@@ -49,7 +49,7 @@ export function createHistoryItem(
   metric: string,
   points: number,
   maxPoints: number,
-  reason: string
+  reason: string,
 ): HistoryItem {
   return { category, metric, points, maxPoints, reason };
 }
@@ -59,7 +59,7 @@ export function createHistoryItem(
  */
 export function createScoringResult(
   points: number,
-  reason: string
+  reason: string,
 ): ScoringResult {
   return { points, reason };
 }
@@ -69,7 +69,7 @@ export function createScoringResult(
  */
 export function calculatePercentageScore(
   points: number,
-  maxPoints: number
+  maxPoints: number,
 ): number {
   return Math.round((points / maxPoints) * 100);
 }
@@ -95,7 +95,7 @@ export function determineFitnessLevel(totalScore: number): string {
  * Calculate resting heart rate points
  */
 export function calculateRestingHeartRatePoints(
-  restingHeartRate: number
+  restingHeartRate: number,
 ): ScoringResult {
   if (restingHeartRate <= 0) {
     return createScoringResult(0, "No resting heart rate data available");
@@ -104,32 +104,32 @@ export function calculateRestingHeartRatePoints(
   if (restingHeartRate <= HEART_RATE_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
       10,
-      `Excellent RHR (${restingHeartRate} bpm) - athlete-level cardiovascular fitness`
+      `Excellent RHR (${restingHeartRate} bpm) - athlete-level cardiovascular fitness`,
     );
   } else if (restingHeartRate <= HEART_RATE_THRESHOLDS.VERY_GOOD) {
     return createScoringResult(
       8,
-      `Very good RHR (${restingHeartRate} bpm) - excellent cardiovascular health`
+      `Very good RHR (${restingHeartRate} bpm) - excellent cardiovascular health`,
     );
   } else if (restingHeartRate <= HEART_RATE_THRESHOLDS.GOOD) {
     return createScoringResult(
       6,
-      `Good RHR (${restingHeartRate} bpm) - healthy cardiovascular range`
+      `Good RHR (${restingHeartRate} bpm) - healthy cardiovascular range`,
     );
   } else if (restingHeartRate <= HEART_RATE_THRESHOLDS.AVERAGE) {
     return createScoringResult(
       4,
-      `Average RHR (${restingHeartRate} bpm) - room for improvement with cardio training`
+      `Average RHR (${restingHeartRate} bpm) - room for improvement with cardio training`,
     );
   } else if (restingHeartRate <= HEART_RATE_THRESHOLDS.ELEVATED) {
     return createScoringResult(
       2,
-      `Elevated RHR (${restingHeartRate} bpm) - focus on cardiovascular conditioning`
+      `Elevated RHR (${restingHeartRate} bpm) - focus on cardiovascular conditioning`,
     );
   } else {
     return createScoringResult(
       1,
-      `High RHR (${restingHeartRate} bpm) - consult healthcare provider`
+      `High RHR (${restingHeartRate} bpm) - consult healthcare provider`,
     );
   }
 }
@@ -138,7 +138,7 @@ export function calculateRestingHeartRatePoints(
  * Calculate heart rate variability points
  */
 export function calculateHeartRateVariabilityPoints(
-  heartRateVariability: number
+  heartRateVariability: number,
 ): ScoringResult {
   if (heartRateVariability <= 0) {
     return createScoringResult(0, "No heart rate variability data available");
@@ -147,27 +147,27 @@ export function calculateHeartRateVariabilityPoints(
   if (heartRateVariability >= HRV_THRESHOLDS.OUTSTANDING) {
     return createScoringResult(
       10,
-      `Outstanding HRV (${heartRateVariability} ms) - excellent autonomic nervous system recovery`
+      `Outstanding HRV (${heartRateVariability} ms) - excellent autonomic nervous system recovery`,
     );
   } else if (heartRateVariability >= HRV_THRESHOLDS.VERY_GOOD) {
     return createScoringResult(
       8,
-      `Very good HRV (${heartRateVariability} ms) - strong recovery capacity`
+      `Very good HRV (${heartRateVariability} ms) - strong recovery capacity`,
     );
   } else if (heartRateVariability >= HRV_THRESHOLDS.GOOD) {
     return createScoringResult(
       6,
-      `Good HRV (${heartRateVariability} ms) - adequate recovery signals`
+      `Good HRV (${heartRateVariability} ms) - adequate recovery signals`,
     );
   } else if (heartRateVariability >= HRV_THRESHOLDS.BELOW_AVERAGE) {
     return createScoringResult(
       4,
-      `Below average HRV (${heartRateVariability} ms) - focus on stress management and recovery`
+      `Below average HRV (${heartRateVariability} ms) - focus on stress management and recovery`,
     );
   } else {
     return createScoringResult(
       2,
-      `Low HRV (${heartRateVariability} ms) - prioritize sleep, stress reduction, and recovery`
+      `Low HRV (${heartRateVariability} ms) - prioritize sleep, stress reduction, and recovery`,
     );
   }
 }
@@ -179,34 +179,34 @@ export function calculateVO2MaxPoints(vo2Max: number): ScoringResult {
   if (vo2Max <= 0) {
     return createScoringResult(
       0,
-      "No VO2 Max data available - consider fitness assessment"
+      "No VO2 Max data available - consider fitness assessment",
     );
   }
 
   if (vo2Max >= VO2_MAX_THRESHOLDS.OUTSTANDING) {
     return createScoringResult(
       10,
-      `Outstanding VO2 Max (${vo2Max} ml/kg/min) - superior aerobic fitness`
+      `Outstanding VO2 Max (${vo2Max} ml/kg/min) - superior aerobic fitness`,
     );
   } else if (vo2Max >= VO2_MAX_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
       8,
-      `Excellent VO2 Max (${vo2Max} ml/kg/min) - very high aerobic capacity`
+      `Excellent VO2 Max (${vo2Max} ml/kg/min) - very high aerobic capacity`,
     );
   } else if (vo2Max >= VO2_MAX_THRESHOLDS.GOOD) {
     return createScoringResult(
       6,
-      `Good VO2 Max (${vo2Max} ml/kg/min) - solid aerobic fitness`
+      `Good VO2 Max (${vo2Max} ml/kg/min) - solid aerobic fitness`,
     );
   } else if (vo2Max >= VO2_MAX_THRESHOLDS.AVERAGE) {
     return createScoringResult(
       4,
-      `Average VO2 Max (${vo2Max} ml/kg/min) - increase cardio training intensity`
+      `Average VO2 Max (${vo2Max} ml/kg/min) - increase cardio training intensity`,
     );
   } else {
     return createScoringResult(
       2,
-      `Low VO2 Max (${vo2Max} ml/kg/min) - focus on building aerobic endurance`
+      `Low VO2 Max (${vo2Max} ml/kg/min) - focus on building aerobic endurance`,
     );
   }
 }
@@ -215,37 +215,37 @@ export function calculateVO2MaxPoints(vo2Max: number): ScoringResult {
  * Calculate deep sleep points
  */
 export function calculateDeepSleepPoints(
-  deepSleepPercentage: number
+  deepSleepPercentage: number,
 ): ScoringResult {
   if (deepSleepPercentage >= DEEP_SLEEP_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
       15,
-      `Excellent deep sleep (${deepSleepPercentage}%) - optimal physical recovery`
+      `Excellent deep sleep (${deepSleepPercentage}%) - optimal physical recovery`,
     );
   } else if (deepSleepPercentage >= DEEP_SLEEP_THRESHOLDS.VERY_GOOD) {
     return createScoringResult(
       12,
-      `Very good deep sleep (${deepSleepPercentage}%) - great physical recovery`
+      `Very good deep sleep (${deepSleepPercentage}%) - great physical recovery`,
     );
   } else if (deepSleepPercentage >= DEEP_SLEEP_THRESHOLDS.GOOD) {
     return createScoringResult(
       10,
-      `Good deep sleep (${deepSleepPercentage}%) - adequate physical recovery`
+      `Good deep sleep (${deepSleepPercentage}%) - adequate physical recovery`,
     );
   } else if (deepSleepPercentage >= DEEP_SLEEP_THRESHOLDS.AVERAGE) {
     return createScoringResult(
       7,
-      `Average deep sleep (${deepSleepPercentage}%) - improve sleep environment and routine`
+      `Average deep sleep (${deepSleepPercentage}%) - improve sleep environment and routine`,
     );
   } else if (deepSleepPercentage >= DEEP_SLEEP_THRESHOLDS.BELOW_AVERAGE) {
     return createScoringResult(
       4,
-      `Below average deep sleep (${deepSleepPercentage}%) - focus on sleep quality improvement`
+      `Below average deep sleep (${deepSleepPercentage}%) - focus on sleep quality improvement`,
     );
   } else if (deepSleepPercentage > 0) {
     return createScoringResult(
       2,
-      `Low deep sleep (${deepSleepPercentage}%) - significant sleep quality concerns`
+      `Low deep sleep (${deepSleepPercentage}%) - significant sleep quality concerns`,
     );
   } else {
     return createScoringResult(0, "No deep sleep data available");
@@ -256,32 +256,32 @@ export function calculateDeepSleepPoints(
  * Calculate REM sleep points
  */
 export function calculateREMSleepPoints(
-  remSleepPercentage: number
+  remSleepPercentage: number,
 ): ScoringResult {
   if (remSleepPercentage >= REM_SLEEP_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
       12,
-      `Excellent REM sleep (${remSleepPercentage}%) - optimal mental recovery and memory consolidation`
+      `Excellent REM sleep (${remSleepPercentage}%) - optimal mental recovery and memory consolidation`,
     );
   } else if (remSleepPercentage >= REM_SLEEP_THRESHOLDS.VERY_GOOD) {
     return createScoringResult(
       10,
-      `Very good REM sleep (${remSleepPercentage}%) - great mental recovery`
+      `Very good REM sleep (${remSleepPercentage}%) - great mental recovery`,
     );
   } else if (remSleepPercentage >= REM_SLEEP_THRESHOLDS.GOOD) {
     return createScoringResult(
       8,
-      `Good REM sleep (${remSleepPercentage}%) - adequate mental recovery`
+      `Good REM sleep (${remSleepPercentage}%) - adequate mental recovery`,
     );
   } else if (remSleepPercentage >= REM_SLEEP_THRESHOLDS.AVERAGE) {
     return createScoringResult(
       5,
-      `Average REM sleep (${remSleepPercentage}%) - reduce stress and screen time before bed`
+      `Average REM sleep (${remSleepPercentage}%) - reduce stress and screen time before bed`,
     );
   } else if (remSleepPercentage > 0) {
     return createScoringResult(
       3,
-      `Low REM sleep (${remSleepPercentage}%) - address sleep disturbances and stress levels`
+      `Low REM sleep (${remSleepPercentage}%) - address sleep disturbances and stress levels`,
     );
   } else {
     return createScoringResult(0, "No REM sleep data available");
@@ -292,27 +292,27 @@ export function calculateREMSleepPoints(
  * Calculate sleep consistency points
  */
 export function calculateSleepConsistencyPoints(
-  sleepConsistency: number
+  sleepConsistency: number,
 ): ScoringResult {
   if (sleepConsistency >= SLEEP_CONSISTENCY_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
       8,
-      `Excellent sleep consistency (${sleepConsistency}%) - regular sleep schedule optimizes recovery`
+      `Excellent sleep consistency (${sleepConsistency}%) - regular sleep schedule optimizes recovery`,
     );
   } else if (sleepConsistency >= SLEEP_CONSISTENCY_THRESHOLDS.GOOD) {
     return createScoringResult(
       6,
-      `Good sleep consistency (${sleepConsistency}%) - maintain regular bedtime routine`
+      `Good sleep consistency (${sleepConsistency}%) - maintain regular bedtime routine`,
     );
   } else if (sleepConsistency >= SLEEP_CONSISTENCY_THRESHOLDS.MODERATE) {
     return createScoringResult(
       4,
-      `Moderate sleep consistency (${sleepConsistency}%) - work on more regular schedule`
+      `Moderate sleep consistency (${sleepConsistency}%) - work on more regular schedule`,
     );
   } else if (sleepConsistency > 0) {
     return createScoringResult(
       2,
-      `Poor sleep consistency (${sleepConsistency}%) - establish a regular sleep schedule`
+      `Poor sleep consistency (${sleepConsistency}%) - establish a regular sleep schedule`,
     );
   } else {
     return createScoringResult(0, "No sleep consistency data available");
@@ -323,56 +323,56 @@ export function calculateSleepConsistencyPoints(
  * Calculate daily training time points
  */
 export function calculateDailyTrainingTimePoints(
-  dailyTrainingTime: number
+  dailyTrainingTime: number,
 ): ScoringResult {
   if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.OUTSTANDING) {
     return createScoringResult(
       12,
       `Outstanding training volume (${Math.round(
-        dailyTrainingTime
-      )} min/day) - exceptional fitness commitment`
+        dailyTrainingTime,
+      )} min/day) - exceptional fitness commitment`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
       10,
       `Excellent training volume (${Math.round(
-        dailyTrainingTime
-      )} min/day) - great commitment to fitness`
+        dailyTrainingTime,
+      )} min/day) - great commitment to fitness`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.GOOD) {
     return createScoringResult(
       8,
       `Good training volume (${Math.round(
-        dailyTrainingTime
-      )} min/day) - solid fitness routine`
+        dailyTrainingTime,
+      )} min/day) - solid fitness routine`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.MODERATE) {
     return createScoringResult(
       6,
       `Moderate training volume (${Math.round(
-        dailyTrainingTime
-      )} min/day) - meets WHO minimum`
+        dailyTrainingTime,
+      )} min/day) - meets WHO minimum`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE) {
     return createScoringResult(
       4,
       `Below recommended volume (${Math.round(
-        dailyTrainingTime
-      )} min/day) - increase frequency`
+        dailyTrainingTime,
+      )} min/day) - increase frequency`,
     );
   } else if (dailyTrainingTime >= DAILY_TRAINING_THRESHOLDS.LOW) {
     return createScoringResult(
       2,
       `Low training volume (${Math.round(
-        dailyTrainingTime
-      )} min/day) - aim for more consistent training`
+        dailyTrainingTime,
+      )} min/day) - aim for more consistent training`,
     );
   } else if (dailyTrainingTime > 0) {
     return createScoringResult(
       1,
       `Very low training volume (${Math.round(
-        dailyTrainingTime
-      )} min/day) - start building routine`
+        dailyTrainingTime,
+      )} min/day) - start building routine`,
     );
   } else {
     return createScoringResult(0, "No training data available");
@@ -383,32 +383,32 @@ export function calculateDailyTrainingTimePoints(
  * Calculate training intensity points
  */
 export function calculateTrainingIntensityPoints(
-  trainingIntensity: number
+  trainingIntensity: number,
 ): ScoringResult {
   if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL) {
     return createScoringResult(
       12,
-      `Exceptional training intensity (${trainingIntensity}%) - outstanding workout quality and effort`
+      `Exceptional training intensity (${trainingIntensity}%) - outstanding workout quality and effort`,
     );
   } else if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.HIGH) {
     return createScoringResult(
       10,
-      `High training intensity (${trainingIntensity}%) - excellent workout quality and effort`
+      `High training intensity (${trainingIntensity}%) - excellent workout quality and effort`,
     );
   } else if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.GOOD) {
     return createScoringResult(
       7,
-      `Good training intensity (${trainingIntensity}%) - effective workout sessions`
+      `Good training intensity (${trainingIntensity}%) - effective workout sessions`,
     );
   } else if (trainingIntensity >= TRAINING_INTENSITY_THRESHOLDS.MODERATE) {
     return createScoringResult(
       4,
-      `Moderate training intensity (${trainingIntensity}%) - push yourself harder during workouts`
+      `Moderate training intensity (${trainingIntensity}%) - push yourself harder during workouts`,
     );
   } else if (trainingIntensity > 0) {
     return createScoringResult(
       2,
-      `Low training intensity (${trainingIntensity}%) - focus on challenging yourself more`
+      `Low training intensity (${trainingIntensity}%) - focus on challenging yourself more`,
     );
   } else {
     return createScoringResult(0, "No training intensity data available");
@@ -421,38 +421,38 @@ export function calculateTrainingIntensityPoints(
 export function calculateDailyStepsPoints(dailySteps: number): ScoringResult {
   if (dailySteps >= DAILY_STEPS_THRESHOLDS.OUTSTANDING) {
     return createScoringResult(
-      6,
-      `Outstanding daily activity (${dailySteps.toLocaleString()} steps) - exceptional health benefits`
+      8,
+      `Outstanding daily activity (${dailySteps.toLocaleString()} steps) - exceptional health benefits`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.EXCELLENT) {
     return createScoringResult(
-      5,
-      `Excellent daily activity (${dailySteps.toLocaleString()} steps) - optimal WHO range for health`
+      6,
+      `Excellent daily activity (${dailySteps.toLocaleString()} steps) - optimal WHO range for health`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.VERY_GOOD) {
     return createScoringResult(
-      4,
-      `Very good daily activity (${dailySteps.toLocaleString()} steps) - significant health benefits`
+      5,
+      `Very good daily activity (${dailySteps.toLocaleString()} steps) - significant health benefits`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.GOOD) {
     return createScoringResult(
-      3,
-      `Good daily activity (${dailySteps.toLocaleString()} steps) - moderate health benefits`
+      4,
+      `Good daily activity (${dailySteps.toLocaleString()} steps) - moderate health benefits`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.MODERATE) {
     return createScoringResult(
       2,
-      `Moderate activity (${dailySteps.toLocaleString()} steps) - some health benefits, aim higher`
+      `Moderate activity (${dailySteps.toLocaleString()} steps) - some health benefits, aim higher`,
     );
   } else if (dailySteps >= DAILY_STEPS_THRESHOLDS.LOW) {
     return createScoringResult(
       1,
-      `Low daily activity (${dailySteps.toLocaleString()} steps) - minimal benefits, increase gradually`
+      `Low daily activity (${dailySteps.toLocaleString()} steps) - minimal benefits, increase gradually`,
     );
   } else if (dailySteps > 0) {
     return createScoringResult(
       1,
-      `Very low daily activity (${dailySteps.toLocaleString()} steps) - start building movement habits`
+      `Very low daily activity (${dailySteps.toLocaleString()} steps) - start building movement habits`,
     );
   } else {
     return createScoringResult(0, "No step data available");
@@ -465,19 +465,19 @@ export function calculateDailyStepsPoints(dailySteps: number): ScoringResult {
 export function calculateBonusPoints(
   cardiovascularPoints: number,
   recoveryPoints: number,
-  activityPoints: number
+  activityPoints: number,
 ): { points: number; reason: string; detailedExplanation: string } {
   const cardiovascularPercent = calculatePercentageScore(
     cardiovascularPoints,
-    SCORING_WEIGHTS.CARDIOVASCULAR_MAX
+    SCORING_WEIGHTS.CARDIOVASCULAR_MAX,
   );
   const recoveryPercent = calculatePercentageScore(
     recoveryPoints,
-    SCORING_WEIGHTS.RECOVERY_MAX
+    SCORING_WEIGHTS.RECOVERY_MAX,
   );
   const activityPercent = calculatePercentageScore(
     activityPoints,
-    SCORING_WEIGHTS.ACTIVITY_MAX
+    SCORING_WEIGHTS.ACTIVITY_MAX,
   );
 
   const excellentCategories = [];
@@ -500,13 +500,13 @@ export function calculateBonusPoints(
       cat === "Cardiovascular"
         ? `${cardiovascularPercent}%`
         : cat === "Recovery"
-        ? `${recoveryPercent}%`
-        : `${activityPercent}%`
+          ? `${recoveryPercent}%`
+          : `${activityPercent}%`,
     );
     return {
       points: BONUS_REQUIREMENTS.TWO_CATEGORIES_BONUS,
       reason: `Excellent performance in ${excellentCategories.join(
-        " & "
+        " & ",
       )} (${categoryPercentages.join(", ")}) - strong consistency!`,
       detailedExplanation:
         "Achieved ≥75% in two health categories - great progress toward full consistency!",
@@ -516,8 +516,8 @@ export function calculateBonusPoints(
       excellentCategories[0] === "Cardiovascular"
         ? cardiovascularPercent
         : excellentCategories[0] === "Recovery"
-        ? recoveryPercent
-        : activityPercent;
+          ? recoveryPercent
+          : activityPercent;
     return {
       points: BONUS_REQUIREMENTS.ONE_CATEGORY_BONUS,
       reason: `Good performance in ${excellentCategories[0]} (${categoryPercent}%) - build consistency in other areas`,

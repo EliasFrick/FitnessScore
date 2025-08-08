@@ -13,7 +13,7 @@ import AppleHealthKit, {
  * Get historical step data for specified number of days
  */
 export async function getHistoricalStepsData(
-  days: number = 30
+  days: number = 30,
 ): Promise<HealthValue[]> {
   if (Platform.OS !== "ios") return [];
 
@@ -39,7 +39,7 @@ export async function getHistoricalStepsData(
             } else {
               resolve(results?.value || 0);
             }
-          }
+          },
         );
       });
 
@@ -62,14 +62,14 @@ export async function getHistoricalStepsData(
  * Get historical heart rate data for specified number of days
  */
 export async function getHistoricalHeartRateData(
-  days: number = 30
+  days: number = 30,
 ): Promise<HealthValue[]> {
   if (Platform.OS !== "ios") return [];
 
   return new Promise((resolve) => {
     const options: HealthInputOptions = {
       startDate: new Date(
-        Date.now() - days * 24 * 60 * 60 * 1000
+        Date.now() - days * 24 * 60 * 60 * 1000,
       ).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
@@ -84,7 +84,7 @@ export async function getHistoricalHeartRateData(
         } else {
           resolve(results || []);
         }
-      }
+      },
     );
   });
 }
@@ -93,14 +93,14 @@ export async function getHistoricalHeartRateData(
  * Get historical HRV data for specified number of days
  */
 export async function getHistoricalHRVData(
-  days: number = 30
+  days: number = 30,
 ): Promise<HealthValue[]> {
   if (Platform.OS !== "ios") return [];
 
   return new Promise((resolve) => {
     const options: HealthInputOptions = {
       startDate: new Date(
-        Date.now() - days * 24 * 60 * 60 * 1000
+        Date.now() - days * 24 * 60 * 60 * 1000,
       ).toISOString(),
       endDate: new Date().toISOString(),
       ascending: false,
@@ -115,7 +115,7 @@ export async function getHistoricalHRVData(
         } else {
           resolve(results || []);
         }
-      }
+      },
     );
   });
 }
@@ -124,14 +124,14 @@ export async function getHistoricalHRVData(
  * Get historical sleep data for specified number of days
  */
 export async function getHistoricalSleepData(
-  days: number = 30
+  days: number = 30,
 ): Promise<any[]> {
   if (Platform.OS !== "ios") return [];
 
   return new Promise((resolve) => {
     const options: HealthInputOptions = {
       startDate: new Date(
-        Date.now() - days * 24 * 60 * 60 * 1000
+        Date.now() - days * 24 * 60 * 60 * 1000,
       ).toISOString(),
       endDate: new Date().toISOString(),
     };
@@ -144,7 +144,7 @@ export async function getHistoricalSleepData(
         } else {
           resolve(results || []);
         }
-      }
+      },
     );
   });
 }
@@ -164,7 +164,7 @@ export async function getHistoricalWorkoutData(days: number = 30): Promise<
   return new Promise((resolve) => {
     const options = {
       startDate: new Date(
-        Date.now() - days * 24 * 60 * 60 * 1000
+        Date.now() - days * 24 * 60 * 60 * 1000,
       ).toISOString(),
       endDate: new Date().toISOString(),
     };
@@ -228,7 +228,7 @@ export async function getHistoricalWorkoutData(days: number = 30): Promise<
 
               dailyWorkouts[dateString].intensity = Math.max(
                 dailyWorkouts[dateString].intensity,
-                Math.min(100, Math.max(0, Math.round(workoutIntensity)))
+                Math.min(100, Math.max(0, Math.round(workoutIntensity))),
               );
             }
           });
@@ -239,12 +239,12 @@ export async function getHistoricalWorkoutData(days: number = 30): Promise<
               date: new Date(dateString),
               duration: Math.round(data.duration),
               intensity: data.intensity,
-            })
+            }),
           );
 
           resolve(result.sort((a, b) => b.date.getTime() - a.date.getTime()));
         }
-      }
+      },
     );
   });
 }

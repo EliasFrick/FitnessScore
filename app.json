@@ -8,6 +8,7 @@
     "scheme": "fitnessscore",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "owner": "eliass-company",
     "ios": {
       "supportsTablet": true,
       "icon": {

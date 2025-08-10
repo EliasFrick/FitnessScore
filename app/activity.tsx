@@ -30,49 +30,100 @@ export default function ActivityScreen() {
     currentValue: number,
     currentPoints: number,
     maxPoints: number,
-    type: "training" | "intensity" | "steps",
+    type: "training" | "intensity" | "steps"
   ) => {
     if (currentPoints >= maxPoints) return null;
-    
+
     const remainingPoints = maxPoints - currentPoints;
-    
+
     if (type === "training") {
       if (currentValue < DAILY_TRAINING_THRESHOLDS.LOW)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.LOW} min/day for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          DAILY_TRAINING_THRESHOLDS.LOW
+        } min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE} min/day for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE
+        } min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.MODERATE)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.MODERATE} min/day for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          DAILY_TRAINING_THRESHOLDS.MODERATE
+        } min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.GOOD)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.GOOD} min/day for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          DAILY_TRAINING_THRESHOLDS.GOOD
+        } min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.EXCELLENT)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.EXCELLENT} min/day for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          DAILY_TRAINING_THRESHOLDS.EXCELLENT
+        } min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.OUTSTANDING)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.OUTSTANDING} min/day for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          DAILY_TRAINING_THRESHOLDS.OUTSTANDING
+        } min/day for +${Math.min(2, remainingPoints)} more points`;
     } else if (type === "intensity") {
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.LOW)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.LOW} min/week of high-intensity training for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          TRAINING_INTENSITY_THRESHOLDS.LOW
+        } min/week of high-intensity training for +${Math.min(
+          2,
+          remainingPoints
+        )} more points`;
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.MODERATE)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.MODERATE} min/week of high-intensity training for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          TRAINING_INTENSITY_THRESHOLDS.MODERATE
+        } min/week of high-intensity training for +${Math.min(
+          2,
+          remainingPoints
+        )} more points`;
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.GOOD)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.GOOD} min/week of high-intensity training for +${Math.min(3, remainingPoints)} more points`;
+        return `Get above ${
+          TRAINING_INTENSITY_THRESHOLDS.GOOD
+        } min/week of high-intensity training for +${Math.min(
+          3,
+          remainingPoints
+        )} more points`;
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.HIGH)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.HIGH} min/week of high-intensity training for +${Math.min(1, remainingPoints)} more point`;
+        return `Get above ${
+          TRAINING_INTENSITY_THRESHOLDS.HIGH
+        } min/week of high-intensity training for +${Math.min(
+          1,
+          remainingPoints
+        )} more point`;
       if (currentValue <= TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL} min/week of high-intensity training for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL
+        } min/week of high-intensity training for +${Math.min(
+          2,
+          remainingPoints
+        )} more points`;
     } else if (type === "steps") {
       if (currentValue < DAILY_STEPS_THRESHOLDS.LOW)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.LOW} steps for +${Math.min(1, remainingPoints)} more point`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.LOW} steps for +${Math.min(
+          1,
+          remainingPoints
+        )} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.MODERATE)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.MODERATE} steps for +${Math.min(1, remainingPoints)} more point`;
+        return `Get above ${
+          DAILY_STEPS_THRESHOLDS.MODERATE
+        } steps for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.GOOD)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.GOOD} steps for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.GOOD} steps for +${Math.min(
+          2,
+          remainingPoints
+        )} more points`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.VERY_GOOD)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.VERY_GOOD} steps for +${Math.min(1, remainingPoints)} more point`;
+        return `Get above ${
+          DAILY_STEPS_THRESHOLDS.VERY_GOOD
+        } steps for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.EXCELLENT)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.EXCELLENT} steps for +${Math.min(1, remainingPoints)} more point`;
+        return `Get above ${
+          DAILY_STEPS_THRESHOLDS.EXCELLENT
+        } steps for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.OUTSTANDING)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.OUTSTANDING} steps for +${Math.min(2, remainingPoints)} more points`;
+        return `Get above ${
+          DAILY_STEPS_THRESHOLDS.OUTSTANDING
+        } steps for +${Math.min(2, remainingPoints)} more points`;
     }
     return null;
   };
@@ -80,15 +131,15 @@ export default function ActivityScreen() {
   const activityMetrics = useMemo(() => {
     const dailyStepsIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Daily Steps",
+      "Daily Steps"
     );
     const trainingIntensityIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Training Intensity",
+      "Training Intensity"
     );
     const trainingTimeIndex = findCategoryIndex(
       currentResult.historyItems,
-      "Daily Training Time",
+      "Daily Training Time"
     );
     return {
       dailySteps: {
@@ -102,7 +153,7 @@ export default function ActivityScreen() {
           healthMetrics.averageSteps,
           currentResult.historyItems[dailyStepsIndex].points,
           8,
-          "steps",
+          "steps"
         ),
       },
       trainingIntensity: {
@@ -110,13 +161,13 @@ export default function ActivityScreen() {
           currentResult.historyItems[trainingIntensityIndex].points /
           currentResult.historyItems[trainingIntensityIndex].maxPoints,
         points: currentResult.historyItems[trainingIntensityIndex].points,
-        currentValue: healthMetrics.trainingIntensity,
+        currentValue: Math.round(healthMetrics.trainingIntensity * 100) / 100,
         unit: " min/week",
         nextTarget: getNextTarget(
           healthMetrics.trainingIntensity,
           currentResult.historyItems[trainingIntensityIndex].points,
           10,
-          "intensity",
+          "intensity"
         ),
       },
       trainingTime: {
@@ -130,7 +181,7 @@ export default function ActivityScreen() {
           Math.round(healthMetrics.monthlyTrainingTime / 30),
           currentResult.historyItems[trainingTimeIndex].points,
           12,
-          "training",
+          "training"
         ),
       },
     };

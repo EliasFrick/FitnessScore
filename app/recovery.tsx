@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+
+import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
@@ -21,6 +22,7 @@ export default function RecoveryScreen() {
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
   const currentResult = calculateFitnessScore(healthMetrics);
+  const [showCitationsModal, setShowCitationsModal] = useState(false);
   const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
     return dataArray.findIndex((item: any) => item.metric === metricToFind);
   };

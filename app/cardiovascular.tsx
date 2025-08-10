@@ -1,15 +1,18 @@
-import React, { useMemo } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
+import { MedicalCitationsModal } from "@/components/MedicalCitationsModal";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { HeaderBackText } from "@/components/ui/HeaderBackText";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import {
   HEART_RATE_THRESHOLDS,
   HRV_THRESHOLDS,
   VO2_MAX_THRESHOLDS,
 } from "@/constants/healthThresholds";
+import { getSourcesForMetric } from "@/constants/medicalCitations";
 import { useHealthData } from "@/hooks/useHealthData";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
@@ -22,6 +25,7 @@ export default function CardiovascularScreen() {
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
   const currentResult = calculateFitnessScore(healthMetrics);
+  const [showCitationsModal, setShowCitationsModal] = useState(false);
   const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
     return dataArray.findIndex((item: any) => item.metric === metricToFind);
   };
@@ -313,6 +317,32 @@ const styles = StyleSheet.create({
   description: {
     textAlign: "center",
     opacity: 0.7,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  citationsButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(33, 150, 243, 0.1)",
+  },
+  sourcesHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(128, 128, 128, 0.2)",
+  },
+  sourcesHintText: {
+    fontSize: 12,
+    opacity: 0.6,
+    flex: 1,
   },
   sectionTitle: {
     marginTop: 8,

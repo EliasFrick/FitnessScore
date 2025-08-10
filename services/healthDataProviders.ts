@@ -35,7 +35,7 @@ export async function getRestingHeartRateData(): Promise<number> {
               : 0;
           resolve(Math.round(averageRestingHeartRate));
         }
-      },
+      }
     );
   });
 }
@@ -67,7 +67,7 @@ export async function getHeartRateVariabilityData(): Promise<number> {
 
           resolve(Math.round(averageHeartRateVariability * 1000));
         }
-      },
+      }
     );
   });
 }
@@ -91,7 +91,6 @@ export async function getVO2MaxData(): Promise<number> {
         if (callbackError) {
           resolve(0);
         } else {
-          console.log(results);
           const averageVO2Max =
             results.length > 0
               ? results.reduce((sum, sample) => sum + sample.value, 0) /
@@ -99,7 +98,7 @@ export async function getVO2MaxData(): Promise<number> {
               : 0;
           resolve(Math.round(averageVO2Max * 10) / 10);
         }
-      },
+      }
     );
   });
 }
@@ -173,7 +172,7 @@ export async function getSleepAnalysisData(): Promise<{
             sleepDurations.length > 0
               ? sleepDurations.reduce(
                   (sum, duration) => sum + Math.pow(duration - averageSleep, 2),
-                  0,
+                  0
                 ) / sleepDurations.length
               : 0;
           const standardDeviation = Math.sqrt(variance);
@@ -185,7 +184,7 @@ export async function getSleepAnalysisData(): Promise<{
             sleepConsistency: Math.round(sleepConsistency),
           });
         }
-      },
+      }
     );
   });
 }

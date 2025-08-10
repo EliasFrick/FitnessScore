@@ -38,35 +38,37 @@ export default function CardiovascularScreen() {
   ) => {
     if (currentPoints >= maxPoints) return null;
 
+    const remainingPoints = maxPoints - currentPoints;
+
     if (type === "rhr") {
       if (currentValue > HEART_RATE_THRESHOLDS.ELEVATED)
-        return `Get below ${HEART_RATE_THRESHOLDS.ELEVATED} bpm for +1 point`;
+        return `Get below ${HEART_RATE_THRESHOLDS.ELEVATED} bpm for +${Math.min(1, remainingPoints)} point`;
       if (currentValue > HEART_RATE_THRESHOLDS.AVERAGE)
-        return `Get below ${HEART_RATE_THRESHOLDS.AVERAGE} bpm for +2 more points`;
+        return `Get below ${HEART_RATE_THRESHOLDS.AVERAGE} bpm for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue > HEART_RATE_THRESHOLDS.GOOD)
-        return `Get below ${HEART_RATE_THRESHOLDS.GOOD} bpm for +2 more points`;
+        return `Get below ${HEART_RATE_THRESHOLDS.GOOD} bpm for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue > HEART_RATE_THRESHOLDS.VERY_GOOD)
-        return `Get below ${HEART_RATE_THRESHOLDS.VERY_GOOD} bpm for +2 more points`;
+        return `Get below ${HEART_RATE_THRESHOLDS.VERY_GOOD} bpm for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue > HEART_RATE_THRESHOLDS.EXCELLENT)
-        return `Get below ${HEART_RATE_THRESHOLDS.EXCELLENT} bpm for +2 more points`;
+        return `Get below ${HEART_RATE_THRESHOLDS.EXCELLENT} bpm for +${Math.min(2, remainingPoints)} more points`;
     } else if (type === "hrv") {
       if (currentValue < HRV_THRESHOLDS.BELOW_AVERAGE)
-        return `Get above ${HRV_THRESHOLDS.BELOW_AVERAGE} ms for +2 more points`;
+        return `Get above ${HRV_THRESHOLDS.BELOW_AVERAGE} ms for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < HRV_THRESHOLDS.GOOD)
-        return `Get above ${HRV_THRESHOLDS.GOOD} ms for +2 more points`;
+        return `Get above ${HRV_THRESHOLDS.GOOD} ms for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < HRV_THRESHOLDS.VERY_GOOD)
-        return `Get above ${HRV_THRESHOLDS.VERY_GOOD} ms for +2 more points`;
+        return `Get above ${HRV_THRESHOLDS.VERY_GOOD} ms for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < HRV_THRESHOLDS.OUTSTANDING)
-        return `Get above ${HRV_THRESHOLDS.OUTSTANDING} ms for +2 more points`;
+        return `Get above ${HRV_THRESHOLDS.OUTSTANDING} ms for +${Math.min(2, remainingPoints)} more points`;
     } else if (type === "vo2max") {
       if (currentValue < VO2_MAX_THRESHOLDS.AVERAGE)
-        return `Get above ${VO2_MAX_THRESHOLDS.AVERAGE} ml/kg/min for +2 more points`;
+        return `Get above ${VO2_MAX_THRESHOLDS.AVERAGE} ml/kg/min for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < VO2_MAX_THRESHOLDS.GOOD)
-        return `Get above ${VO2_MAX_THRESHOLDS.GOOD} ml/kg/min for +2 more points`;
+        return `Get above ${VO2_MAX_THRESHOLDS.GOOD} ml/kg/min for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < VO2_MAX_THRESHOLDS.EXCELLENT)
-        return `Get above ${VO2_MAX_THRESHOLDS.EXCELLENT} ml/kg/min for +2 more points`;
+        return `Get above ${VO2_MAX_THRESHOLDS.EXCELLENT} ml/kg/min for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < VO2_MAX_THRESHOLDS.OUTSTANDING)
-        return `Get above ${VO2_MAX_THRESHOLDS.OUTSTANDING} ml/kg/min for +2 more points`;
+        return `Get above ${VO2_MAX_THRESHOLDS.OUTSTANDING} ml/kg/min for +${Math.min(2, remainingPoints)} more points`;
     }
     return null;
   };

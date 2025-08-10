@@ -33,43 +33,46 @@ export default function ActivityScreen() {
     type: "training" | "intensity" | "steps",
   ) => {
     if (currentPoints >= maxPoints) return null;
+    
+    const remainingPoints = maxPoints - currentPoints;
+    
     if (type === "training") {
       if (currentValue < DAILY_TRAINING_THRESHOLDS.LOW)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.LOW} min/day for +2 more points`;
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.LOW} min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE} min/day for +2 more points`;
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.BELOW_AVERAGE} min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.MODERATE)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.MODERATE} min/day for +2 more points`;
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.MODERATE} min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.GOOD)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.GOOD} min/day for +2 more points`;
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.GOOD} min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.EXCELLENT)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.EXCELLENT} min/day for +2 more points`;
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.EXCELLENT} min/day for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_TRAINING_THRESHOLDS.OUTSTANDING)
-        return `Get above ${DAILY_TRAINING_THRESHOLDS.OUTSTANDING} min/day for +2 more points`;
+        return `Get above ${DAILY_TRAINING_THRESHOLDS.OUTSTANDING} min/day for +${Math.min(2, remainingPoints)} more points`;
     } else if (type === "intensity") {
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.LOW)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.LOW} min/week of high-intensity training for +2 more points`;
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.LOW} min/week of high-intensity training for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.MODERATE)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.MODERATE} min/week of high-intensity training for +2 more points`;
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.MODERATE} min/week of high-intensity training for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.GOOD)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.GOOD} min/week of high-intensity training for +3 more points`;
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.GOOD} min/week of high-intensity training for +${Math.min(3, remainingPoints)} more points`;
       if (currentValue < TRAINING_INTENSITY_THRESHOLDS.HIGH)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.HIGH} min/week of high-intensity training for +1 more point`;
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.HIGH} min/week of high-intensity training for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue <= TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL)
-        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL} min/week of high-intensity training for +2 more points`;
+        return `Get above ${TRAINING_INTENSITY_THRESHOLDS.EXCEPTIONAL} min/week of high-intensity training for +${Math.min(2, remainingPoints)} more points`;
     } else if (type === "steps") {
       if (currentValue < DAILY_STEPS_THRESHOLDS.LOW)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.LOW} steps for +1 more point`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.LOW} steps for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.MODERATE)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.MODERATE} steps for +1 more point`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.MODERATE} steps for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.GOOD)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.GOOD} steps for +2 more points`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.GOOD} steps for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.VERY_GOOD)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.VERY_GOOD} steps for +1 more point`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.VERY_GOOD} steps for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.EXCELLENT)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.EXCELLENT} steps for +1 more point`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.EXCELLENT} steps for +${Math.min(1, remainingPoints)} more point`;
       if (currentValue < DAILY_STEPS_THRESHOLDS.OUTSTANDING)
-        return `Get above ${DAILY_STEPS_THRESHOLDS.OUTSTANDING} steps for +2 more points`;
+        return `Get above ${DAILY_STEPS_THRESHOLDS.OUTSTANDING} steps for +${Math.min(2, remainingPoints)} more points`;
     }
     return null;
   };

@@ -35,30 +35,32 @@ export default function RecoveryScreen() {
   ) => {
     if (currentPoints >= maxPoints) return null;
 
+    const remainingPoints = maxPoints - currentPoints;
+
     if (type === "deep") {
       if (currentValue < DEEP_SLEEP_THRESHOLDS.BELOW_AVERAGE)
-        return `Get above ${DEEP_SLEEP_THRESHOLDS.BELOW_AVERAGE}% for +3 more points`;
+        return `Get above ${DEEP_SLEEP_THRESHOLDS.BELOW_AVERAGE}% for +${Math.min(3, remainingPoints)} more points`;
       if (currentValue < DEEP_SLEEP_THRESHOLDS.AVERAGE)
-        return `Get above ${DEEP_SLEEP_THRESHOLDS.AVERAGE}% for +2 more points`;
+        return `Get above ${DEEP_SLEEP_THRESHOLDS.AVERAGE}% for +${Math.min(2, remainingPoints)} more points`;
       if (currentValue < DEEP_SLEEP_THRESHOLDS.GOOD)
-        return `Get above ${DEEP_SLEEP_THRESHOLDS.GOOD}% for +3 more points`;
+        return `Get above ${DEEP_SLEEP_THRESHOLDS.GOOD}% for +${Math.min(3, remainingPoints)} more points`;
       if (currentValue < DEEP_SLEEP_THRESHOLDS.VERY_GOOD)
-        return `Get above ${DEEP_SLEEP_THRESHOLDS.VERY_GOOD}% for +3 more points`;
+        return `Get above ${DEEP_SLEEP_THRESHOLDS.VERY_GOOD}% for +${Math.min(3, remainingPoints)} more points`;
       if (currentValue < DEEP_SLEEP_THRESHOLDS.EXCELLENT)
-        return `Get above ${DEEP_SLEEP_THRESHOLDS.EXCELLENT}% for +3 more points`;
+        return `Get above ${DEEP_SLEEP_THRESHOLDS.EXCELLENT}% for +${Math.min(3, remainingPoints)} more points`;
     } else if (type === "rem") {
       if (currentValue < REM_SLEEP_THRESHOLDS.AVERAGE)
-        return `Get above ${REM_SLEEP_THRESHOLDS.AVERAGE}% for +3 more points`;
+        return `Get above ${REM_SLEEP_THRESHOLDS.AVERAGE}% for +${Math.min(3, remainingPoints)} more points`;
       if (currentValue < REM_SLEEP_THRESHOLDS.GOOD)
-        return `Get above ${REM_SLEEP_THRESHOLDS.GOOD}% for +3 more points`;
+        return `Get above ${REM_SLEEP_THRESHOLDS.GOOD}% for +${Math.min(3, remainingPoints)} more points`;
       if (currentValue < REM_SLEEP_THRESHOLDS.VERY_GOOD)
-        return `Get above ${REM_SLEEP_THRESHOLDS.VERY_GOOD}% for +3 more points`;
+        return `Get above ${REM_SLEEP_THRESHOLDS.VERY_GOOD}% for +${Math.min(3, remainingPoints)} more points`;
       if (currentValue < REM_SLEEP_THRESHOLDS.EXCELLENT)
-        return `Get above ${REM_SLEEP_THRESHOLDS.EXCELLENT}% for +3 more points`;
+        return `Get above ${REM_SLEEP_THRESHOLDS.EXCELLENT}% for +${Math.min(3, remainingPoints)} more points`;
     } else if (type === "consistency") {
-      if (currentValue < 5) return `Get above 5/10 for +2 more points`;
-      if (currentValue < 7) return `Get above 7/10 for +2 more points`;
-      if (currentValue < 8.5) return `Get above 8.5/10 for +2 more points`;
+      if (currentValue < 5) return `Get above 5/10 for +${Math.min(2, remainingPoints)} more points`;
+      if (currentValue < 7) return `Get above 7/10 for +${Math.min(2, remainingPoints)} more points`;
+      if (currentValue < 8.5) return `Get above 8.5/10 for +${Math.min(2, remainingPoints)} more points`;
     }
     return null;
   };

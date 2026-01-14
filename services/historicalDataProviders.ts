@@ -8,6 +8,7 @@ import AppleHealthKit, {
   HealthInputOptions,
   HealthValue,
 } from "react-native-health";
+import { SleepNightData } from "@/types/health";
 
 /**
  * Get historical step data for specified number of days
@@ -247,4 +248,80 @@ export async function getHistoricalWorkoutData(days: number = 30): Promise<
       },
     );
   });
+}
+
+/**
+ * Get nightly sleep history with breakdown of sleep stages
+ * Groups raw sleep samples by night and calculates percentages
+ */
+export async function getNightlySleepHistory(
+  days: number = 14,
+): Promise<SleepNightData[]> {
+  if (Platform.OS !== "ios") return [];
+
+  const rawSleepData = await getHistoricalSleepData(days);
+  if (rawSleepData.length === 0) return [];
+
+  // Group samples by night (using end date as reference)
+  const nightsMap = new Map<
+    string,
+    { deep: number; light: number; rem: number; awake: number; core: number }
+  >();
+
+  rawSleepData.forEach((sample) => {
+    const endDate = new Date(sample.endDate);
+    // Use the date of sleep end to group (handles overnight sleep)
+    const nightKey = endDate.toDateString();
+
+    const duration =
+      (new Date(sample.endDate).getTime() -
+        new Date(sample.startDate).getTime()) /
+      (1000 * 60); // minutes
+
+    if (!nightsMap.has(nightKey)) {
+      nightsMap.set(nightKey, { deep: 0, light: 0, rem: 0, awake: 0, core: 0 });
+    }
+
+    const night = nightsMap.get(nightKey)!;
+    const sleepType = sample.value?.toUpperCase() || "";
+
+    if (sleepType === "DEEP") {
+      night.deep += duration;
+    } else if (sleepType === "REM") {
+      night.rem += duration;
+    } else if (sleepType === "AWAKE" || sleepType === "INBED") {
+      night.awake += duration;
+    } else if (sleepType === "CORE") {
+      night.core += duration;
+    } else {
+      // ASLEEP, LIGHT, or unknown = light sleep
+      night.light += duration;
+    }
+  });
+
+  // Convert to array with percentages
+  const nights: SleepNightData[] = [];
+
+  nightsMap.forEach((data, nightKey) => {
+    // Light sleep includes core sleep stage
+    const lightTotal = data.light + data.core;
+    const totalSleep = data.deep + lightTotal + data.rem;
+
+    if (totalSleep < 30) return; // Skip nights with less than 30 min of sleep data
+
+    nights.push({
+      date: new Date(nightKey),
+      totalSleepMinutes: Math.round(totalSleep),
+      deepSleepPercent:
+        totalSleep > 0 ? Math.round((data.deep / totalSleep) * 100) : 0,
+      lightSleepPercent:
+        totalSleep > 0 ? Math.round((lightTotal / totalSleep) * 100) : 0,
+      remSleepPercent:
+        totalSleep > 0 ? Math.round((data.rem / totalSleep) * 100) : 0,
+      awakeMins: Math.round(data.awake),
+    });
+  });
+
+  // Sort by date, most recent first
+  return nights.sort((a, b) => b.date.getTime() - a.date.getTime());
 }

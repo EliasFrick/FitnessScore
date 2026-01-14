@@ -56,3 +56,12 @@ export interface MonthlyAverageResult {
   dataPointsCount: number;
   isEstimated: boolean;
 }
+
+export interface SleepNightData {
+  date: Date;
+  totalSleepMinutes: number;
+  deepSleepPercent: number;
+  lightSleepPercent: number;
+  remSleepPercent: number;
+  awakeMins: number;
+}

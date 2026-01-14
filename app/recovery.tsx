@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Card, ProgressBar, Text } from "react-native-paper";
 
@@ -15,14 +15,44 @@ import {
   calculateFitnessScore,
   calculateMonthlyAverage,
 } from "@/utils/fitnessCalculator";
+import { getNightlySleepHistory } from "@/services/historicalDataProviders";
+import { SleepNightData } from "@/types/health";
 
 export default function RecoveryScreen() {
   const { healthMetrics } = useHealthData();
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
   const currentResult = calculateFitnessScore(healthMetrics);
+  const [sleepHistory, setSleepHistory] = useState<SleepNightData[]>([]);
+
+  useEffect(() => {
+    getNightlySleepHistory(14).then(setSleepHistory);
+  }, []);
+
   const findCategoryIndex = (dataArray: any, metricToFind: string): number => {
     return dataArray.findIndex((item: any) => item.metric === metricToFind);
+  };
+
+  const formatSleepDuration = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.round(minutes % 60);
+    return `${hours}h ${mins}m`;
+  };
+
+  const formatDate = (date: Date) => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) return "Today";
+    if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   const getNextTarget = (
@@ -270,6 +300,126 @@ export default function RecoveryScreen() {
               </View>
             </Card.Content>
           </Card>
+
+          {/* Sleep History */}
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            🛏️ Sleep History
+          </ThemedText>
+
+          {sleepHistory.length === 0 ? (
+            <Card style={styles.metricCard}>
+              <Card.Content style={styles.metricContent}>
+                <Text
+                  variant="bodyMedium"
+                  style={[styles.noDataText, { color: textColor }]}
+                >
+                  No sleep data available
+                </Text>
+              </Card.Content>
+            </Card>
+          ) : (
+            sleepHistory.map((night, index) => (
+              <Card key={index} style={styles.sleepNightCard}>
+                <Card.Content style={styles.sleepNightContent}>
+                  <View style={styles.sleepNightHeader}>
+                    <Text
+                      variant="titleMedium"
+                      style={[styles.sleepDate, { color: textColor }]}
+                    >
+                      {formatDate(night.date)}
+                    </Text>
+                    <Text variant="titleMedium" style={styles.sleepDuration}>
+                      {formatSleepDuration(night.totalSleepMinutes)}
+                    </Text>
+                  </View>
+
+                  {/* Sleep stage bars */}
+                  <View style={styles.sleepStagesContainer}>
+                    <View style={styles.sleepStageRow}>
+                      <View style={styles.sleepStageLabel}>
+                        <Text style={styles.sleepStageEmoji}>😴</Text>
+                        <Text
+                          variant="bodySmall"
+                          style={[styles.sleepStageName, { color: textColor }]}
+                        >
+                          Deep
+                        </Text>
+                      </View>
+                      <View style={styles.sleepStageBarContainer}>
+                        <View
+                          style={[
+                            styles.sleepStageBar,
+                            styles.deepBar,
+                            { width: `${Math.min(night.deepSleepPercent, 100)}%` },
+                          ]}
+                        />
+                      </View>
+                      <Text
+                        variant="bodySmall"
+                        style={[styles.sleepStagePercent, { color: textColor }]}
+                      >
+                        {night.deepSleepPercent}%
+                      </Text>
+                    </View>
+
+                    <View style={styles.sleepStageRow}>
+                      <View style={styles.sleepStageLabel}>
+                        <Text style={styles.sleepStageEmoji}>💤</Text>
+                        <Text
+                          variant="bodySmall"
+                          style={[styles.sleepStageName, { color: textColor }]}
+                        >
+                          Light
+                        </Text>
+                      </View>
+                      <View style={styles.sleepStageBarContainer}>
+                        <View
+                          style={[
+                            styles.sleepStageBar,
+                            styles.lightBar,
+                            { width: `${Math.min(night.lightSleepPercent, 100)}%` },
+                          ]}
+                        />
+                      </View>
+                      <Text
+                        variant="bodySmall"
+                        style={[styles.sleepStagePercent, { color: textColor }]}
+                      >
+                        {night.lightSleepPercent}%
+                      </Text>
+                    </View>
+
+                    <View style={styles.sleepStageRow}>
+                      <View style={styles.sleepStageLabel}>
+                        <Text style={styles.sleepStageEmoji}>🌙</Text>
+                        <Text
+                          variant="bodySmall"
+                          style={[styles.sleepStageName, { color: textColor }]}
+                        >
+                          REM
+                        </Text>
+                      </View>
+                      <View style={styles.sleepStageBarContainer}>
+                        <View
+                          style={[
+                            styles.sleepStageBar,
+                            styles.remBar,
+                            { width: `${Math.min(night.remSleepPercent, 100)}%` },
+                          ]}
+                        />
+                      </View>
+                      <Text
+                        variant="bodySmall"
+                        style={[styles.sleepStagePercent, { color: textColor }]}
+                      >
+                        {night.remSleepPercent}%
+                      </Text>
+                    </View>
+                  </View>
+                </Card.Content>
+              </Card>
+            ))
+          )}
         </ThemedView>
       </ScrollView>
     </SafeAreaView>
@@ -413,5 +563,79 @@ const styles = StyleSheet.create({
     fontSize: 10,
     opacity: 0.8,
     lineHeight: 12,
+  },
+  noDataText: {
+    textAlign: "center",
+    opacity: 0.6,
+  },
+  sleepNightCard: {
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+  },
+  sleepNightContent: {
+    paddingVertical: 12,
+  },
+  sleepNightHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  sleepDate: {
+    fontWeight: "600",
+  },
+  sleepDuration: {
+    fontWeight: "bold",
+    color: "#4CAF50",
+  },
+  sleepStagesContainer: {
+    gap: 8,
+  },
+  sleepStageRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  sleepStageLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: 70,
+    gap: 4,
+  },
+  sleepStageEmoji: {
+    fontSize: 14,
+  },
+  sleepStageName: {
+    fontSize: 12,
+    opacity: 0.9,
+  },
+  sleepStageBarContainer: {
+    flex: 1,
+    height: 8,
+    backgroundColor: "rgba(150, 150, 150, 0.2)",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  sleepStageBar: {
+    height: "100%",
+    borderRadius: 4,
+  },
+  deepBar: {
+    backgroundColor: "#5C6BC0",
+  },
+  lightBar: {
+    backgroundColor: "#81D4FA",
+  },
+  remBar: {
+    backgroundColor: "#CE93D8",
+  },
+  sleepStagePercent: {
+    width: 36,
+    textAlign: "right",
+    fontSize: 12,
+    fontWeight: "500",
   },
 });

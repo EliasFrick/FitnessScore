@@ -12,6 +12,7 @@ import {
 import { Card, ProgressBar, Text } from "react-native-paper";
 
 import { FitnessRings } from "@/components/FitnessRings";
+import { MedicalCitationsModal } from "@/components/MedicalCitationsModal";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -32,6 +33,7 @@ export default function OverviewScreen() {
   const monthlyAverage = calculateMonthlyAverage(healthMetrics);
   const backgroundColor = useThemeColor({}, "background");
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showCitationsModal, setShowCitationsModal] = useState(false);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -45,17 +47,32 @@ export default function OverviewScreen() {
         <ThemedView style={styles.content}>
           <ThemedView style={styles.titleContainer}>
             <View style={styles.headerRow}>
-              <TouchableOpacity
-                onPress={() => setShowInfoModal(true)}
-                activeOpacity={0.7}
-              >
-                <IconSymbol
-                  name="info.circle"
-                  size={24}
-                  color={colorScheme === "dark" ? "#FFFFFF" : "#000000"}
-                  style={{ backgroundColor: "transparent" }}
-                />
-              </TouchableOpacity>
+              <View style={styles.leftButtons}>
+                <TouchableOpacity
+                  onPress={() => setShowInfoModal(true)}
+                  activeOpacity={0.7}
+                  style={styles.headerButton}
+                >
+                  <IconSymbol
+                    name="info.circle"
+                    size={24}
+                    color={colorScheme === "dark" ? "#FFFFFF" : "#000000"}
+                    style={{ backgroundColor: "transparent" }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setShowCitationsModal(true)}
+                  activeOpacity={0.7}
+                  style={styles.headerButton}
+                >
+                  <IconSymbol
+                    name="doc.text"
+                    size={24}
+                    color={colorScheme === "dark" ? "#FFFFFF" : "#000000"}
+                    style={{ backgroundColor: "transparent" }}
+                  />
+                </TouchableOpacity>
+              </View>
 
               <View style={styles.switchContainer}>
                 <TouchableOpacity
@@ -303,6 +320,16 @@ export default function OverviewScreen() {
                   <ThemedText style={styles.modalIntroText}>
                     Your HealthScore is calculated based on four key areas that provide a comprehensive view of your fitness and wellness:
                   </ThemedText>
+                  <View style={styles.sourcesNotice}>
+                    <IconSymbol
+                      name="doc.text.fill"
+                      size={16}
+                      color="#2196F3"
+                    />
+                    <ThemedText style={styles.sourcesNoticeText}>
+                      All recommendations are based on peer-reviewed research. Tap the document icon above to view medical sources.
+                    </ThemedText>
+                  </View>
                 </View>
 
                 <View style={styles.scoreSection}>
@@ -413,6 +440,11 @@ export default function OverviewScreen() {
           </ThemedView>
         </View>
       </Modal>
+
+      <MedicalCitationsModal
+        visible={showCitationsModal}
+        onClose={() => setShowCitationsModal(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -605,6 +637,13 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 30,
   },
+  leftButtons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  headerButton: {
+    padding: 4,
+  },
   // Modal Styles
   modalOverlay: {
     flex: 1,
@@ -768,5 +807,20 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     opacity: 0.9,
     lineHeight: 18,
+  },
+  sourcesNotice: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: "rgba(33, 150, 243, 0.1)",
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  sourcesNoticeText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    opacity: 0.8,
   },
 });
